@@ -276,7 +276,7 @@
   .end-actions .game-button { padding-inline: 8px; font-size: 0.78rem; }
 }
 
-@media (max-width: 600px) and (pointer: coarse) {
+@media (max-width: 600px) and (pointer: coarse) and (display-mode: standalone) {
   .busfahrer-page { height: 100dvh; }
   .question-panel .feedback { position: relative; top: -8px; }
 }
