@@ -183,7 +183,7 @@ function revealPyramid() {
 function startBus() {
   deck = createDeck()
   phase = 'bus'; busCards = []; busProgress = 0; busFailed = false; busLost = false; busfahrerUsedCards = []
-  feedback = { text: 'Neues 32er-Deck – errate die erste Kartenfarbe.', kind: 'info' }
+  feedback = { text: '', kind: 'info' }
   renderGame()
 }
 
@@ -196,12 +196,14 @@ function renderBus() {
   const complete = busProgress === busCards.length
     && busProgress === busRoundLength
   const first = busProgress === 0
+  const choicePrompt = first ? 'Errate die Kartenfarbe' : 'Ist die nächste Karte höher, gleich oder tiefer?'
   return `${phaseHeader(3, complete ? 'Ziel erreicht' : `Karte ${busProgress + 1} von ${busCards.length}`)}<section class="bus-panel">
-    <p class="eyebrow">Finale Runde</p><h2>${complete ? 'Geschafft!' : first ? 'Rot oder Blau?' : 'Höher oder tiefer?'}</h2>
-    <div class="bus-road">${Array.from({ length: busRoundLength }, (_, index) => {
+    <p class="eyebrow">Finale Runde</p><h2>${complete ? 'Geschafft!' : 'Busfahrer'}</h2>
+    <div class="bus-road"><div class="bus-card-row">${Array.from({ length: busRoundLength }, (_, index) => {
       const card = busCards[index]
       return card ? cardMarkup(card, true, index === busProgress ? 'current-card' : '') : cardMarkup(deck.at(-1) ?? createDeck()[0]!, false, index === busProgress ? 'current-card' : '')
-    }).join('')}</div>${feedbackMarkup()}
+    }).join('')}</div><div class="bus-dashed-line" aria-hidden="true"></div></div>
+    ${complete ? feedbackMarkup() : `<div class="bus-prompt-zone">${feedback.text ? feedbackMarkup() : `<p>${choicePrompt}</p>`}</div>`}
     ${complete ? '<button class="game-button primary" data-action="restart">Neu starten</button>' : busFailed
       ? '<button class="game-button primary" data-action="retry-bus">Zurück zum Anfang</button>'
       : `<div class="choice-grid">${first
@@ -244,7 +246,7 @@ function renderGame() {
   gameRoot.innerHTML = `<div class="busfahrer-shell"><header class="busfahrer-header">
     <button class="back-button bus-back" type="button" data-action="back">← Zurück</button><div><p>GetDrunk präsentiert</p><h1>Busfahrer</h1></div>
     <button class="restart-button" type="button" data-action="restart">Neu starten</button></header>
-    <p class="responsibility-note">Trink verantwortungsvoll. Dieses Spiel ist nur für Erwachsene.</p><div class="game-stage">${content}</div>${phase === 'bus' ? busUsedCardsMarkup() : ''}</div>`
+    <p class="responsibility-note">Trink verantwortungsvoll. Dieses Spiel ist nur für Erwachsene.</p><div class="game-stage">${content}${phase === 'bus' ? busUsedCardsMarkup() : ''}</div></div>`
 }
 
 function handleClick(event: Event) {
@@ -259,7 +261,7 @@ function handleClick(event: Event) {
       busLost = true; feedback = { text: '', kind: 'info' }
     } else {
       busCards = []; busProgress = 0; busFailed = false
-      feedback = { text: 'Neue Reihe – errate die Kartenfarbe.', kind: 'info' }
+      feedback = { text: '', kind: 'info' }
     }
     renderGame()
   }
