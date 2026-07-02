@@ -8,6 +8,19 @@ const viewportMeta = document.querySelector<HTMLMetaElement>('meta[name="viewpor
 const zoomableViewport = 'width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=5.0'
 const resetViewport = 'width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0'
 
+function detectStandaloneMode() {
+  const navigatorWithStandalone = navigator as Navigator & { standalone?: boolean }
+  const installedDisplayMode = ['standalone', 'fullscreen', 'minimal-ui']
+    .some((mode) => window.matchMedia(`(display-mode: ${mode})`).matches)
+  const launchedFromAndroidApp = document.referrer.startsWith('android-app://')
+  document.documentElement.classList.toggle(
+    'is-standalone',
+    navigatorWithStandalone.standalone === true || installedDisplayMode || launchedFromAndroidApp,
+  )
+}
+
+detectStandaloneMode()
+
 function resetPinchZoom() {
   if (!window.visualViewport || window.visualViewport.scale <= 1.01) return
   viewportMeta.content = resetViewport
@@ -39,4 +52,5 @@ function renderPage() {
 }
 
 window.addEventListener('hashchange', renderPage)
+window.addEventListener('pageshow', detectStandaloneMode)
 renderPage()
