@@ -184,7 +184,7 @@
   padding: clamp(5px, 1vh, 10px) clamp(5px, 1vh, 10px) calc(clamp(5px, 1vh, 10px) + 44px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 18px;
-  background: rgba(20, 16, 29, 0.78);
+  background: rgba(31, 25, 44, 0.82);
 }
 
 .used-cards h3 {
