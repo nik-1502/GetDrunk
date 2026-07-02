@@ -112,9 +112,9 @@ function renderQuestions() {
   const question = questions[questionIndex]!
   const preview = deck.at(-1) ?? createDeck()[0]!
   return `${phaseHeader(1, `Frage ${questionIndex + 1} von 4`)}<section class="question-panel">
-    <p class="eyebrow">Fragenrunde</p><h2>${question.title}</h2>
+    <h2>Fragenrunde</h2>
     <div class="question-card-slot">${answered ? cardMarkup(hand.at(-1)!, true, questionResults.at(-1) ? 'answer-correct' : 'answer-wrong') : cardMarkup(preview, false)}</div>
-    <div class="phase-one-feedback-zone">${feedbackMarkup()}</div>
+    <div class="phase-one-feedback-zone">${answered ? feedbackMarkup() : `<p class="phase-one-prompt">${question.title}</p>`}</div>
     <div class="choice-grid ${question.options.length === 4 ? 'four-choices' : ''} ${question.options.length === 3 ? 'three-choices' : ''}">
       ${question.options.map(([label, choice]) => `<button class="game-button choice-${choice}" data-choice="${choice}" aria-label="${choiceNames[choice] ?? label}" ${answered ? 'disabled' : ''}>${label}</button>`).join('')}
     </div>
@@ -205,15 +205,14 @@ function renderBus() {
         ? '<button class="game-button choice-red" data-bus-choice="red">Rot</button><button class="game-button choice-blue" data-bus-choice="blue">Blau</button>'
         : '<div class="three-choices"><button class="game-button" data-bus-choice="higher">Höher</button><button class="game-button" data-bus-choice="equal">Gleich</button><button class="game-button" data-bus-choice="lower">Tiefer</button></div>'}</div>`
   return `${phaseHeader(3, complete ? 'Ziel erreicht' : `Karte ${busProgress + 1} von ${busCards.length}`)}<section class="bus-panel">
-    <p class="eyebrow">Finale Runde</p><h2>${complete ? 'Geschafft!' : 'Busfahrer'}</h2>
-    <div class="bus-road"><div class="bus-card-row">${Array.from({ length: busRoundLength }, (_, index) => {
+    <h2>${complete ? 'Geschafft!' : 'Busfahrer'}</h2>
+    <div class="bus-card-row">${Array.from({ length: busRoundLength }, (_, index) => {
       const card = busCards[index]
       return card ? cardMarkup(card, true, index === busProgress ? 'current-card' : '') : cardMarkup(deck.at(-1) ?? createDeck()[0]!, false, index === busProgress ? 'current-card' : '')
-    }).join('')}</div></div>
-    <div class="bus-controls"><div class="bus-dashed-line" aria-hidden="true"></div>
-      ${complete ? feedbackMarkup() : `<div class="bus-prompt-zone">${feedback.text ? feedbackMarkup() : `<p>${choicePrompt}</p>`}</div>`}
-      ${busAction}
-    </div>
+    }).join('')}</div>
+    <div class="bus-dashed-line" aria-hidden="true"></div>
+    ${complete ? feedbackMarkup() : `<div class="bus-prompt-zone">${feedback.text ? feedbackMarkup() : `<p>${choicePrompt}</p>`}</div>`}
+    ${busAction}
     </section>`
 }
 
