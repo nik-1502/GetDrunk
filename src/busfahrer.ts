@@ -72,13 +72,11 @@ function drawBusCard() {
 }
 
 function cardMarkup(card: Card, revealed = true, extraClass = '') {
-  const face = card.label === 'B' ? '<span class="figure">⌁</span>'
-    : card.label === 'D' ? '<span class="figure">✦</span>'
-      : card.label === 'K' ? '<span class="figure">♛</span>' : `<span class="card-symbol">${card.symbol}</span>`
+  const face = `<span class="card-value">${card.label}</span><span class="card-symbol">${card.symbol}</span>`
   return `<div class="playing-card ${revealed ? 'is-revealed' : ''} ${extraClass}" aria-label="${revealed ? `${card.label} ${card.suitLabel}` : 'Verdeckte Karte'}">
     <div class="card-inner"><div class="card-back"><span>GD</span></div><div class="card-front card-${card.color}">
       <span class="card-corner top"><strong>${card.label}</strong><small>${card.symbol}</small></span>
-      <span class="card-center">${face}<small>${card.suitLabel}</small></span>
+      <span class="card-center">${face}</span>
       <span class="card-corner bottom"><strong>${card.label}</strong><small>${card.symbol}</small></span>
     </div></div></div>`
 }

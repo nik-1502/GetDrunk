@@ -122,10 +122,9 @@
 .card-corner small { margin-top: 4px; font-size: .82rem; }
 .card-corner.top { top: 8px; left: 8px; }
 .card-corner.bottom { right: 8px; bottom: 8px; transform: rotate(180deg); }
-.card-center { position: absolute; inset: 25% 14%; display: grid; place-items: center; align-content: center; gap: 5px; }
-.card-center small { font-size: .58rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
-.card-symbol, .figure { font-size: 2.55rem; line-height: 1; }
-.figure { display: grid; width: 52px; height: 52px; place-items: center; border: 3px solid currentColor; border-radius: 16px 5px; background: color-mix(in srgb, currentColor 8%, white); }
+.card-center { position: absolute; inset: 20% 14%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; line-height: 1; }
+.card-value { font-size: 2rem; font-weight: 900; line-height: 1; }
+.card-symbol { font-size: 1.45rem; line-height: 1; }
 .question-card-slot { display: flex; width: 100%; min-height: 0; align-items: center; justify-content: center; }
 .question-card-slot .playing-card { width: clamp(64px, 12dvh, 92px); }
 .phase-one-feedback-zone {
@@ -185,6 +184,8 @@
 .player-hand h3 { margin: 0 0 12px; text-align: center; color: #d7d0e4; font-size: .9rem; }
 .hand-cards { display: flex; width: max-content; min-width: 100%; min-height: clamp(58px, 11vh, 82px); margin-inline: auto; justify-content: center; align-items: center; gap: clamp(4px, 1vw, 8px); }
 .hand-cards .playing-card { width: clamp(38px, 8vh, 60px); }
+.hand-cards .card-value { font-size: clamp(.82rem, 2.3vh, 1.2rem); }
+.hand-cards .card-symbol { font-size: clamp(.62rem, 1.8vh, .92rem); }
 .hand-cards p { color: #8f879e; }
 
 .used-cards {
@@ -272,6 +273,8 @@
 .pyramid-row { position: relative; display: flex; justify-content: center; gap: 7px; }
 .pyramid-row::after { content: attr(data-drinks); position: absolute; left: calc(50% + 226px); top: 50%; color: #9c94aa; font-size: .68rem; transform: translateY(-50%); white-space: nowrap; }
 .pyramid .playing-card { width: clamp(35px, min(10vw, 10vh), 78px); }
+.pyramid .card-value { font-size: clamp(.78rem, 2.5vh, 1.4rem); }
+.pyramid .card-symbol { font-size: clamp(.6rem, 1.8vh, 1rem); }
 .pyramid-hit { animation: hit-glow 1s ease-in-out infinite alternate; }
 .pyramid-hit .card-front { box-shadow: 0 0 0 4px #62df9b, 0 0 28px rgba(70, 230, 142, .8); }
 
@@ -287,6 +290,8 @@
 .bus-card-row { display: flex; width: min(820px, 100%); margin: 0 auto; align-items: center; justify-content: space-between; gap: clamp(4px, 2vw, 22px); padding-inline: var(--bus-edge-gap); }
 .bus-dashed-line { width: calc(100% - 2 * var(--bus-edge-gap)); height: 3px; margin: 0 auto; border-radius: 9px; background: repeating-linear-gradient(90deg, #70687c 0 22px, transparent 22px 38px); }
 .bus-card-row .playing-card { width: clamp(42px, min(15vw, 17vh), 108px); }
+.bus-card-row .card-value { font-size: clamp(1rem, 3vh, 1.8rem); }
+.bus-card-row .card-symbol { font-size: clamp(.72rem, 2.2vh, 1.25rem); }
 .bus-prompt-zone {
   display: grid;
   width: 100%;
