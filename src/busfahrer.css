@@ -391,8 +391,10 @@
 }
 .player-turn-icon { display: grid; width: 68px; height: 68px; margin-bottom: 18px; place-items: center; border: 1px solid rgba(221, 161, 94, .36); border-radius: 50%; color: #dda15e; background: rgba(221, 161, 94, .1); font-size: 2rem; }
 .player-turn-screen > p { margin: 0 0 8px; color: #aaa1ba; font-size: .78rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
-.player-turn-screen h2 { margin: 0 0 clamp(28px, 6dvh, 48px); color: #fff; font-size: clamp(2rem, 8vw, 4rem); }
-.player-turn-actions { display: grid; width: min(420px, 100%); grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.player-turn-screen h2 { display: grid; margin: 0 0 clamp(28px, 6dvh, 48px); color: #fff; gap: 4px; }
+.turn-player-name { color: #dda15e; font-size: clamp(2.6rem, 11vw, 5.4rem); font-weight: 900; line-height: 1; }
+.player-turn-screen h2 > span { font-size: clamp(1.25rem, 4vw, 2rem); font-weight: 700; }
+.player-turn-actions { display: grid; width: min(420px, 100%); grid-template-columns: 1fr; gap: 12px; }
 .player-turn-actions .game-button { width: 100%; }
 
 @keyframes feedback-pop { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: scale(1); } }

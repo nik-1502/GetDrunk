@@ -119,8 +119,8 @@ function handMarkup() {
 }
 
 function renderPlayerIntro() {
-  return `<section class="player-turn-screen"><div class="player-turn-icon" aria-hidden="true">♠</div><p>Spieler ${currentPlayerIndex + 1} von ${gamePlayers.length}</p><h2>${escapeHtml(currentPlayer().name)} ist dran</h2>
-    <div class="player-turn-actions"><button class="game-button primary" data-action="start-player-round">Jetzt starten</button><button class="game-button" data-action="back">Zurück</button></div></section>`
+  return `<section class="player-turn-screen"><div class="player-turn-icon" aria-hidden="true">♠</div><p>Spieler ${currentPlayerIndex + 1} von ${gamePlayers.length}</p><h2><strong class="turn-player-name">${escapeHtml(currentPlayer().name)}</strong><span>ist dran</span></h2>
+    <div class="player-turn-actions"><button class="game-button primary" data-action="start-player-round">Jetzt starten</button></div></section>`
 }
 
 function busUsedCardsMarkup() {
@@ -369,7 +369,7 @@ function renderGame() {
   if (!gameRoot) return
   const content = phase === 'player-intro' ? renderPlayerIntro() : phase === 'questions' ? renderQuestions() : phase === 'pyramid' ? renderPyramid() : phase === 'summary' ? renderSummary() : phase === 'final' ? renderSummary(true) : renderBus()
   gameRoot.innerHTML = `<div class="busfahrer-shell"><header class="busfahrer-header">
-    <button class="back-button bus-back" type="button" data-action="back">← Zurück</button><div><p>GetDrunk präsentiert</p><h1>Busfahrer</h1></div>
+    <button class="back-button bus-back" type="button" data-action="back">${phase === 'player-intro' ? 'Beenden' : '← Zurück'}</button><div><p>GetDrunk präsentiert</p><h1>Busfahrer</h1></div>
     <button class="restart-button" type="button" data-action="restart">Neu starten</button></header>
     <p class="responsibility-note">Trink verantwortungsvoll. Dieses Spiel ist nur für Erwachsene.</p><div class="game-stage">${content}${phase === 'bus' ? busUsedCardsMarkup() : ''}</div></div>`
 }
