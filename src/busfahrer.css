@@ -399,8 +399,8 @@
   box-shadow: 0 24px 70px rgba(0, 0, 0, .28);
   text-align: center;
 }
-.player-turn-avatar { display: grid; width: clamp(86px, 20vw, 132px); height: clamp(86px, 20vw, 132px); margin-bottom: 18px; border: 2px solid rgba(221, 161, 94, .48); border-radius: 50%; place-items: center; overflow: hidden; background: rgba(255, 255, 255, .06); box-shadow: 0 12px 34px rgba(0, 0, 0, .3); }
-.player-turn-avatar img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; }
+.player-turn-avatar { display: grid; width: clamp(86px, 20vw, 132px); height: clamp(86px, 20vw, 132px); margin-bottom: 18px; border: 0; border-radius: 50%; place-items: center; overflow: hidden; background: transparent; box-shadow: 0 12px 34px rgba(0, 0, 0, .3); }
+.player-turn-avatar img { display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: fill; object-position: 50% 50%; transform: scale(1.08); }
 .player-turn-screen > p { margin: 0 0 8px; color: #aaa1ba; font-size: .78rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
 .player-turn-screen h2 { display: grid; margin: 0 0 clamp(28px, 6dvh, 48px); color: #fff; gap: 4px; }
 .turn-player-name { color: #dda15e; font-size: clamp(2.6rem, 11vw, 5.4rem); font-weight: 900; line-height: 1; }
@@ -483,8 +483,8 @@
 .player-row:last-child { border-bottom: 0; }
 .player-row:hover { background: rgba(255, 255, 255, .06); }
 .player-number { color: #9e8bd0; font-weight: 900; }
-.player-avatar { display: grid; width: 44px; height: 44px; border: 1px solid rgba(255, 255, 255, .18); border-radius: 50%; place-items: center; overflow: hidden; background: rgba(255, 255, 255, .06); }
-.player-avatar img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; }
+.player-avatar { display: grid; width: 44px; height: 44px; border: 0; border-radius: 50%; place-items: center; overflow: hidden; background: transparent; }
+.player-avatar img { display: block; width: 100%; height: 100%; border-radius: 50%; object-fit: fill; object-position: 50% 50%; transform: scale(1.08); }
 .player-name { overflow: hidden; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
 .player-edit-label { color: #aaa1ba; font-size: .78rem; }
 .player-name-input { width: 100%; min-width: 0; padding: 9px 10px; border: 1px solid #8a5cff; border-radius: 9px; outline: none; color: #fff; background: #211a30; font: inherit; font-weight: 800; }
