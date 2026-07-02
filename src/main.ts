@@ -33,7 +33,7 @@ function renderPage() {
 
   if (route === '#busfahrer') {
     app.innerHTML = '<main class="busfahrer-page" id="busfahrer-game"></main>'
-    unmountCurrentPage = mountBusfahrer(app.querySelector<HTMLElement>('#busfahrer-game')!)
+    unmountCurrentPage = mountBusfahrer(app.querySelector<HTMLElement>('#busfahrer-game')!, players.map((player) => player.name))
     return
   }
 

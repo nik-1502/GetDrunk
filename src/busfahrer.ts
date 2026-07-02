@@ -4,6 +4,8 @@ type CardColor = 'red' | 'blue'
 type SuitId = 'heart' | 'diamond' | 'star' | 'moon'
 type Card = { id: string; value: number; label: string; color: CardColor; suit: SuitId; suitLabel: string; symbol: string; numericValue: number }
 type FeedbackKind = 'success' | 'error' | 'info'
+type GamePlayer = { id: string; name: string; hand: Card[]; questionResults: boolean[]; drinks: number }
+type PyramidDecision = { cardId: string; label: string; drinks: number; step: 'offer' | 'target' }
 
 const suits: Array<Pick<Card, 'suit' | 'suitLabel' | 'symbol' | 'color'>> = [
   { suit: 'heart', suitLabel: 'Herz', symbol: '♥', color: 'red' },
@@ -33,7 +35,12 @@ const pyramidOrder = [6, 7, 8, 9, 3, 4, 5, 1, 2, 0]
 const busRoundLength = 5
 
 let deck: Card[] = []
-let phase: 'questions' | 'pyramid' | 'bus' = 'questions'
+let phase: 'questions' | 'pyramid' | 'summary' | 'bus' | 'final' = 'questions'
+let configuredPlayerNames = ['Nick']
+let gamePlayers: GamePlayer[] = []
+let currentPlayerIndex = 0
+let busDriverIndex = 0
+let finalResult = ''
 let questionIndex = 0
 let hand: Card[] = []
 let questionResults: boolean[] = []
@@ -42,6 +49,7 @@ let feedback = { text: '', kind: 'info' as FeedbackKind }
 let pyramidCards: Card[] = []
 let pyramidProgress = 0
 let pyramidHits = new Set<number>()
+let pyramidDecision: PyramidDecision | null = null
 let busCards: Card[] = []
 let busProgress = 0
 let busFailed = false
@@ -60,14 +68,14 @@ function shuffle<T>(items: T[]) {
   return result
 }
 
-function createDeck(): Card[] {
-  return shuffle(suits.flatMap((suit) => values.map((item) => ({
-    id: `${suit.suit}-${item.value}`, ...item, ...suit, numericValue: item.value,
-  }))))
+function createDeck(deckCount = 1): Card[] {
+  return shuffle(Array.from({ length: deckCount }, (_, deckIndex) => suits.flatMap((suit) => values.map((item) => ({
+    id: `${deckIndex}-${suit.suit}-${item.value}`, ...item, ...suit, numericValue: item.value,
+  })))).flat())
 }
 
 function drawCard() {
-  if (!deck.length) deck = createDeck()
+  if (!deck.length) throw new Error('Das gemeinsame Kartendeck ist aufgebraucht.')
   return deck.pop()!
 }
 
@@ -75,6 +83,10 @@ function drawBusCard() {
   const card = deck.pop()!
   busfahrerUsedCards.push(card)
   return card
+}
+
+function escapeHtml(value: string) {
+  return value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;')
 }
 
 function cardMarkup(card: Card, revealed = true, extraClass = '') {
@@ -86,15 +98,24 @@ function cardMarkup(card: Card, revealed = true, extraClass = '') {
 }
 
 function phaseHeader(current: number, subtitle: string) {
-  return `<div class="game-progress"><span>Phase ${current} von 3</span><div class="progress-track"><i style="width:${current / 3 * 100}%"></i></div><span>${subtitle}</span></div>`
+  return `<div class="game-progress"><span>Phase ${current} von 3</span><div class="progress-track"><i style="width:${current / 3 * 100}%"></i></div><span>${escapeHtml(subtitle)}</span></div>`
 }
 
 function feedbackMarkup() {
-  return feedback.text ? `<div class="feedback feedback-${feedback.kind}" aria-live="polite">${feedback.text}</div>` : '<div class="feedback is-empty" aria-live="polite"></div>'
+  return feedback.text ? `<div class="feedback feedback-${feedback.kind}" aria-live="polite">${escapeHtml(feedback.text)}</div>` : '<div class="feedback is-empty" aria-live="polite"></div>'
+}
+
+function currentPlayer() {
+  return gamePlayers[currentPlayerIndex]!
+}
+
+function syncCurrentPlayerCards() {
+  currentPlayer().hand = hand
+  currentPlayer().questionResults = questionResults
 }
 
 function handMarkup() {
-  return `<section class="player-hand"><h3>Deine Karten</h3><div class="hand-cards">${hand.length ? hand.map((card, index) => cardMarkup(card, true, questionResults[index] ? 'answer-correct' : 'answer-wrong')).join('') : '<p>Noch keine Karten gezogen.</p>'}</div></section>`
+  return `<section class="player-hand"><h3>${escapeHtml(currentPlayer().name)}: Deine Karten</h3><div class="hand-cards">${hand.length ? hand.map((card, index) => cardMarkup(card, true, questionResults[index] ? 'answer-correct' : 'answer-wrong')).join('') : '<p>Noch keine Karten gezogen.</p>'}</div></section>`
 }
 
 function busUsedCardsMarkup() {
@@ -114,7 +135,7 @@ function busUsedCardsMarkup() {
 function renderQuestions() {
   const question = questions[questionIndex]!
   const preview = deck.at(-1) ?? createDeck()[0]!
-  return `${phaseHeader(1, `Frage ${questionIndex + 1} von 4`)}<section class="question-panel">
+  return `${phaseHeader(1, `${currentPlayer().name} · Frage ${questionIndex + 1} von 4`)}<section class="question-panel">
     <h2>Fragenrunde</h2>
     <div class="question-card-slot">${answered ? cardMarkup(hand.at(-1)!, true, questionResults.at(-1) ? 'answer-correct' : 'answer-wrong') : cardMarkup(preview, false)}</div>
     <div class="phase-one-feedback-zone">${answered ? feedbackMarkup() : `<p class="phase-one-prompt">${questionPrompts[questionIndex]}</p>`}</div>
@@ -141,6 +162,8 @@ function answerQuestion(choice: string) {
   const correct = evaluateQuestion(choice, card)
   hand.push(card)
   questionResults.push(correct)
+  if (!correct) currentPlayer().drinks += 1
+  syncCurrentPlayerCards()
   answered = true
   feedback = correct ? { text: 'Richtig!', kind: 'success' } : { text: 'Falsch – trinken.', kind: 'error' }
   renderGame()
@@ -156,9 +179,10 @@ function nextQuestion() {
     questionIndex += 1; answered = false; feedback = { text: '', kind: 'info' }
   } else {
     phase = 'pyramid'
-    const heldCardIds = new Set(hand.map((card) => card.id))
-    deck = deck.filter((card) => !heldCardIds.has(card.id))
-    pyramidCards = Array.from({ length: 10 }, drawCard)
+    if (!pyramidCards.length) pyramidCards = Array.from({ length: 10 }, drawCard)
+    pyramidProgress = 0
+    pyramidHits = new Set<number>()
+    pyramidDecision = null
     feedback = { text: '', kind: 'info' }
   }
   renderGame()
@@ -167,30 +191,98 @@ function nextQuestion() {
 function renderPyramid() {
   const rows = [[0], [1, 2], [3, 4, 5], [6, 7, 8, 9]]
   const complete = pyramidProgress === 10
-  return `${phaseHeader(2, `${pyramidProgress} von 10 Karten`)}<section class="pyramid-panel">
+  const pyramidAction = pyramidDecision?.step === 'offer'
+    ? `<div class="pyramid-decision"><p>Möchtest du deine ${pyramidDecision.label} setzen?</p><div><button class="game-button primary" data-action="use-pyramid-card">Ja</button><button class="game-button" data-action="keep-pyramid-card">Nein</button></div></div>`
+    : pyramidDecision?.step === 'target'
+      ? `<div class="pyramid-decision"><p>Wer soll ${pyramidDecision.drinks} Schluck${pyramidDecision.drinks === 1 ? '' : 'e'} trinken?</p><div class="pyramid-targets">${gamePlayers.map((player, index) => `<button class="game-button" data-pyramid-target="${index}">${escapeHtml(player.name)}</button>`).join('')}</div></div>`
+      : `<button class="game-button primary" data-action="${complete ? 'finish-player-pyramid' : 'reveal-pyramid'}">${complete ? `${currentPlayer().name} ist fertig` : 'Nächste Karte aufdecken'}</button>`
+  return `${phaseHeader(2, `${currentPlayer().name} · ${pyramidProgress} von 10 Karten`)}<section class="pyramid-panel">
     <h2>Pyramide</h2><div class="pyramid">${rows.map((row, rowIndex) =>
       `<div class="pyramid-row" data-drinks="${4 - rowIndex} Schluck${rowIndex === 3 ? '' : 'e'}">${row.map((index) => cardMarkup(pyramidCards[index]!, pyramidOrder.slice(0, pyramidProgress).includes(index), pyramidHits.has(index) ? 'pyramid-hit' : '')).join('')}</div>`).join('')}</div>
-    ${feedbackMarkup()}<button class="game-button primary" data-action="${complete ? 'start-bus' : 'reveal-pyramid'}">${complete ? 'Weiter zur Busfahrer-Runde' : 'Nächste Karte aufdecken'}</button>
+    ${feedbackMarkup()}${pyramidAction}
     </section>${handMarkup()}`
 }
 
 function revealPyramid() {
-  if (pyramidProgress >= 10) return
+  if (pyramidProgress >= 10 || pyramidDecision) return
   const index = pyramidOrder[pyramidProgress]!
   const card = pyramidCards[index]!
-  const match = hand.some((heldCard) => heldCard.value === card.value)
+  const matchingCard = hand.find((heldCard) => heldCard.value === card.value)
+  const match = Boolean(matchingCard)
   if (match) pyramidHits.add(index)
   const drinks = index >= 6 ? 1 : index >= 3 ? 2 : index >= 1 ? 3 : 4
-  feedback = match ? { text: `Treffer! Wert gefunden – ${drinks} Schluck${drinks === 1 ? '' : 'e'}.`, kind: 'success' } : { text: 'Kein Treffer.', kind: 'info' }
+  feedback = match ? { text: `Treffer: ${card.label}`, kind: 'success' } : { text: 'Kein Treffer.', kind: 'info' }
+  if (matchingCard) pyramidDecision = { cardId: matchingCard.id, label: matchingCard.label, drinks, step: 'offer' }
   pyramidProgress += 1
   renderGame()
 }
 
+function usePyramidCard() {
+  if (!pyramidDecision || pyramidDecision.step !== 'offer') return
+  const cardIndex = hand.findIndex((card) => card.id === pyramidDecision!.cardId)
+  if (cardIndex >= 0) {
+    hand.splice(cardIndex, 1)
+    questionResults.splice(cardIndex, 1)
+    syncCurrentPlayerCards()
+  }
+  pyramidDecision.step = 'target'
+  feedback = { text: '', kind: 'info' }
+  renderGame()
+}
+
+function keepPyramidCard() {
+  pyramidDecision = null
+  feedback = { text: '', kind: 'info' }
+  renderGame()
+}
+
+function assignPyramidDrinks(targetIndex: number) {
+  if (!pyramidDecision || pyramidDecision.step !== 'target' || !gamePlayers[targetIndex]) return
+  gamePlayers[targetIndex]!.drinks += pyramidDecision.drinks
+  feedback = { text: `${gamePlayers[targetIndex]!.name}: ${pyramidDecision.drinks} Schluck${pyramidDecision.drinks === 1 ? '' : 'e'}.`, kind: 'success' }
+  pyramidDecision = null
+  renderGame()
+}
+
+function finishPlayerPyramid() {
+  if (pyramidProgress !== 10 || pyramidDecision) return
+  if (currentPlayerIndex < gamePlayers.length - 1) {
+    currentPlayerIndex += 1
+    hand = currentPlayer().hand
+    questionResults = currentPlayer().questionResults
+    questionIndex = 0
+    answered = false
+    pyramidProgress = 0
+    pyramidHits = new Set<number>()
+    pyramidDecision = null
+    feedback = { text: '', kind: 'info' }
+    phase = 'questions'
+  } else {
+    const ranked = gamePlayers.map((player, index) => ({ player, index })).sort((a, b) =>
+      b.player.hand.length - a.player.hand.length || b.player.drinks - a.player.drinks || a.index - b.index)
+    busDriverIndex = ranked[0]!.index
+    phase = 'summary'
+    feedback = { text: '', kind: 'info' }
+  }
+  renderGame()
+}
+
 function startBus() {
-  deck = createDeck()
+  currentPlayerIndex = busDriverIndex
+  deck = createDeck(1)
   phase = 'bus'; busCards = []; busProgress = 0; busFailed = false; busLost = false; busFeedbackPending = false; busfahrerUsedCards = []
   feedback = { text: '', kind: 'info' }
   renderGame()
+}
+
+function playerStatsMarkup() {
+  return `<div class="game-stats-table"><div class="game-stats-head"><span>Spieler</span><span>Karten</span><span>Schlücke</span></div>${gamePlayers.map((player, index) => `<div class="game-stats-row ${index === busDriverIndex ? 'is-bus-driver' : ''}"><strong>${escapeHtml(player.name)}</strong><span>${player.hand.length}</span><span>${player.drinks}</span></div>`).join('')}</div>`
+}
+
+function renderSummary(final = false) {
+  const title = final ? finalResult : `${gamePlayers[busDriverIndex]!.name} ist Busfahrer`
+  return `${phaseHeader(final ? 3 : 2, final ? 'Endstand' : 'Auswertung')}<section class="game-summary-panel"><h2>${escapeHtml(title)}</h2>${playerStatsMarkup()}
+    <button class="game-button primary" data-action="${final ? 'restart' : 'start-bus'}">${final ? 'Neu starten' : 'Phase 3 starten'}</button></section>`
 }
 
 function renderBus() {
@@ -205,7 +297,7 @@ function renderBus() {
   const choicePrompt = first ? questionPrompts[0] : questionPrompts[1]
   const busDisabled = busFeedbackPending ? ' disabled' : ''
   const busAction = complete
-    ? '<button class="game-button primary" data-action="restart">Neu starten</button>'
+    ? '<button class="game-button primary" data-action="show-final-summary">Ergebnis anzeigen</button>'
     : busFailed
       ? '<button class="game-button primary" data-action="retry-bus">Zurück zum Anfang</button>'
       : `<div class="choice-grid">${first
@@ -237,6 +329,7 @@ function answerBus(choice: string) {
         : card.numericValue === previousCard!.numericValue
   if (!correct) {
     feedback = { text: 'Falsch – trinken.', kind: 'error' }
+    currentPlayer().drinks += 1
     busFailed = true; renderGame(); return
   }
   busProgress += 1
@@ -259,13 +352,15 @@ function answerBus(choice: string) {
 function resetGame() {
   window.clearTimeout(advanceTimer)
   advanceTimer = undefined
-  deck = createDeck(); phase = 'questions'; questionIndex = 0; hand = []; questionResults = []; answered = false
-  feedback = { text: '', kind: 'info' }; pyramidCards = []; pyramidProgress = 0; pyramidHits = new Set<number>(); busCards = []; busProgress = 0; busFailed = false; busLost = false; busFeedbackPending = false; busfahrerUsedCards = []
+  gamePlayers = configuredPlayerNames.map((name, index) => ({ id: `${index}-${name}`, name, hand: [], questionResults: [], drinks: 0 }))
+  currentPlayerIndex = 0; busDriverIndex = 0; finalResult = ''
+  deck = createDeck(gamePlayers.length >= 6 ? 2 : 1); phase = 'questions'; questionIndex = 0; hand = gamePlayers[0]!.hand; questionResults = gamePlayers[0]!.questionResults; answered = false
+  feedback = { text: '', kind: 'info' }; pyramidCards = []; pyramidProgress = 0; pyramidHits = new Set<number>(); pyramidDecision = null; busCards = []; busProgress = 0; busFailed = false; busLost = false; busFeedbackPending = false; busfahrerUsedCards = []
 }
 
 function renderGame() {
   if (!gameRoot) return
-  const content = phase === 'questions' ? renderQuestions() : phase === 'pyramid' ? renderPyramid() : renderBus()
+  const content = phase === 'questions' ? renderQuestions() : phase === 'pyramid' ? renderPyramid() : phase === 'summary' ? renderSummary() : phase === 'final' ? renderSummary(true) : renderBus()
   gameRoot.innerHTML = `<div class="busfahrer-shell"><header class="busfahrer-header">
     <button class="back-button bus-back" type="button" data-action="back">← Zurück</button><div><p>GetDrunk präsentiert</p><h1>Busfahrer</h1></div>
     <button class="restart-button" type="button" data-action="restart">Neu starten</button></header>
@@ -277,11 +372,21 @@ function handleClick(event: Event) {
   if (!button) return
   if (button.dataset.choice) answerQuestion(button.dataset.choice)
   if (button.dataset.busChoice) answerBus(button.dataset.busChoice)
+  if (button.dataset.pyramidTarget) assignPyramidDrinks(Number(button.dataset.pyramidTarget))
   if (button.dataset.action === 'reveal-pyramid') revealPyramid()
+  if (button.dataset.action === 'use-pyramid-card') usePyramidCard()
+  if (button.dataset.action === 'keep-pyramid-card') keepPyramidCard()
+  if (button.dataset.action === 'finish-player-pyramid') finishPlayerPyramid()
   if (button.dataset.action === 'start-bus') startBus()
+  if (button.dataset.action === 'show-final-summary') {
+    finalResult = `${currentPlayer().name} hat die Busfahrer-Runde geschafft!`
+    phase = 'final'
+    renderGame()
+  }
   if (button.dataset.action === 'retry-bus') {
     if (deck.length < busRoundLength) {
-      busLost = true; feedback = { text: '', kind: 'info' }
+      finalResult = 'Deck aufgebraucht – verloren'
+      phase = 'final'; busLost = true; feedback = { text: '', kind: 'info' }
     } else {
       busCards = []; busProgress = 0; busFailed = false; busFeedbackPending = false
       feedback = { text: '', kind: 'info' }
@@ -289,10 +394,11 @@ function handleClick(event: Event) {
     renderGame()
   }
   if (button.dataset.action === 'restart') { resetGame(); renderGame() }
-  if (button.dataset.action === 'back') window.location.hash = ''
+  if (button.dataset.action === 'back') window.location.hash = 'busfahrer-offline'
 }
 
-export function mountBusfahrer(root: HTMLElement) {
+export function mountBusfahrer(root: HTMLElement, playerNames: string[] = ['Nick']) {
+  configuredPlayerNames = playerNames.length ? playerNames : ['Nick']
   gameRoot = root; resetGame(); root.addEventListener('click', handleClick); renderGame()
   return () => { window.clearTimeout(advanceTimer); root.removeEventListener('click', handleClick); gameRoot = null }
 }

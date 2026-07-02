@@ -288,6 +288,12 @@
 .pyramid-panel > .feedback { position: absolute; z-index: 2; top: clamp(6px, 1.2vh, 12px); right: clamp(8px, 2vw, 18px); max-width: 34%; min-height: 0; margin: 0; padding: 5px 8px; font-size: clamp(0.62rem, 1.5vw, 0.78rem); pointer-events: none; }
 .pyramid-panel > .game-button { width: min(520px, 100%); justify-self: center; }
 .pyramid-panel > .game-button { height: var(--phase-action-height); min-height: var(--phase-action-height); }
+.pyramid-decision { width: min(620px, 100%); justify-self: center; }
+.pyramid-decision > p { margin: 0 0 8px; color: #fff; font-weight: 800; }
+.pyramid-decision > div { display: flex; justify-content: center; gap: 8px; }
+.pyramid-decision > div > .game-button { min-width: 120px; min-height: var(--phase-action-height); }
+.pyramid-targets { max-height: 104px; padding: 2px; flex-wrap: wrap; overflow: auto; }
+.pyramid-targets .game-button { min-width: 0 !important; padding: 8px 12px; flex: 1 1 120px; }
 .pyramid-row { position: relative; display: flex; justify-content: center; gap: 7px; }
 .pyramid-row::after { content: attr(data-drinks); position: absolute; left: calc(50% + 226px); top: 50%; color: #9c94aa; font-size: .68rem; transform: translateY(-50%); white-space: nowrap; }
 .pyramid .playing-card { width: clamp(35px, min(10vw, 10vh), 78px); }
@@ -339,6 +345,32 @@
 .lost-screen h2 { margin-block: clamp(38px, 8vh, 80px); }
 .end-actions { width: min(460px, 100%); margin: 0 auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
 .end-actions .game-button { width: 100%; min-width: 0; }
+
+.game-summary-panel {
+  grid-row: 2 / 4;
+  display: flex;
+  min-height: 0;
+  padding: clamp(16px, 3dvh, 30px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(14px, 2.5dvh, 24px);
+  color: #f8f5ff;
+  background: rgba(31, 25, 44, 0.82);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28);
+  overflow: auto;
+}
+.game-summary-panel h2 { margin: 0; color: #fff; text-align: center; }
+.game-summary-panel > .game-button { width: min(460px, 100%); flex: 0 0 auto; }
+.game-stats-table { width: min(620px, 100%); overflow: hidden; border: 1px solid rgba(255, 255, 255, .12); border-radius: 14px; background: rgba(0, 0, 0, .14); }
+.game-stats-head, .game-stats-row { display: grid; padding: 10px 12px; grid-template-columns: minmax(0, 1fr) 76px 86px; align-items: center; gap: 8px; }
+.game-stats-head { color: #9e8bd0; font-size: .72rem; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+.game-stats-row { border-top: 1px solid rgba(255, 255, 255, .1); }
+.game-stats-row > :not(:first-child), .game-stats-head > :not(:first-child) { text-align: center; }
+.game-stats-row.is-bus-driver { color: #fff; background: rgba(138, 92, 255, .18); }
+.game-stats-row strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 @keyframes feedback-pop { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: scale(1); } }
 @keyframes hit-glow { from { transform: translateY(0); } to { transform: translateY(-1px); } }
