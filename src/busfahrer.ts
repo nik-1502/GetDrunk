@@ -229,7 +229,9 @@ function answerBus(choice: string) {
     busFailed = true; renderGame(); return
   }
   busProgress += 1
-  feedback = busProgress === busRoundLength ? { text: 'Geschafft! Du bist aus dem Bus.', kind: 'success' } : { text: 'Richtig – weiter!', kind: 'success' }
+  feedback = busProgress === busRoundLength
+    ? { text: 'Geschafft! Du bist aus dem Bus.', kind: 'success' }
+    : { text: '', kind: 'info' }
   renderGame()
 }
 

@@ -298,7 +298,7 @@
   .pyramid { gap: 5px; }
   .pyramid-row { gap: 5px; }
   .hand-cards { justify-content: center; }
-  .bus-road { justify-content: space-between; }
+  .bus-road { justify-content: center; }
   .used-card-list { justify-content: center; padding: 0 8px 4px; }
   .used-card-list { gap: 4px; }
   .used-card-stack { width: 30px; height: 44px; flex-basis: 30px; }
