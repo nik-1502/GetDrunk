@@ -401,3 +401,32 @@
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+.setup-shell { gap: clamp(12px, 3dvh, 28px); }
+.setup-stage { display: grid; flex: 1 1 auto; min-height: 0; place-items: center; }
+.setup-panel { width: min(620px, 100%); padding: clamp(22px, 5vw, 44px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; color: #f8f5ff; background: rgba(31, 25, 44, 0.9); box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28); text-align: center; }
+.setup-panel h2 { margin: 0 0 clamp(22px, 5dvh, 40px); color: #fff; font-size: clamp(1.5rem, 5vw, 2.4rem); }
+.setup-mode-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.setup-copy { margin: 0; color: #bdb4d2; }
+.offline-panel { max-height: 100%; overflow: auto; }
+.offline-panel h2 { margin-bottom: 18px; }
+.player-table { display: grid; margin-bottom: 14px; overflow: hidden; border: 1px solid rgba(255, 255, 255, .12); border-radius: 14px; background: rgba(0, 0, 0, .14); }
+.player-row { display: grid; width: 100%; min-height: 56px; padding: 8px 12px; border: 0; border-bottom: 1px solid rgba(255, 255, 255, .1); color: #fff; background: transparent; grid-template-columns: 34px minmax(0, 1fr) auto; align-items: center; gap: 10px; font: inherit; text-align: left; cursor: pointer; }
+.player-row:last-child { border-bottom: 0; }
+.player-row:hover { background: rgba(255, 255, 255, .06); }
+.player-number { color: #9e8bd0; font-weight: 900; }
+.player-name { overflow: hidden; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
+.player-edit-label { color: #aaa1ba; font-size: .78rem; }
+.player-name-input { width: 100%; min-width: 0; padding: 9px 10px; border: 1px solid #8a5cff; border-radius: 9px; outline: none; color: #fff; background: #211a30; font: inherit; font-weight: 800; }
+.player-name-input:focus { box-shadow: 0 0 0 3px rgba(138, 92, 255, .24); }
+.player-remove { padding: 9px 10px; border: 1px solid rgba(255, 99, 124, .38); border-radius: 9px; color: #ff9bac; background: rgba(228, 54, 82, .12); font: inherit; font-size: .78rem; font-weight: 800; cursor: pointer; }
+.setup-add-player, .setup-start-game { width: 100%; }
+.setup-add-player { margin-bottom: 12px; }
+.setup-start-game:disabled { cursor: not-allowed; opacity: .45; }
+
+@media (max-width: 520px) {
+  .setup-panel { padding: 20px 14px; }
+  .setup-mode-actions { grid-template-columns: 1fr; }
+  .player-row { grid-template-columns: 26px minmax(0, 1fr) auto; padding-inline: 8px; gap: 7px; }
+  .player-remove { padding-inline: 7px; }
+}
