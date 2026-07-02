@@ -300,8 +300,8 @@
 .pyramid-offer { display: grid; place-items: center; }
 .pyramid-offer-question { display: grid; width: min(248px, 100%); height: var(--phase-action-height); padding: 6px 14px; place-items: center; border: 1px solid rgba(255, 255, 255, .16); border-radius: 14px; color: #fff; background: #352c48; font-weight: 800; }
 .pyramid-side-choice { position: absolute; top: 50%; width: clamp(58px, 11vw, 110px); min-width: 0 !important; min-height: var(--phase-action-height); padding-inline: 8px; translate: 0 -50%; z-index: 3; }
-.pyramid-choice-no { left: 14%; translate: -50% -50%; }
-.pyramid-choice-yes { right: 14%; translate: 50% -50%; }
+.pyramid-choice-no { left: 18%; translate: -50% -50%; }
+.pyramid-choice-yes { right: 18%; translate: 50% -50%; }
 .pyramid-target-screen { --phase-action-height: clamp(44px, 7dvh, 50px); grid-row: 2 / 4; display: flex; min-height: 0; padding: clamp(18px, 4dvh, 36px); border: 1px solid rgba(255, 255, 255, .1); border-radius: 24px; flex-direction: column; align-items: center; justify-content: center; color: #f8f5ff; background: rgba(31, 25, 44, .9); box-shadow: 0 24px 70px rgba(0, 0, 0, .28); text-align: center; overflow: auto; }
 .pyramid-target-screen h2 { margin: 0 0 clamp(18px, 4dvh, 32px); color: #fff; font-size: clamp(1.35rem, 4vw, 2rem); }
 .pyramid-player-list { display: grid; width: min(440px, 100%); gap: 10px; }
