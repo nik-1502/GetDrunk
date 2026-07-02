@@ -197,18 +197,23 @@ function renderBus() {
     && busProgress === busRoundLength
   const first = busProgress === 0
   const choicePrompt = first ? 'Errate die Kartenfarbe' : 'Ist die nächste Karte höher, gleich oder tiefer?'
+  const busAction = complete
+    ? '<button class="game-button primary" data-action="restart">Neu starten</button>'
+    : busFailed
+      ? '<button class="game-button primary" data-action="retry-bus">Zurück zum Anfang</button>'
+      : `<div class="choice-grid">${first
+        ? '<button class="game-button choice-red" data-bus-choice="red">Rot</button><button class="game-button choice-blue" data-bus-choice="blue">Blau</button>'
+        : '<div class="three-choices"><button class="game-button" data-bus-choice="higher">Höher</button><button class="game-button" data-bus-choice="equal">Gleich</button><button class="game-button" data-bus-choice="lower">Tiefer</button></div>'}</div>`
   return `${phaseHeader(3, complete ? 'Ziel erreicht' : `Karte ${busProgress + 1} von ${busCards.length}`)}<section class="bus-panel">
     <p class="eyebrow">Finale Runde</p><h2>${complete ? 'Geschafft!' : 'Busfahrer'}</h2>
     <div class="bus-road"><div class="bus-card-row">${Array.from({ length: busRoundLength }, (_, index) => {
       const card = busCards[index]
       return card ? cardMarkup(card, true, index === busProgress ? 'current-card' : '') : cardMarkup(deck.at(-1) ?? createDeck()[0]!, false, index === busProgress ? 'current-card' : '')
-    }).join('')}</div><div class="bus-dashed-line" aria-hidden="true"></div></div>
-    ${complete ? feedbackMarkup() : `<div class="bus-prompt-zone">${feedback.text ? feedbackMarkup() : `<p>${choicePrompt}</p>`}</div>`}
-    ${complete ? '<button class="game-button primary" data-action="restart">Neu starten</button>' : busFailed
-      ? '<button class="game-button primary" data-action="retry-bus">Zurück zum Anfang</button>'
-      : `<div class="choice-grid">${first
-      ? '<button class="game-button choice-red" data-bus-choice="red">Rot</button><button class="game-button choice-blue" data-bus-choice="blue">Blau</button>'
-      : '<div class="three-choices"><button class="game-button" data-bus-choice="higher">Höher</button><button class="game-button" data-bus-choice="equal">Gleich</button><button class="game-button" data-bus-choice="lower">Tiefer</button></div>'}</div>`}
+    }).join('')}</div></div>
+    <div class="bus-controls"><div class="bus-dashed-line" aria-hidden="true"></div>
+      ${complete ? feedbackMarkup() : `<div class="bus-prompt-zone">${feedback.text ? feedbackMarkup() : `<p>${choicePrompt}</p>`}</div>`}
+      ${busAction}
+    </div>
     </section>`
 }
 

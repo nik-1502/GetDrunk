@@ -267,16 +267,16 @@
 .pyramid-hit .card-front { box-shadow: 0 0 0 4px #62df9b, 0 0 28px rgba(70, 230, 142, .8); }
 
 .bus-panel { --bus-edge-gap: clamp(10px, 3vw, 28px); display: flex; flex-direction: column; }
-.bus-road { display: flex; width: min(820px, 100%); min-height: 0; margin: 0 auto; flex: 1 1 auto; flex-direction: column; justify-content: center; overflow: hidden; }
+.bus-road { display: flex; width: min(820px, 100%); min-height: 0; margin: 0 auto; flex: 1 1 auto; flex-direction: column; justify-content: flex-end; overflow: hidden; }
 .bus-card-row { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: clamp(4px, 2vw, 22px); padding-inline: var(--bus-edge-gap); }
-.bus-dashed-line { width: calc(100% - 2 * var(--bus-edge-gap)); height: 3px; margin: var(--bus-edge-gap) auto 0; flex: 0 0 3px; border-radius: 9px; background: repeating-linear-gradient(90deg, #70687c 0 22px, transparent 22px 38px); }
+.bus-controls { display: grid; width: min(820px, 100%); margin: 0 auto; padding-top: var(--bus-edge-gap); grid-template-rows: 3px minmax(clamp(42px, 7dvh, 64px), 1fr) auto; }
+.bus-dashed-line { width: calc(100% - 2 * var(--bus-edge-gap)); height: 3px; margin: 0 auto; border-radius: 9px; background: repeating-linear-gradient(90deg, #70687c 0 22px, transparent 22px 38px); }
 .bus-road .playing-card { width: clamp(42px, min(15vw, 17vh), 108px); }
 .bus-prompt-zone {
   display: grid;
   width: 100%;
-  height: clamp(42px, 7dvh, 64px);
+  height: 100%;
   min-height: 0;
-  flex: 0 0 clamp(42px, 7dvh, 64px);
   place-items: center;
   text-align: center;
 }
@@ -306,7 +306,7 @@
   .pyramid { gap: 5px; }
   .pyramid-row { gap: 5px; }
   .hand-cards { justify-content: center; }
-  .bus-road { justify-content: center; }
+  .bus-road { justify-content: flex-end; }
   .used-card-list { justify-content: center; padding: 0 8px 4px; }
   .used-card-list { gap: 4px; }
   .used-card-stack { width: 30px; height: 44px; flex-basis: 30px; }
