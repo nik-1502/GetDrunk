@@ -150,6 +150,7 @@
 .prompt-red { color: #ff526d; font-weight: 900; }
 .prompt-blue { color: #58a1ff; font-weight: 900; }
 .prompt-purple { color: #b591ff; font-weight: 900; }
+.prompt-white { color: #fff; font-weight: 900; }
 .question-panel .feedback {
   width: fit-content;
   min-height: 0;

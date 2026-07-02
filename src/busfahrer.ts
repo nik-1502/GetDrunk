@@ -26,7 +26,7 @@ const questionPrompts = [
   '<span class="prompt-red">Rot</span> oder <span class="prompt-blue">Blau</span>?',
   '<span class="prompt-red">Höher</span>, <span class="prompt-purple">gleich</span> oder <span class="prompt-blue">tiefer</span>?',
   '<span class="prompt-red">Innen</span> oder <span class="prompt-blue">außen</span>?',
-  '<span class="prompt-purple">Welche Kartenfarbe?</span>',
+  '<span class="prompt-white">Welche</span> <span class="prompt-purple">Kartenfarbe?</span>',
 ]
 const choiceNames: Record<string, string> = { heart: 'Herz', diamond: 'Karo', star: 'Stern', moon: 'Mond' }
 const pyramidOrder = [6, 7, 8, 9, 3, 4, 5, 1, 2, 0]
