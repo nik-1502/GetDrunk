@@ -198,6 +198,8 @@
 
 .player-hand { padding: clamp(6px, 1.2vh, 12px) 14px calc(clamp(6px, 1.2vh, 12px) + 44px); overflow: hidden; }
 .player-hand h3 { margin: 0 0 12px; text-align: center; color: #d7d0e4; font-size: .9rem; }
+.hand-title-label { color: #d7d0e4; font-weight: 500; }
+.hand-player-name { color: #dda15e; font-weight: 800; }
 .hand-cards { display: flex; width: max-content; min-width: 100%; min-height: clamp(58px, 11vh, 82px); margin-inline: auto; justify-content: center; align-items: center; gap: clamp(4px, 1vw, 8px); }
 .hand-cards .playing-card { width: clamp(38px, 8vh, 60px); }
 .hand-cards .card-value { font-size: clamp(.82rem, 2.3vh, 1.2rem); }
@@ -371,6 +373,27 @@
 .game-stats-row > :not(:first-child), .game-stats-head > :not(:first-child) { text-align: center; }
 .game-stats-row.is-bus-driver { color: #fff; background: rgba(138, 92, 255, .18); }
 .game-stats-row strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.player-turn-screen {
+  grid-row: 1 / 4;
+  display: flex;
+  min-height: 0;
+  padding: clamp(24px, 6vw, 56px);
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-radius: 24px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #f8f5ff;
+  background: rgba(31, 25, 44, .9);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .28);
+  text-align: center;
+}
+.player-turn-icon { display: grid; width: 68px; height: 68px; margin-bottom: 18px; place-items: center; border: 1px solid rgba(221, 161, 94, .36); border-radius: 50%; color: #dda15e; background: rgba(221, 161, 94, .1); font-size: 2rem; }
+.player-turn-screen > p { margin: 0 0 8px; color: #aaa1ba; font-size: .78rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.player-turn-screen h2 { margin: 0 0 clamp(28px, 6dvh, 48px); color: #fff; font-size: clamp(2rem, 8vw, 4rem); }
+.player-turn-actions { display: grid; width: min(420px, 100%); grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.player-turn-actions .game-button { width: 100%; }
 
 @keyframes feedback-pop { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: scale(1); } }
 @keyframes hit-glow { from { transform: translateY(0); } to { transform: translateY(-1px); } }

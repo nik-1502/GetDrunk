@@ -35,7 +35,7 @@ const pyramidOrder = [6, 7, 8, 9, 3, 4, 5, 1, 2, 0]
 const busRoundLength = 5
 
 let deck: Card[] = []
-let phase: 'questions' | 'pyramid' | 'summary' | 'bus' | 'final' = 'questions'
+let phase: 'player-intro' | 'questions' | 'pyramid' | 'summary' | 'bus' | 'final' = 'player-intro'
 let configuredPlayerNames = ['Nick']
 let gamePlayers: GamePlayer[] = []
 let currentPlayerIndex = 0
@@ -115,7 +115,12 @@ function syncCurrentPlayerCards() {
 }
 
 function handMarkup() {
-  return `<section class="player-hand"><h3>${escapeHtml(currentPlayer().name)}: Deine Karten</h3><div class="hand-cards">${hand.length ? hand.map((card, index) => cardMarkup(card, true, questionResults[index] ? 'answer-correct' : 'answer-wrong')).join('') : '<p>Noch keine Karten gezogen.</p>'}</div></section>`
+  return `<section class="player-hand"><h3><span class="hand-title-label">Deine Karten:</span> <strong class="hand-player-name">${escapeHtml(currentPlayer().name)}</strong></h3><div class="hand-cards">${hand.length ? hand.map((card, index) => cardMarkup(card, true, questionResults[index] ? 'answer-correct' : 'answer-wrong')).join('') : '<p>Noch keine Karten gezogen.</p>'}</div></section>`
+}
+
+function renderPlayerIntro() {
+  return `<section class="player-turn-screen"><div class="player-turn-icon" aria-hidden="true">♠</div><p>Spieler ${currentPlayerIndex + 1} von ${gamePlayers.length}</p><h2>${escapeHtml(currentPlayer().name)} ist dran</h2>
+    <div class="player-turn-actions"><button class="game-button primary" data-action="start-player-round">Jetzt starten</button><button class="game-button" data-action="back">Zurück</button></div></section>`
 }
 
 function busUsedCardsMarkup() {
@@ -256,7 +261,7 @@ function finishPlayerPyramid() {
     pyramidHits = new Set<number>()
     pyramidDecision = null
     feedback = { text: '', kind: 'info' }
-    phase = 'questions'
+    phase = 'player-intro'
   } else {
     const ranked = gamePlayers.map((player, index) => ({ player, index })).sort((a, b) =>
       b.player.hand.length - a.player.hand.length || b.player.drinks - a.player.drinks || a.index - b.index)
@@ -354,13 +359,13 @@ function resetGame() {
   advanceTimer = undefined
   gamePlayers = configuredPlayerNames.map((name, index) => ({ id: `${index}-${name}`, name, hand: [], questionResults: [], drinks: 0 }))
   currentPlayerIndex = 0; busDriverIndex = 0; finalResult = ''
-  deck = createDeck(gamePlayers.length >= 6 ? 2 : 1); phase = 'questions'; questionIndex = 0; hand = gamePlayers[0]!.hand; questionResults = gamePlayers[0]!.questionResults; answered = false
+  deck = createDeck(gamePlayers.length >= 6 ? 2 : 1); phase = 'player-intro'; questionIndex = 0; hand = gamePlayers[0]!.hand; questionResults = gamePlayers[0]!.questionResults; answered = false
   feedback = { text: '', kind: 'info' }; pyramidCards = []; pyramidProgress = 0; pyramidHits = new Set<number>(); pyramidDecision = null; busCards = []; busProgress = 0; busFailed = false; busLost = false; busFeedbackPending = false; busfahrerUsedCards = []
 }
 
 function renderGame() {
   if (!gameRoot) return
-  const content = phase === 'questions' ? renderQuestions() : phase === 'pyramid' ? renderPyramid() : phase === 'summary' ? renderSummary() : phase === 'final' ? renderSummary(true) : renderBus()
+  const content = phase === 'player-intro' ? renderPlayerIntro() : phase === 'questions' ? renderQuestions() : phase === 'pyramid' ? renderPyramid() : phase === 'summary' ? renderSummary() : phase === 'final' ? renderSummary(true) : renderBus()
   gameRoot.innerHTML = `<div class="busfahrer-shell"><header class="busfahrer-header">
     <button class="back-button bus-back" type="button" data-action="back">← Zurück</button><div><p>GetDrunk präsentiert</p><h1>Busfahrer</h1></div>
     <button class="restart-button" type="button" data-action="restart">Neu starten</button></header>
@@ -377,6 +382,11 @@ function handleClick(event: Event) {
   if (button.dataset.action === 'use-pyramid-card') usePyramidCard()
   if (button.dataset.action === 'keep-pyramid-card') keepPyramidCard()
   if (button.dataset.action === 'finish-player-pyramid') finishPlayerPyramid()
+  if (button.dataset.action === 'start-player-round') {
+    phase = 'questions'
+    feedback = { text: '', kind: 'info' }
+    renderGame()
+  }
   if (button.dataset.action === 'start-bus') startBus()
   if (button.dataset.action === 'show-final-summary') {
     finalResult = `${currentPlayer().name} hat die Busfahrer-Runde geschafft!`
