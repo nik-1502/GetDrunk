@@ -62,11 +62,11 @@
   --phase-bottom-frame-height: clamp(105px, 22dvh, 170px);
   --phase-frame-gap: clamp(6px, 1.4dvh, 16px);
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) var(--phase-bottom-frame-height);
+  grid-template-rows: auto minmax(0, 1fr) calc(var(--phase-bottom-frame-height) - var(--phase-frame-gap));
   flex: 1 1 auto;
   min-height: 0;
-  padding-bottom: var(--phase-frame-gap);
-  gap: var(--phase-frame-gap);
+  padding-bottom: calc(var(--phase-frame-gap) + var(--phase-frame-gap));
+  gap: calc(var(--phase-frame-gap) + var(--phase-frame-gap));
 }
 .game-progress { display: grid; grid-template-columns: auto minmax(100px, 1fr) auto; align-items: center; gap: 14px; color: #cfc8dc; font-size: 0.86rem; }
 .progress-track { height: 6px; overflow: hidden; border-radius: 99px; background: rgba(255, 255, 255, 0.1); }
@@ -271,8 +271,8 @@
 .bus-card-row { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: clamp(4px, 2vw, 22px); padding-inline: var(--bus-edge-gap); }
 .bus-dashed-line { width: calc(100% - 2 * var(--bus-edge-gap)); height: 3px; margin: var(--bus-edge-gap) auto 0; flex: 0 0 3px; border-radius: 9px; background: repeating-linear-gradient(90deg, #70687c 0 22px, transparent 22px 38px); }
 .bus-road .playing-card { width: clamp(42px, min(15vw, 17vh), 108px); }
-.bus-prompt-zone { display: flex; min-height: clamp(42px, 7dvh, 64px); align-items: center; justify-content: center; }
-.bus-prompt-zone > p { margin: 0; color: #d4c8f4; font-weight: 800; }
+.bus-prompt-zone { display: flex; width: 100%; min-height: clamp(42px, 7dvh, 64px); flex: 0 0 clamp(42px, 7dvh, 64px); align-items: center; justify-content: center; text-align: center; }
+.bus-prompt-zone > p { width: 100%; margin: 0; color: #d4c8f4; font-weight: 800; }
 .bus-prompt-zone .feedback { margin: 0; }
 .current-card .card-back { box-shadow: 0 0 0 3px #a88aff, 0 0 24px rgba(142, 101, 255, .6); }
 
