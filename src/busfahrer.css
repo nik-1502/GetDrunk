@@ -128,7 +128,7 @@
 .playing-card.is-revealed .card-back { visibility: hidden; }
 .card-back { display: grid; place-items: center; border: var(--card-back-border) solid #fff; color: rgba(255,255,255,.88); background: repeating-linear-gradient(45deg, #5d3bb6 0 var(--card-back-stripe), #7957d3 var(--card-back-stripe) calc(var(--card-back-stripe) + var(--card-back-stripe))); }
 .card-back::after { content: ''; position: absolute; inset: var(--card-back-inset); border: var(--card-back-inner-border) solid rgba(255,255,255,.74); border-radius: var(--card-back-inner-radius); }
-.card-back span { z-index: 1; font-size: clamp(.68rem, 10.7cqw, 1.2rem); font-weight: 900; letter-spacing: .08em; }
+.card-back span { z-index: 1; font-size: clamp(.6rem, 28cqw, 1.7rem); font-weight: 900; letter-spacing: .08em; }
 .card-front { transform: rotateY(180deg); border: 1px solid #ddd9e3; background: linear-gradient(145deg, #fff, #f5f3f7); }
 .card-red { color: #db3150; }
 .card-blue { color: #2874d6; }
@@ -286,7 +286,7 @@
 .pyramid .card-value { font-size: clamp(.78rem, 2.5vh, 1.4rem); }
 .pyramid .card-symbol { font-size: clamp(.6rem, 1.8vh, 1rem); }
 .pyramid-hit { animation: hit-glow 1s ease-in-out infinite alternate; }
-.pyramid-hit .card-front { box-shadow: inset 0 0 0 3px #62df9b, inset 0 0 14px rgba(70, 230, 142, .42); }
+.pyramid-hit .card-front { border: 3px solid #62df9b; box-shadow: inset 0 0 14px rgba(70, 230, 142, .42); }
 
 .bus-panel {
   --bus-edge-gap: clamp(10px, 3vw, 28px);
