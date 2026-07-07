@@ -2,6 +2,7 @@ import './style.css'
 import { mountBusfahrer } from './busfahrer.ts'
 import { avatarColor, avatarOptions, avatarSource, avatarVisualMarkup } from './profiles.ts'
 import userButtonImage from './assets/benutzer/Benutzer.png'
+import heroLogo from './assets/überschrift/ebe5baf7-8dca-44a0-a5bc-ba2f48425dc2.png'
 
 const app = document.querySelector<HTMLDivElement>('#app')!
 const PROFILE_STORAGE_KEY = 'getdrunk.profiles.v1'
@@ -134,8 +135,12 @@ function renderHome() {
     <button class="home-profile-button" type="button" aria-label="Profil öffnen" title="Profil öffnen">
       <img src="${userButtonImage}" alt="">
     </button>
-    <header class="title-frame"><h1>GetDrunk</h1></header>
-    <button class="busfahrer-button" type="button">Busfahrer</button>
+    <header class="hero-header">
+      <img class="hero-logo" src="${heroLogo}" alt="BLOBBA">
+    </header>
+    <section class="game-list" aria-label="Spiele">
+      <button class="busfahrer-button" type="button">Busfahrer</button>
+    </section>
   </main>`
   app.querySelector<HTMLButtonElement>('.home-profile-button')!.addEventListener('click', () => { window.location.hash = 'profile' })
   app.querySelector<HTMLButtonElement>('.busfahrer-button')!.addEventListener('click', () => { window.location.hash = 'busfahrer-menu' })

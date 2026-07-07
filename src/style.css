@@ -1,7 +1,7 @@
 :root {
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  color: #17324d;
-  background: #bde7f6;
+  color: #fff;
+  background: #05020b;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -23,7 +23,7 @@ body,
 html,
 body {
   overscroll-behavior: none;
-  background: #bde7f6;
+  background: #05020b;
 }
 
 html.busfahrer-active,
@@ -34,28 +34,63 @@ body.busfahrer-active {
 body {
   min-height: 100vh;
   min-height: 100svh;
-  background: #bde7f6;
+  background: #05020b;
 }
 
 .home-page {
   position: relative;
+  z-index: 0;
   min-height: 100vh;
   min-height: 100svh;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  align-items: flex-start;
-  gap: 32px;
-  padding: clamp(24px, 6vh, 64px) 20px;
-  background: #bde7f6;
+  align-items: center;
+  gap: clamp(12px, 2.2vh, 26px);
+  padding: clamp(18px, 4vh, 40px) clamp(16px, 4vw, 48px) clamp(36px, 7vh, 72px);
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 82% 70% at 18% 28%, rgba(255, 0, 132, .82) 0%, rgba(205, 0, 116, .48) 26%, rgba(92, 0, 91, .20) 50%, transparent 72%),
+    radial-gradient(ellipse 80% 72% at 86% 30%, rgba(0, 93, 255, .82) 0%, rgba(0, 45, 184, .52) 30%, rgba(25, 0, 95, .22) 54%, transparent 76%),
+    radial-gradient(circle at 52% 45%, rgba(168, 39, 255, .48) 0%, rgba(94, 15, 153, .28) 34%, transparent 62%),
+    radial-gradient(ellipse 115% 85% at 50% 114%, rgba(159, 0, 255, .32) 0%, rgba(26, 2, 54, .36) 42%, transparent 68%),
+    linear-gradient(118deg, #120012 0%, #3b003b 24%, #22083e 48%, #071754 74%, #001435 100%);
+  background-attachment: fixed;
 }
 
-.home-page > * {
-  align-self: center;
+.home-page::before,
+.home-page::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.home-page::before {
+  opacity: .22;
+  background:
+    radial-gradient(circle at center, rgba(255, 255, 255, .15) 0 1px, transparent 1.4px) 0 0 / 16px 16px,
+    radial-gradient(circle at center, rgba(255, 255, 255, .10) 0 1px, transparent 1.6px) 8px 8px / 22px 22px;
+  mask-image:
+    radial-gradient(ellipse 62% 42% at 30% 42%, #000 0%, transparent 72%),
+    radial-gradient(ellipse 58% 42% at 76% 42%, #000 0%, transparent 72%);
+  -webkit-mask-image:
+    radial-gradient(ellipse 62% 42% at 30% 42%, #000 0%, transparent 72%),
+    radial-gradient(ellipse 58% 42% at 76% 42%, #000 0%, transparent 72%);
+}
+
+.home-page::after {
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, .035) 1px, transparent 1px) 0 0 / 3px 3px,
+    linear-gradient(0deg, rgba(0, 0, 0, .045) 1px, transparent 1px) 0 0 / 4px 4px,
+    radial-gradient(ellipse 98% 88% at 50% 43%, transparent 0%, rgba(2, 0, 8, .20) 62%, rgba(0, 0, 0, .78) 100%);
+  opacity: .92;
 }
 
 .home-profile-button {
   position: absolute;
+  z-index: 2;
   top: clamp(18px, 4vh, 38px);
   right: clamp(16px, 4vw, 40px);
   display: grid;
@@ -65,11 +100,12 @@ body {
   overflow: hidden;
   isolation: isolate;
   place-items: center;
-  border: 2px solid #17324d;
+  border: 1px solid rgba(255, 255, 255, .34);
   border-radius: 18px;
-  color: #17324d;
-  background: rgba(255, 255, 255, .72);
-  box-shadow: 0 7px 18px rgba(23, 50, 77, .18);
+  color: #fff;
+  background: rgba(11, 5, 28, .44);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, .34);
+  backdrop-filter: blur(12px);
   cursor: pointer;
   transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
 }
@@ -89,8 +125,8 @@ body {
 .home-profile-button:hover,
 .home-profile-button:active {
   transform: translateY(-2px) scale(1.03);
-  background: rgba(255, 255, 255, .9);
-  box-shadow: 0 10px 24px rgba(23, 50, 77, .24);
+  background: rgba(255, 255, 255, .16);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .42);
 }
 
 .home-profile-button:focus-visible {
@@ -98,24 +134,36 @@ body {
   outline-offset: 3px;
 }
 
-.title-frame {
-  width: min(520px, 100%);
-  padding: 16px 32px;
-  text-align: center;
-  border: 3px solid #17324d;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.28);
-  box-shadow: 0 8px 20px rgba(23, 50, 77, 0.12);
+.hero-header {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: min(860px, 92vw);
+  margin-top: clamp(10px, 2vh, 24px);
+  place-items: center;
 }
 
-.title-frame h1 {
-  margin: 0;
-  font-size: clamp(2.25rem, 7vw, 4rem);
-  line-height: 1.1;
-  letter-spacing: 0.04em;
+.hero-logo {
+  display: block;
+  width: min(100%, clamp(300px, 64vw, 760px));
+  height: auto;
+  object-fit: contain;
 }
 
-.busfahrer-button,
+.busfahrer-button {
+  min-width: 180px;
+  padding: 14px 28px;
+  border: 1px solid rgba(255, 255, 255, .26);
+  border-radius: 12px;
+  color: #fff;
+  background: linear-gradient(135deg, rgba(255, 0, 140, .78), rgba(36, 71, 255, .78));
+  box-shadow: 0 16px 38px rgba(11, 0, 34, .52), inset 0 1px 0 rgba(255, 255, 255, .24);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
 .back-button {
   min-width: 180px;
   padding: 14px 28px;
@@ -130,7 +178,20 @@ body {
   transition: transform 160ms ease, box-shadow 160ms ease;
 }
 
-.busfahrer-button:hover,
+.game-list {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: min(420px, 100%);
+  place-items: center;
+  gap: 12px;
+}
+
+.busfahrer-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 46px rgba(8, 0, 30, .62), inset 0 1px 0 rgba(255, 255, 255, .28);
+}
+
 .back-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 9px 18px rgba(23, 50, 77, 0.2);
@@ -156,6 +217,9 @@ body {
 }
 
 @media (max-width: 620px) {
-  .home-page { padding-top: 92px; }
+  .home-page { padding-top: 76px; background-attachment: scroll; }
   .home-profile-button { border-radius: 16px; }
+  .hero-header { width: min(100%, 430px); margin-top: 0; }
+  .hero-logo { width: min(100%, 380px); }
+  .game-list { width: min(100%, 340px); }
 }
