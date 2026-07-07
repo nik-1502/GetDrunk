@@ -482,7 +482,7 @@
 .player-row { display: grid; width: 100%; min-height: 64px; padding: 8px 12px; border: 0; border-bottom: 1px solid rgba(255, 255, 255, .1); color: #fff; background: transparent; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px; font: inherit; text-align: left; }
 .player-row:last-child { border-bottom: 0; }
 .player-row:hover { background: rgba(255, 255, 255, .06); }
-.player-row-main { display: grid; min-width: 0; padding: 0; border: 0; color: inherit; background: transparent; grid-template-columns: 46px minmax(0, 1fr) auto; align-items: center; gap: 10px; font: inherit; text-align: left; cursor: pointer; }
+.player-row-main { display: grid; min-width: 0; padding: 0; border: 0; color: inherit; background: transparent; grid-template-columns: 46px minmax(0, 1fr); align-items: center; gap: 10px; font: inherit; text-align: left; }
 .player-number { color: #9e8bd0; font-weight: 900; }
 .player-avatar { position: relative; display: grid; width: 44px; height: 44px; aspect-ratio: 1; border: 0; place-items: center; flex: 0 0 auto; overflow: visible; isolation: isolate; background: transparent; }
 .player-avatar img { z-index: 0; display: block; width: 100%; height: 100%; aspect-ratio: 1; object-fit: contain; object-position: 50% 50%; transform: none; transform-origin: 50% 50%; }
@@ -491,7 +491,7 @@
 .is-default { color: #dce2eb; background: linear-gradient(145deg, #657286, #354052); }
 .player-name { overflow: hidden; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
 .player-edit-label { color: #aaa1ba; font-size: .78rem; }
-.player-name-input { width: 100%; min-width: 0; padding: 9px 10px; border: 1px solid #8a5cff; border-radius: 9px; outline: none; color: #fff; background: #211a30; font: inherit; font-weight: 800; }
+.player-name-input { width: 100%; min-width: 0; padding: 9px 10px; border: 1px solid rgba(255, 255, 255, .14); border-radius: 9px; outline: none; color: #fff; background: rgba(33, 26, 48, .72); font: inherit; font-weight: 800; }
 .player-name-input:focus { box-shadow: 0 0 0 3px rgba(138, 92, 255, .24); }
 .player-remove { padding: 9px 10px; border: 1px solid rgba(255, 99, 124, .38); border-radius: 9px; color: #ff9bac; background: rgba(228, 54, 82, .12); font: inherit; font-size: .78rem; font-weight: 800; cursor: pointer; }
 .player-remove:disabled { cursor: not-allowed; opacity: .35; }
@@ -509,8 +509,8 @@
 .profile-name-input:focus { border-color: #9d73ff; box-shadow: 0 0 0 3px rgba(138, 92, 255, .25); }
 .avatar-fieldset { min-width: 0; margin: 0 0 24px; padding: 0; border: 0; }
 .avatar-fieldset legend { margin-bottom: 12px; color: #d7d0e4; font-weight: 800; }
-.avatar-choice-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
-.avatar-choice { display: grid; min-width: 0; padding: 9px 5px; border: 2px solid transparent; border-radius: 14px; color: #d9d2e7; background: rgba(255, 255, 255, .05); place-items: center; gap: 7px; font: inherit; font-size: .68rem; font-weight: 750; cursor: pointer; transition: border-color 150ms ease, background 150ms ease, transform 150ms ease; }
+.avatar-choice-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+.avatar-choice { display: grid; min-width: 0; padding: 8px; border: 2px solid transparent; border-radius: 14px; color: #d9d2e7; background: rgba(255, 255, 255, .05); place-items: center; font: inherit; cursor: pointer; transition: border-color 150ms ease, background 150ms ease, transform 150ms ease; }
 .avatar-choice:hover { transform: translateY(-2px); background: rgba(255, 255, 255, .09); }
 .avatar-choice.is-selected { border-color: #a77cff; background: rgba(138, 92, 255, .2); box-shadow: 0 0 0 2px rgba(138, 92, 255, .16); }
 .avatar-choice-visual, .profile-card-avatar { position: relative; display: grid; width: 58px; height: 58px; overflow: visible; isolation: isolate; place-items: center; }
@@ -533,7 +533,7 @@
   .player-avatar { width: 40px; height: 40px; }
   .player-remove { padding-inline: 7px; }
   .avatar-choice-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
-  .avatar-choice { padding-inline: 3px; font-size: .62rem; }
+  .avatar-choice { padding: 7px; }
   .avatar-choice-visual { width: 50px; height: 50px; }
   .profile-preview { width: 92px; height: 92px; margin-bottom: 18px; }
 }

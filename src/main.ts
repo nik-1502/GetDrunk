@@ -1,12 +1,13 @@
 import './style.css'
 import { mountBusfahrer } from './busfahrer.ts'
 import { avatarColor, avatarOptions, avatarSource, avatarVisualMarkup } from './profiles.ts'
-import userButtonImage from './assets/benutzer/Benutzer.png'
+import userButtonImage from './assets/benutzer/4c0c56d3-a7e5-4be3-81b0-fda84fd67cbf.png'
 import heroLogo from './assets/überschrift/ebe5baf7-8dca-44a0-a5bc-ba2f48425dc2.png'
 
 const app = document.querySelector<HTMLDivElement>('#app')!
 const PROFILE_STORAGE_KEY = 'getdrunk.profiles.v1'
 const MAX_PLAYERS = 10
+const DEFAULT_AVATAR_ID = 'bier'
 
 type StoredProfile = { id: string; name: string; avatarId: string | null }
 type ProfileStore = { profiles: StoredProfile[]; activeProfileId: string; lastUsedProfileIds: string[] }
@@ -18,6 +19,7 @@ let profileStore = loadProfileStore()
 let players = suggestedPlayers()
 let gamePlayerSnapshot: SetupPlayer[] = []
 let profileEditorContext: ProfileEditorContext = { mode: 'primary' }
+let pendingPlayerNameFocusId: string | undefined
 
 const viewportMeta = document.querySelector<HTMLMetaElement>('meta[name="viewport"]')!
 const zoomableViewport = 'width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=5.0'
@@ -28,7 +30,7 @@ function createId() {
 }
 
 function createDefaultProfileStore(): ProfileStore {
-  const profile = { id: createId(), name: '', avatarId: null }
+  const profile = { id: createId(), name: '', avatarId: DEFAULT_AVATAR_ID }
   return { profiles: [profile], activeProfileId: profile.id, lastUsedProfileIds: [profile.id] }
 }
 
@@ -38,7 +40,7 @@ function loadProfileStore(): ProfileStore {
     const validAvatarIds = new Set(avatarOptions.map((avatar) => avatar.id))
     const profiles = Array.isArray(parsed.profiles)
       ? parsed.profiles.filter((profile): profile is StoredProfile => Boolean(profile && typeof profile.id === 'string' && typeof profile.name === 'string'))
-        .map((profile) => ({ ...profile, avatarId: profile.avatarId && validAvatarIds.has(profile.avatarId) ? profile.avatarId : null }))
+        .map((profile) => ({ ...profile, avatarId: profile.avatarId && validAvatarIds.has(profile.avatarId) ? profile.avatarId : DEFAULT_AVATAR_ID }))
       : []
     if (!profiles.length) return createDefaultProfileStore()
     const activeProfileId = profiles.some((profile) => profile.id === parsed.activeProfileId) ? parsed.activeProfileId! : profiles[0]!.id
@@ -67,6 +69,22 @@ function setupPlayerFromProfile(profile: StoredProfile): SetupPlayer {
     avatarId: profile.avatarId,
     avatar: avatarSource(profile.avatarId),
     avatarColor: avatarColor(profile.avatarId),
+  }
+}
+
+function createLocalPlayer(index: number): SetupPlayer {
+  const usedAvatarIds = new Set(players.map((player) => player.avatarId).filter((avatarId): avatarId is string => Boolean(avatarId)))
+  const availableAvatars = avatarOptions.filter((avatar) => !usedAvatarIds.has(avatar.id))
+  const avatarId = availableAvatars.length
+    ? availableAvatars[Math.floor(Math.random() * availableAvatars.length)]!.id
+    : DEFAULT_AVATAR_ID
+  return {
+    id: createId(),
+    profileId: `local-${createId()}`,
+    name: `Spieler ${index}`,
+    avatarId,
+    avatar: avatarSource(avatarId),
+    avatarColor: avatarColor(avatarId),
   }
 }
 
@@ -146,8 +164,8 @@ function renderHome() {
   app.querySelector<HTMLButtonElement>('.busfahrer-button')!.addEventListener('click', () => { window.location.hash = 'busfahrer-menu' })
 }
 
-function setupShell(content: string, backTarget: string, title = 'Busfahrer', eyebrow = 'GetDrunk präsentiert') {
-  app.innerHTML = `<main class="busfahrer-page"><div class="busfahrer-shell setup-shell">
+function setupShell(content: string, backTarget: string, title = 'Busfahrer', eyebrow = 'GetDrunk präsentiert', pageClass = '') {
+  app.innerHTML = `<main class="busfahrer-page ${pageClass}"><div class="busfahrer-shell setup-shell">
     <header class="busfahrer-header"><button class="back-button bus-back" type="button" data-setup-back>← Zurück</button><div><p>${eyebrow}</p><h1>${title}</h1></div><span></span></header>
     <section class="setup-stage">${content}</section>
   </div></main>`
@@ -169,31 +187,46 @@ function renderOnlineMenu() {
 function renderOfflineMenu() {
   setupShell(`<div class="setup-panel offline-panel"><p class="eyebrow">Offline</p><h2>Spieler</h2>
     <div class="player-table" role="list">${players.map((player, index) => `<div class="player-row" role="listitem">
-      <button class="player-row-main" type="button" data-edit-player="${player.profileId}">${playerAvatarMarkup(player)}<span class="player-name">${escapeHtml(player.name || `Spieler ${index + 1}`)}</span><span class="player-edit-label">Profil ändern</span></button>
+      <div class="player-row-main">${playerAvatarMarkup(player)}<input class="player-name-input" data-player-name="${player.id}" value="${escapeHtml(player.name || `Spieler ${index + 1}`)}" maxlength="24" autocomplete="off" aria-label="Name von Spieler ${index + 1}"></div>
       <button class="player-remove" type="button" data-remove-player="${player.id}" ${players.length === 1 ? 'disabled' : ''}>Entfernen</button>
     </div>`).join('')}</div>
     <button class="game-button setup-add-player" type="button" data-add-player ${players.length >= MAX_PLAYERS ? 'disabled' : ''}>+ Spieler hinzufügen</button>
     <button class="game-button primary setup-start-game" type="button" data-start-game>Spiel starten</button>
   </div>`, 'busfahrer-menu')
 
-  app.querySelectorAll<HTMLButtonElement>('[data-edit-player]').forEach((button) => button.addEventListener('click', () => {
-    profileEditorContext = { mode: 'edit-player', profileId: button.dataset.editPlayer }
-    window.location.hash = 'busfahrer-profile-editor'
-  }))
+  app.querySelectorAll<HTMLInputElement>('[data-player-name]').forEach((input) => {
+    input.addEventListener('input', () => {
+      players = players.map((player) => player.id === input.dataset.playerName ? { ...player, name: input.value } : player)
+    })
+  })
   app.querySelectorAll<HTMLButtonElement>('[data-remove-player]').forEach((button) => button.addEventListener('click', () => {
     if (players.length === 1) return
     players = players.filter((player) => player.id !== button.dataset.removePlayer)
     renderOfflineMenu()
   }))
   app.querySelector<HTMLButtonElement>('[data-add-player]')!.addEventListener('click', () => {
-    if (players.length < MAX_PLAYERS) window.location.hash = 'busfahrer-profile-picker'
+    if (players.length >= MAX_PLAYERS) return
+    const player = createLocalPlayer(players.length + 1)
+    players.push(player)
+    pendingPlayerNameFocusId = player.id
+    renderOfflineMenu()
   })
   app.querySelector<HTMLButtonElement>('[data-start-game]')!.addEventListener('click', () => {
     gamePlayerSnapshot = players.map((player, index) => ({ ...player, name: player.name.trim() || `Spieler ${index + 1}` }))
-    profileStore.lastUsedProfileIds = players.map((player) => player.profileId)
+    profileStore.lastUsedProfileIds = players
+      .map((player) => player.profileId)
+      .filter((id) => profileStore.profiles.some((profile) => profile.id === id))
     saveProfileStore()
     window.location.hash = 'busfahrer'
   })
+  if (pendingPlayerNameFocusId) {
+    const input = app.querySelector<HTMLInputElement>(`[data-player-name="${pendingPlayerNameFocusId}"]`)
+    pendingPlayerNameFocusId = undefined
+    window.setTimeout(() => {
+      input?.focus()
+      input?.select()
+    }, 0)
+  }
 }
 
 function renderProfilePicker() {
@@ -222,33 +255,31 @@ function renderProfileEditor() {
   const isPrimary = profileEditorContext.mode === 'primary'
   const isNew = profileEditorContext.mode === 'new-player'
   const storedProfile = isNew ? undefined : profileStore.profiles.find((profile) => profile.id === profileEditorContext.profileId)
-  const draftProfile: StoredProfile = storedProfile ? { ...storedProfile } : { id: createId(), name: '', avatarId: null }
-  let selectedAvatarId = draftProfile.avatarId
+  const draftProfile: StoredProfile = storedProfile ? { ...storedProfile, avatarId: storedProfile.avatarId ?? DEFAULT_AVATAR_ID } : { id: createId(), name: '', avatarId: DEFAULT_AVATAR_ID }
+  let selectedAvatarId = draftProfile.avatarId ?? DEFAULT_AVATAR_ID
   const backTarget = isPrimary ? '' : profileEditorContext.mode === 'edit-player' ? 'busfahrer-offline' : 'busfahrer-profile-picker'
 
   setupShell(`<form class="setup-panel profile-editor-panel" data-profile-form>
     <p class="eyebrow">${isPrimary ? 'Benutzerprofil' : isNew ? 'Neues Spielerprofil' : 'Spielerprofil'}</p>
     <h2>${isPrimary ? 'Dein Profil' : isNew ? 'Profil anlegen' : 'Profil bearbeiten'}</h2>
-    <div class="profile-preview ${selectedAvatarId ? '' : 'is-default'}" data-profile-preview style="--avatar-ring:${avatarColor(selectedAvatarId)}">${avatarVisualMarkup(selectedAvatarId)}</div>
+    <div class="profile-preview" data-profile-preview style="--avatar-ring:${avatarColor(selectedAvatarId)}">${avatarVisualMarkup(selectedAvatarId)}</div>
     <label class="profile-name-label" for="profile-name">Spielername</label>
     <input class="profile-name-input" id="profile-name" name="profile-name" value="${escapeHtml(draftProfile.name)}" maxlength="24" autocomplete="nickname" placeholder="Spielername eingeben">
     <fieldset class="avatar-fieldset"><legend>Profilbild</legend><div class="avatar-choice-grid">
-      <button class="avatar-choice ${selectedAvatarId === null ? 'is-selected' : ''}" type="button" data-avatar-id="" aria-pressed="${selectedAvatarId === null}"><span class="avatar-choice-visual is-default">${avatarVisualMarkup(null)}</span><span>Standard</span></button>
-      ${avatarOptions.map((avatar) => `<button class="avatar-choice ${selectedAvatarId === avatar.id ? 'is-selected' : ''}" type="button" data-avatar-id="${avatar.id}" aria-pressed="${selectedAvatarId === avatar.id}"><span class="avatar-choice-visual" style="--avatar-ring:${avatar.color}">${avatarVisualMarkup(avatar.id)}</span><span>${avatar.label}</span></button>`).join('')}
+      ${avatarOptions.map((avatar) => `<button class="avatar-choice ${selectedAvatarId === avatar.id ? 'is-selected' : ''}" type="button" data-avatar-id="${avatar.id}" aria-label="${avatar.label}" aria-pressed="${selectedAvatarId === avatar.id}"><span class="avatar-choice-visual" style="--avatar-ring:${avatar.color}">${avatarVisualMarkup(avatar.id)}</span></button>`).join('')}
     </div></fieldset>
     <button class="game-button primary profile-save-button" type="submit">Speichern</button>
-  </form>`, backTarget, 'Profil', 'GetDrunk')
+  </form>`, backTarget, 'Profil', 'GetDrunk', 'profile-page')
 
   const preview = app.querySelector<HTMLElement>('[data-profile-preview]')!
   const input = app.querySelector<HTMLInputElement>('#profile-name')!
   app.querySelectorAll<HTMLButtonElement>('[data-avatar-id]').forEach((button) => button.addEventListener('click', () => {
-    selectedAvatarId = button.dataset.avatarId || null
+    selectedAvatarId = button.dataset.avatarId || DEFAULT_AVATAR_ID
     app.querySelectorAll<HTMLButtonElement>('[data-avatar-id]').forEach((choice) => {
       const selected = (choice.dataset.avatarId || null) === selectedAvatarId
       choice.classList.toggle('is-selected', selected)
       choice.setAttribute('aria-pressed', String(selected))
     })
-    preview.classList.toggle('is-default', !selectedAvatarId)
     preview.style.setProperty('--avatar-ring', avatarColor(selectedAvatarId))
     preview.innerHTML = avatarVisualMarkup(selectedAvatarId)
   }))

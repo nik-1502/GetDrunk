@@ -97,23 +97,22 @@ body {
   width: clamp(50px, 7vw, 58px);
   height: clamp(50px, 7vw, 58px);
   padding: 0;
-  overflow: hidden;
+  overflow: visible;
   isolation: isolate;
   place-items: center;
-  border: 1px solid rgba(255, 255, 255, .34);
-  border-radius: 18px;
+  border: 0;
+  border-radius: 0;
   color: #fff;
-  background: rgba(11, 5, 28, .44);
-  box-shadow: 0 10px 26px rgba(0, 0, 0, .34);
-  backdrop-filter: blur(12px);
+  background: transparent;
+  box-shadow: none;
   cursor: pointer;
-  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+  transition: transform 160ms ease;
 }
 
 .home-profile-button img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   transform: none;
 }
 
@@ -125,13 +124,10 @@ body {
 .home-profile-button:hover,
 .home-profile-button:active {
   transform: translateY(-2px) scale(1.03);
-  background: rgba(255, 255, 255, .16);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, .42);
 }
 
 .home-profile-button:focus-visible {
-  outline: 3px solid #fff;
-  outline-offset: 3px;
+  outline: none;
 }
 
 .hero-header {
@@ -210,6 +206,54 @@ body {
   background: #8c52cc;
 }
 
+.busfahrer-page.profile-page {
+  position: relative;
+  z-index: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 82% 70% at 18% 28%, rgba(255, 0, 132, .82) 0%, rgba(205, 0, 116, .48) 26%, rgba(92, 0, 91, .20) 50%, transparent 72%),
+    radial-gradient(ellipse 80% 72% at 86% 30%, rgba(0, 93, 255, .82) 0%, rgba(0, 45, 184, .52) 30%, rgba(25, 0, 95, .22) 54%, transparent 76%),
+    radial-gradient(circle at 52% 45%, rgba(168, 39, 255, .48) 0%, rgba(94, 15, 153, .28) 34%, transparent 62%),
+    radial-gradient(ellipse 115% 85% at 50% 114%, rgba(159, 0, 255, .32) 0%, rgba(26, 2, 54, .36) 42%, transparent 68%),
+    linear-gradient(118deg, #120012 0%, #3b003b 24%, #22083e 48%, #071754 74%, #001435 100%);
+  background-attachment: fixed;
+}
+
+.busfahrer-page.profile-page::before,
+.busfahrer-page.profile-page::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.busfahrer-page.profile-page::before {
+  opacity: .22;
+  background:
+    radial-gradient(circle at center, rgba(255, 255, 255, .15) 0 1px, transparent 1.4px) 0 0 / 16px 16px,
+    radial-gradient(circle at center, rgba(255, 255, 255, .10) 0 1px, transparent 1.6px) 8px 8px / 22px 22px;
+  mask-image:
+    radial-gradient(ellipse 62% 42% at 30% 42%, #000 0%, transparent 72%),
+    radial-gradient(ellipse 58% 42% at 76% 42%, #000 0%, transparent 72%);
+  -webkit-mask-image:
+    radial-gradient(ellipse 62% 42% at 30% 42%, #000 0%, transparent 72%),
+    radial-gradient(ellipse 58% 42% at 76% 42%, #000 0%, transparent 72%);
+}
+
+.busfahrer-page.profile-page::after {
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, .035) 1px, transparent 1px) 0 0 / 3px 3px,
+    linear-gradient(0deg, rgba(0, 0, 0, .045) 1px, transparent 1px) 0 0 / 4px 4px,
+    radial-gradient(ellipse 98% 88% at 50% 43%, transparent 0%, rgba(2, 0, 8, .20) 62%, rgba(0, 0, 0, .78) 100%);
+  opacity: .92;
+}
+
+.busfahrer-page.profile-page > .busfahrer-shell {
+  position: relative;
+  z-index: 1;
+}
+
 .back-button {
   min-width: auto;
   color: #3c165f;
@@ -218,7 +262,7 @@ body {
 
 @media (max-width: 620px) {
   .home-page { padding-top: 76px; background-attachment: scroll; }
-  .home-profile-button { border-radius: 16px; }
+  .busfahrer-page.profile-page { background-attachment: scroll; }
   .hero-header { width: min(100%, 430px); margin-top: 0; }
   .hero-logo { width: min(100%, 380px); }
   .game-list { width: min(100%, 340px); }
