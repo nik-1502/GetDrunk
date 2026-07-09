@@ -124,6 +124,7 @@
 .game-stage:has(.pyramid-panel) .pyramid-panel,
 .game-stage:has(.bus-panel) .bus-panel { grid-row: 3; }
 .game-progress { display: grid; grid-template-columns: auto minmax(100px, 1fr) auto; align-items: center; gap: 14px; color: #cfc8dc; font-size: 0.86rem; }
+.progress-player-name { color: #dda15e; font-weight: 900; }
 .progress-track { height: 6px; overflow: hidden; border-radius: 99px; background: rgba(255, 255, 255, 0.1); }
 .progress-track i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #8a5cff, #4b9cff); }
 
@@ -183,7 +184,8 @@
 .playing-card.is-revealed .card-back { visibility: hidden; }
 .card-back { display: grid; place-items: center; border: var(--card-back-border) solid #fff; color: rgba(255,255,255,.88); background: repeating-linear-gradient(45deg, #5d3bb6 0 var(--card-back-stripe), #7957d3 var(--card-back-stripe) calc(var(--card-back-stripe) + var(--card-back-stripe))); }
 .card-back::after { content: ''; position: absolute; inset: var(--card-back-inset); border: var(--card-back-inner-border) solid rgba(255,255,255,.74); border-radius: var(--card-back-inner-radius); }
-.card-back span { z-index: 1; font-size: clamp(.6rem, 28cqw, 1.7rem); font-weight: 900; letter-spacing: .08em; }
+.card-back > span { z-index: 1; font-size: clamp(.6rem, 28cqw, 1.7rem); font-weight: 900; letter-spacing: .08em; }
+.card-back-mirror { display: inline-block; transform: scaleX(-1); }
 .card-front { transform: rotateY(180deg); border: 1px solid #ddd9e3; background: linear-gradient(145deg, #fff, #f5f3f7); }
 .card-red { color: #db3150; }
 .card-blue { color: #2874d6; }
@@ -378,11 +380,11 @@
 .pyramid-decision > div > .game-button { min-width: 120px; min-height: var(--phase-action-height); }
 .pyramid-targets { max-height: 104px; padding: 2px; flex-wrap: wrap; overflow: auto; }
 .pyramid-targets .game-button { min-width: 0 !important; padding: 8px 12px; flex: 1 1 120px; }
-.pyramid-offer { display: grid; place-items: center; }
-.pyramid-offer-question { display: grid; width: min(248px, 100%); height: var(--phase-action-height); padding: 6px 14px; place-items: center; border: 1px solid rgba(255, 255, 255, .16); border-radius: 14px; color: #fff; background: #352c48; font-weight: 800; }
-.pyramid-side-choice { position: absolute; top: 50%; width: clamp(74px, 12vw, 110px); min-width: 0 !important; min-height: var(--phase-action-height); padding-inline: 8px; translate: 0 -50%; z-index: 3; }
-.pyramid-choice-no { left: 18%; translate: -50% -50%; }
-.pyramid-choice-yes { right: 18%; translate: 50% -50%; }
+.pyramid-offer { display: grid; width: min(520px, 100%); grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: center; justify-content: center; gap: 12px; }
+.pyramid-offer-question { display: grid; width: 100%; height: var(--phase-action-height); padding: 12px 18px; place-items: center; border: 1px solid rgba(255, 255, 255, .16); border-radius: 14px; color: #fff; background: #352c48; font-size: clamp(1.12rem, 2.8vw, 1.28rem); font-weight: 800; line-height: 1; white-space: nowrap; }
+.pyramid-offer .game-button { height: var(--phase-action-height); white-space: nowrap; }
+.pyramid-side-choice { position: static; width: 100%; min-width: 0 !important; min-height: var(--phase-action-height); padding: 12px 18px; translate: none; z-index: 3; }
+.pyramid-choice-no, .pyramid-choice-yes { translate: none; }
 .pyramid-target-screen { --phase-action-height: clamp(44px, 7dvh, 50px); grid-row: 2 / 4; display: flex; min-height: 0; padding: clamp(18px, 4dvh, 36px); border: 1px solid rgba(255, 255, 255, .1); border-radius: 24px; flex-direction: column; align-items: center; justify-content: center; color: #f8f5ff; background: rgba(31, 25, 44, .9); box-shadow: 0 24px 70px rgba(0, 0, 0, .28); text-align: center; overflow: auto; }
 .pyramid-target-screen h2 { margin: 0 0 clamp(18px, 4dvh, 32px); color: #fff; font-size: clamp(1.35rem, 4vw, 2rem); }
 .drink-count-highlight { color: #dda15e; font-size: 1.22em; font-weight: 900; line-height: 1; }
@@ -542,6 +544,13 @@
 
 /* Die installierte Handy-App hat mehr nutzbare Höhe als der mobile Browser.
    Eine kompaktere Bühne hält alle drei Phasen optisch auf derselben Höhe. */
+@media (display-mode: standalone), (display-mode: fullscreen) {
+  .pyramid { width: min(600px, 100%); gap: clamp(5px, 1.15dvh, 10px); }
+  .pyramid .playing-card { width: clamp(42px, min(11vw, 11.5vh), 84px); }
+  .pyramid .card-value { font-size: clamp(.9rem, 2.9vh, 1.62rem); }
+  .pyramid .card-symbol { font-size: clamp(.66rem, 2.15vh, 1.16rem); }
+}
+
 @media (max-height: 650px) and (orientation: landscape) {
   .busfahrer-shell { padding-block: 5px; }
   .busfahrer-header h1 { font-size: 1.35rem; }
@@ -558,6 +567,8 @@
   .game-button { min-height: 38px; padding: 5px 10px; font-size: 1rem; }
   .question-panel > .choice-grid .game-button,
   .pyramid-panel > .game-button,
+  .pyramid-offer .game-button,
+  .pyramid-offer-question,
   .bus-panel > .choice-grid .game-button,
   .bus-panel > .game-button { height: 38px; min-height: 38px; }
   .player-hand { padding: 3px 8px; }

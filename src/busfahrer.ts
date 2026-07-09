@@ -126,13 +126,18 @@ function escapeHtml(value: string) {
 function cardMarkup(card: Card, revealed = true, extraClass = '') {
   const face = `<span class="card-value">${card.label}</span><span class="card-symbol">${card.symbol}</span>`
   return `<div class="playing-card ${revealed ? 'is-revealed' : ''} ${extraClass}" aria-label="${revealed ? `${card.label} ${card.suitLabel}` : 'Verdeckte Karte'}">
-    <div class="card-inner"><div class="card-back"><span>GD</span></div><div class="card-front card-${card.color}">
+    <div class="card-inner"><div class="card-back"><span><span class="card-back-mirror">B</span><span>B</span></span></div><div class="card-front card-${card.color}">
       <span class="card-center">${face}</span>
     </div></div></div>`
 }
 
 function phaseHeader(current: number, subtitle: string) {
-  return `<div class="game-progress"><span>Phase ${current} von 3</span><div class="progress-track"><i style="width:${current / 3 * 100}%"></i></div><span>${escapeHtml(subtitle)}</span></div>`
+  const [name, detail] = subtitle.split(' · ')
+  const hasPlayerName = Boolean(detail) && gamePlayers.some((player) => player.name === name)
+  const subtitleMarkup = hasPlayerName
+    ? `<span><strong class="progress-player-name">${escapeHtml(name)}</strong> · ${escapeHtml(detail!)}</span>`
+    : `<span>${escapeHtml(subtitle)}</span>`
+  return `<div class="game-progress"><span>Phase ${current} von 3</span><div class="progress-track"><i style="width:${current / 3 * 100}%"></i></div>${subtitleMarkup}</div>`
 }
 
 function feedbackMarkup() {
@@ -296,7 +301,7 @@ function renderPyramid() {
   const rows = [[0], [1, 2], [3, 4, 5], [6, 7, 8, 9]]
   const complete = pyramidProgress === 10
   const pyramidAction = pyramidDecision?.step === 'offer'
-    ? `<div class="pyramid-decision pyramid-offer"><div class="pyramid-offer-question">Möchtest du deine ${pyramidDecision.label} setzen?</div><button class="game-button choice-red pyramid-side-choice pyramid-choice-no" data-action="keep-pyramid-card">Nein</button><button class="game-button choice-blue pyramid-side-choice pyramid-choice-yes" data-action="use-pyramid-card">Ja</button></div>`
+    ? `<div class="pyramid-decision pyramid-offer"><button class="game-button choice-red pyramid-side-choice pyramid-choice-no" data-action="keep-pyramid-card">Nein</button><div class="pyramid-offer-question">${escapeHtml(pyramidDecision.label)} setzen?</div><button class="game-button choice-blue pyramid-side-choice pyramid-choice-yes" data-action="use-pyramid-card">Ja</button></div>`
     : `<button class="game-button primary" data-action="${complete ? 'finish-player-pyramid' : 'reveal-pyramid'}">${complete ? `${currentPlayer().name} ist fertig` : 'Nächste Karte aufdecken'}</button>`
   return `${phaseHeader(2, `${currentPlayer().name} · ${pyramidProgress} von 10 Karten`)}<section class="pyramid-panel">
     <h2>Pyramide</h2><div class="pyramid">${rows.map((row, rowIndex) =>
@@ -469,7 +474,7 @@ function renderGame() {
   if (!gameRoot) return
   const content = phase === 'player-intro' ? renderPlayerIntro() : phase === 'questions' ? renderQuestions() : phase === 'pyramid' ? renderPyramid() : phase === 'summary' ? renderSummary() : phase === 'final' ? renderSummary(true) : renderBus()
   gameRoot.innerHTML = `<div class="busfahrer-shell"><header class="busfahrer-header">
-    <button class="back-button bus-back" type="button" data-action="back">${phase === 'player-intro' ? 'Beenden' : '← Zurück'}</button><div><p>GetDrunk präsentiert</p><h1>BLOBB-FAHRER</h1></div>
+    <button class="back-button bus-back" type="button" data-action="back">Beenden</button><div><p>GetDrunk präsentiert</p><h1>BLOBB-FAHRER</h1></div>
     <button class="restart-button" type="button" data-action="restart">Neu starten</button></header>
     <p class="responsibility-note">Trink verantwortungsvoll. Dieses Spiel ist nur für Erwachsene.</p><div class="game-stage">${content}${phase === 'bus' ? busUsedCardsMarkup() : ''}</div></div>`
   gameRoot.querySelector('.responsibility-note')?.remove()
@@ -479,8 +484,6 @@ function renderGame() {
 
 function applyOnlineControls() {
   if (!gameRoot || !onlineOptions.localPlayerId) return
-  const backButton = gameRoot.querySelector<HTMLButtonElement>('[data-action="back"]')
-  if (backButton) backButton.textContent = 'Spiel verlassen'
   if (localCanControl()) return
   gameRoot.querySelectorAll<HTMLButtonElement>('button').forEach((button) => {
     if (button.dataset.action === 'back') return
@@ -493,7 +496,7 @@ function handleClick(event: Event) {
   if (!button) return
   if (button.dataset.action === 'back') {
     onlineOptions.onLeave?.()
-    window.location.hash = onlineOptions.localPlayerId ? 'busfahrer-menu' : 'busfahrer-offline'
+    window.location.hash = ''
     return
   }
   if (!localCanControl()) return
@@ -525,7 +528,12 @@ function handleClick(event: Event) {
     }
     renderGame()
   }
-  if (button.dataset.action === 'restart') { resetGame(); renderGame() }
+  if (button.dataset.action === 'restart') {
+    window.clearTimeout(advanceTimer)
+    advanceTimer = undefined
+    onlineOptions.onLeave?.()
+    window.location.hash = onlineOptions.localPlayerId ? 'busfahrer-online' : 'busfahrer-offline'
+  }
 }
 
 export function mountBusfahrer(root: HTMLElement, playerSetups: PlayerSetup[] = [{ name: 'Nick', avatar: '', avatarColor: '#dda15e' }], options: OnlineGameOptions = {}) {
