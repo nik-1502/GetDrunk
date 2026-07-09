@@ -213,6 +213,11 @@ function renderPlayerIntro() {
     <div class="player-turn-actions"><button class="game-button primary" data-action="start-player-round">Jetzt starten</button></div></section></div>`
 }
 
+function playerTargetAvatarMarkup(player: GamePlayer) {
+  const avatar = player.avatar ? `<img src="${player.avatar}" alt="Profilbild von ${escapeHtml(player.name)}">` : defaultProfileIconMarkup()
+  return `<span class="pyramid-target-avatar ${player.avatar ? '' : 'is-default'}" style="--avatar-ring:${player.avatarColor}">${avatar}</span>`
+}
+
 function busUsedCardsMarkup() {
   const grouped = new Map<number, Card[]>()
   for (const card of busfahrerUsedCards) grouped.set(card.value, [...(grouped.get(card.value) ?? []), card])
@@ -285,8 +290,8 @@ function nextQuestion() {
 
 function renderPyramid() {
   if (pyramidDecision?.step === 'target') {
-    return `${phaseHeader(2, `${currentPlayer().name} · Spieler auswählen`)}<section class="pyramid-target-screen"><p class="eyebrow">Pyramide</p><h2>Wer soll ${pyramidDecision.drinks} Schluck${pyramidDecision.drinks === 1 ? '' : 'e'} trinken?</h2>
-      <div class="pyramid-player-list">${gamePlayers.map((player, index) => `<button class="game-button" data-pyramid-target="${index}">${escapeHtml(player.name)}</button>`).join('')}</div></section>`
+    return `${phaseHeader(2, `${currentPlayer().name} · Spieler auswählen`)}<section class="pyramid-target-screen"><p class="eyebrow">Pyramide</p><h2>Wer soll <span class="drink-count-highlight">${pyramidDecision.drinks}</span> Schluck${pyramidDecision.drinks === 1 ? '' : 'e'} trinken?</h2>
+      <div class="pyramid-player-list">${gamePlayers.map((player, index) => `<button class="game-button" data-pyramid-target="${index}">${playerTargetAvatarMarkup(player)}<span>${escapeHtml(player.name)}</span></button>`).join('')}</div></section>`
   }
   const rows = [[0], [1, 2], [3, 4, 5], [6, 7, 8, 9]]
   const complete = pyramidProgress === 10
@@ -375,7 +380,10 @@ function startBus() {
 }
 
 function playerStatsMarkup() {
-  return `<div class="game-stats-table"><div class="game-stats-head"><span>Spieler</span><span>Schlücke</span></div>${gamePlayers.map((player, index) => `<div class="game-stats-row ${index === busDriverIndex ? 'is-bus-driver' : ''}"><strong>${escapeHtml(player.name)}</strong><span>${player.drinks}</span></div>`).join('')}</div>`
+  const sortedPlayers = gamePlayers
+    .map((player, index) => ({ player, index }))
+    .sort((left, right) => right.player.drinks - left.player.drinks || left.index - right.index)
+  return `<div class="game-stats-table"><div class="game-stats-head"><span>Spieler</span><span>Schlücke</span></div>${sortedPlayers.map(({ player, index }) => `<div class="game-stats-row ${index === busDriverIndex ? 'is-bus-driver' : ''}"><div class="game-stats-player">${playerTargetAvatarMarkup(player)}<strong>${escapeHtml(player.name)}</strong></div><span>${player.drinks}</span></div>`).join('')}</div>`
 }
 
 function renderSummary(final = false) {
