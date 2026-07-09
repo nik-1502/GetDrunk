@@ -134,9 +134,7 @@ function cardMarkup(card: Card, revealed = true, extraClass = '') {
 function phaseHeader(current: number, subtitle: string) {
   const [name, detail] = subtitle.split(' · ')
   const hasPlayerName = Boolean(detail) && gamePlayers.some((player) => player.name === name)
-  const subtitleMarkup = hasPlayerName
-    ? `<span><strong class="progress-player-name">${escapeHtml(name)}</strong> · ${escapeHtml(detail!)}</span>`
-    : `<span>${escapeHtml(subtitle)}</span>`
+  const subtitleMarkup = `<span>${escapeHtml(hasPlayerName ? detail! : subtitle)}</span>`
   return `<div class="game-progress"><span>Phase ${current} von 3</span><div class="progress-track"><i style="width:${current / 3 * 100}%"></i></div>${subtitleMarkup}</div>`
 }
 
@@ -221,6 +219,12 @@ function renderPlayerIntro() {
 function playerTargetAvatarMarkup(player: GamePlayer) {
   const avatar = player.avatar ? `<img src="${player.avatar}" alt="Profilbild von ${escapeHtml(player.name)}">` : defaultProfileIconMarkup()
   return `<span class="pyramid-target-avatar ${player.avatar ? '' : 'is-default'}" style="--avatar-ring:${player.avatarColor}">${avatar}</span>`
+}
+
+function currentPlayerFooterMarkup() {
+  if (phase === 'player-intro') return ''
+  const player = currentPlayer()
+  return `<div class="current-player-footer">${playerTargetAvatarMarkup(player)}<strong>${escapeHtml(player.name)}</strong></div>`
 }
 
 function busUsedCardsMarkup() {
@@ -476,7 +480,7 @@ function renderGame() {
   gameRoot.innerHTML = `<div class="busfahrer-shell"><header class="busfahrer-header">
     <button class="back-button bus-back" type="button" data-action="back">Beenden</button><div><p>GetDrunk präsentiert</p><h1>BLOBB-FAHRER</h1></div>
     <button class="restart-button" type="button" data-action="restart">Neu starten</button></header>
-    <p class="responsibility-note">Trink verantwortungsvoll. Dieses Spiel ist nur für Erwachsene.</p><div class="game-stage">${content}${phase === 'bus' ? busUsedCardsMarkup() : ''}</div></div>`
+    <p class="responsibility-note">Trink verantwortungsvoll. Dieses Spiel ist nur für Erwachsene.</p><div class="game-stage">${content}${phase === 'bus' ? busUsedCardsMarkup() : ''}${currentPlayerFooterMarkup()}</div></div>`
   gameRoot.querySelector('.responsibility-note')?.remove()
   applyOnlineControls()
   publishState()

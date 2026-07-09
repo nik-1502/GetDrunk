@@ -101,6 +101,7 @@
   --phase-bottom-frame-height: clamp(105px, 22dvh, 170px);
   --phase-frame-gap: clamp(6px, 1.4dvh, 16px);
   --setup-panel-top: clamp(86px, 17dvh, 150px);
+  position: relative;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) calc(var(--phase-bottom-frame-height) - var(--phase-frame-gap));
   flex: 1 1 auto;
@@ -123,6 +124,14 @@
 .game-stage:has(.question-panel) .question-panel,
 .game-stage:has(.pyramid-panel) .pyramid-panel,
 .game-stage:has(.bus-panel) .bus-panel { grid-row: 3; }
+.game-stage:has(.question-panel) .player-hand,
+.game-stage:has(.pyramid-panel) .player-hand,
+.game-stage:has(.bus-panel) .used-cards,
+.game-stage:has(.question-panel) .question-panel,
+.game-stage:has(.pyramid-panel) .pyramid-panel,
+.game-stage:has(.bus-panel) .bus-panel {
+  justify-self: center;
+}
 .game-progress { display: grid; grid-template-columns: auto minmax(100px, 1fr) auto; align-items: center; gap: 14px; color: #cfc8dc; font-size: 0.86rem; }
 .progress-player-name { color: #dda15e; font-weight: 900; }
 .progress-track { height: 6px; overflow: hidden; border-radius: 99px; background: rgba(255, 255, 255, 0.1); }
@@ -144,7 +153,8 @@
 .pyramid-panel,
 .bus-panel {
   --phase-action-height: clamp(37.4px, 5.95dvh, 42.5px);
-  height: 85%;
+  width: 100%;
+  height: 79%;
   min-height: 0;
   margin: 0;
   padding: clamp(6.8px, 1.7vh, 18.7px) clamp(10px, 3vw, 28px);
@@ -367,11 +377,31 @@
 .game-stage:has(.bus-panel) .mini-used-card,
 .game-stage:has(.bus-panel) .placeholder-card { width: clamp(25px, 4.7dvh, 37px); height: clamp(34px, 6.5dvh, 52px); font-size: clamp(.66rem, 1.7vh, .94rem); }
 
+.current-player-footer {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(10px, 2.6dvh, 24px);
+  z-index: 2;
+  display: flex;
+  width: fit-content;
+  max-width: min(520px, calc(100% - 20px));
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transform: translateX(-50%);
+  color: #dda15e;
+  font-size: clamp(1.52rem, 3.8vw, 1.86rem);
+  font-weight: 900;
+  text-align: center;
+}
+.current-player-footer .pyramid-target-avatar { width: clamp(32px, 4.8vw, 40px); height: clamp(32px, 4.8vw, 40px); }
+.current-player-footer strong { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
 .lost-screen > p:not(.eyebrow) { color: #bdb4d2; }
 
 .pyramid-panel { --phase-action-height: clamp(56.1px, 8.5dvh, 73.1px); position: relative; display: grid; grid-template-rows: auto minmax(0, 1fr) var(--phase-action-height); align-items: center; row-gap: clamp(6.8px, 1.3dvh, 13.6px); }
 .pyramid-panel h2 { margin: 0; }
-.pyramid { width: min(540px, 100%); min-height: 0; margin: auto; display: grid; place-self: center; align-content: center; gap: clamp(4px, 1dvh, 9px); transform: none; }
+.pyramid { width: min(540px, 100%); min-height: 0; margin: 0 auto auto; display: grid; place-self: start center; align-content: start; gap: clamp(3px, .8dvh, 7px); transform: none; }
 .pyramid-panel > .feedback { position: absolute; z-index: 2; top: clamp(6px, 1.2vh, 12px); right: clamp(8px, 2vw, 18px); max-width: 34%; min-height: 0; margin: 0; padding: 5px 8px; font-size: clamp(0.62rem, 1.5vw, 0.78rem); pointer-events: none; }
 .pyramid-panel > .game-button { width: min(520px, 100%); justify-self: center; }
 .pyramid-panel > .game-button { height: var(--phase-action-height); min-height: var(--phase-action-height); }
@@ -396,9 +426,9 @@
 .pyramid-target-avatar .default-profile-icon { width: 68%; height: 68%; }
 .pyramid-row { position: relative; display: flex; justify-content: center; gap: 7px; }
 .pyramid-row::after { content: attr(data-drinks); position: absolute; left: calc(50% + 226px); top: 50%; color: #9c94aa; font-size: .68rem; transform: translateY(-50%); white-space: nowrap; }
-.pyramid .playing-card { width: clamp(38px, min(10vw, 10.5vh), 76px); }
-.pyramid .card-value { font-size: clamp(.84rem, 2.7vh, 1.5rem); }
-.pyramid .card-symbol { font-size: clamp(.62rem, 2vh, 1.08rem); }
+.pyramid .playing-card { width: clamp(33px, min(8.7vw, 9.1vh), 66px); }
+.pyramid .card-value { font-size: clamp(.72rem, 2.35vh, 1.3rem); }
+.pyramid .card-symbol { font-size: clamp(.54rem, 1.74vh, .94rem); }
 .pyramid-hit { animation: hit-glow 1s ease-in-out infinite alternate; }
 .pyramid-hit .card-front { border: 3px solid #62df9b; box-shadow: inset 0 0 14px rgba(70, 230, 142, .42); }
 
@@ -547,9 +577,9 @@
    Eine kompaktere Bühne hält alle drei Phasen optisch auf derselben Höhe. */
 @media (display-mode: standalone), (display-mode: fullscreen) {
   .pyramid { width: min(600px, 100%); gap: clamp(5px, 1.15dvh, 10px); }
-  .pyramid .playing-card { width: clamp(36px, min(9.4vw, 9.8vh), 71px); }
-  .pyramid .card-value { font-size: clamp(.76rem, 2.45vh, 1.38rem); }
-  .pyramid .card-symbol { font-size: clamp(.56rem, 1.82vh, .98rem); }
+  .pyramid .playing-card { width: clamp(38px, min(10vw, 10.3vh), 76px); }
+  .pyramid .card-value { font-size: clamp(.8rem, 2.58vh, 1.46rem); }
+  .pyramid .card-symbol { font-size: clamp(.59rem, 1.92vh, 1.04rem); }
 }
 
 @media (max-height: 650px) and (orientation: landscape) {
