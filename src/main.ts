@@ -23,6 +23,7 @@ import {
 } from './online.ts'
 import type { Session } from '@supabase/supabase-js'
 import userButtonImage from './assets/benutzer/4c0c56d3-a7e5-4be3-81b0-fda84fd67cbf.png'
+import busfahrerGameImage from './assets/spielbild icons/91c70169-1e14-42c9-b836-6eacc3325af0.png'
 import heroLogo from './assets/überschrift/ebe5baf7-8dca-44a0-a5bc-ba2f48425dc2.png'
 
 const app = document.querySelector<HTMLDivElement>('#app')!
@@ -332,7 +333,10 @@ function renderHome() {
       <img class="hero-logo" src="${heroLogo}" alt="BLOBBA">
     </header>
     <section class="game-list" aria-label="Spiele">
-      <button class="busfahrer-button" type="button">BLOBB-FAHRER</button>
+      <button class="busfahrer-button" type="button" aria-label="Busfahrer öffnen">
+        <img class="busfahrer-button-image" src="${busfahrerGameImage}" alt="">
+        <span class="busfahrer-button-label">BLOBB-FAHRER</span>
+      </button>
     </section>
   </main>`
   app.querySelector<HTMLButtonElement>('.home-profile-button')!.addEventListener('click', () => { window.location.hash = 'profile' })

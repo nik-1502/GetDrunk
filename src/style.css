@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@700&display=swap');
+
 :root {
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: #fff;
@@ -147,17 +149,34 @@ body {
 }
 
 .busfahrer-button {
-  min-width: 180px;
-  padding: 14px 28px;
+  width: min(100%, clamp(220px, 58vw, 360px));
+  padding: clamp(10px, 2.6vw, 16px);
   border: 1px solid rgba(255, 255, 255, .26);
-  border-radius: 12px;
+  border-radius: 18px;
   color: #fff;
-  background: linear-gradient(135deg, rgba(255, 0, 140, .78), rgba(36, 71, 255, .78));
+  background: linear-gradient(135deg, rgba(255, 0, 140, .34), rgba(36, 71, 255, .34));
   box-shadow: 0 16px 38px rgba(11, 0, 34, .52), inset 0 1px 0 rgba(255, 255, 255, .24);
   font: inherit;
   font-weight: 700;
   cursor: pointer;
+  display: grid;
+  place-items: center;
+  gap: 10px;
   transition: transform 160ms ease, box-shadow 160ms ease;
+}
+
+.busfahrer-button-image {
+  display: block;
+  width: 100%;
+  max-height: clamp(150px, 32dvh, 260px);
+  object-fit: contain;
+}
+
+.busfahrer-button-label {
+  color: #fff;
+  font-family: "Fredoka", Inter, system-ui, sans-serif;
+  font-weight: 900;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, .45), 0 0 18px rgba(255, 0, 166, .45);
 }
 
 .back-button {
@@ -184,8 +203,8 @@ body {
 }
 
 .busfahrer-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 20px 46px rgba(8, 0, 30, .62), inset 0 1px 0 rgba(255, 255, 255, .28);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 20px 46px rgba(8, 0, 30, .62), 0 0 28px rgba(255, 0, 166, .28), inset 0 1px 0 rgba(255, 255, 255, .28);
 }
 
 .back-button:hover {

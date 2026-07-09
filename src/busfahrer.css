@@ -418,15 +418,17 @@
 .end-actions .game-button { width: 100%; min-width: 0; }
 
 .game-summary-panel {
+  --summary-action-height: clamp(66px, 10dvh, 86px);
+  --summary-panel-pad: clamp(16px, 3dvh, 30px);
   grid-row: 2 / 4;
-  display: flex;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) var(--summary-action-height);
   min-height: 0;
-  padding: clamp(16px, 3dvh, 30px);
+  padding: var(--summary-panel-pad) var(--summary-panel-pad) clamp(6px, 1dvh, 10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 24px;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  align-items: start;
+  justify-items: center;
   gap: clamp(14px, 2.5dvh, 24px);
   color: #f8f5ff;
   background: rgba(31, 25, 44, 0.82);
@@ -434,7 +436,7 @@
   overflow: auto;
 }
 .game-summary-panel h2 { margin: 0; color: #fff; text-align: center; }
-.game-summary-panel > .game-button { width: min(460px, 100%); flex: 0 0 auto; }
+.game-summary-panel > .game-button { display: flex; width: min(460px, 100%); height: var(--summary-action-height); min-height: var(--summary-action-height); align-items: center; justify-content: center; align-self: end; transform: translateY(clamp(68px, 10dvh, 96px)); }
 .game-stats-table { width: min(620px, 100%); overflow: hidden; border: 1px solid rgba(255, 255, 255, .12); border-radius: 14px; background: rgba(0, 0, 0, .14); }
 .game-stats-head, .game-stats-row { display: grid; padding: 10px 12px; grid-template-columns: minmax(0, 1fr) 96px; align-items: center; gap: 8px; }
 .game-stats-head { color: #9e8bd0; font-size: .72rem; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
