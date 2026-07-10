@@ -310,7 +310,7 @@ function renderPyramid() {
   const rows = [[0], [1, 2], [3, 4, 5], [6, 7, 8, 9]]
   const complete = pyramidProgress === 10
   const pyramidAction = pyramidDecision?.step === 'offer'
-    ? `<div class="pyramid-decision pyramid-offer"><button class="game-button choice-red pyramid-side-choice pyramid-choice-no" data-action="keep-pyramid-card">Nein</button><div class="pyramid-offer-question">${escapeHtml(pyramidDecision.label)} setzen?</div><button class="game-button choice-blue pyramid-side-choice pyramid-choice-yes" data-action="use-pyramid-card">Ja</button></div>`
+    ? `<div class="pyramid-decision pyramid-offer"><button class="game-button choice-red pyramid-side-choice pyramid-choice-no" data-action="keep-pyramid-card">Nein</button><div class="pyramid-offer-question">Möchtest du die Karte ${escapeHtml(pyramidDecision.label)} setzen?</div><button class="game-button choice-blue pyramid-side-choice pyramid-choice-yes" data-action="use-pyramid-card">Ja</button></div>`
     : `<button class="game-button primary" data-action="${complete ? 'finish-player-pyramid' : 'reveal-pyramid'}">${complete ? `${currentPlayer().name} ist fertig` : 'Nächste Karte aufdecken'}</button>`
   return `${phaseHeader(2, `${currentPlayer().name} · ${pyramidProgress} von 10 Karten`)}<section class="pyramid-panel">
     <h2>Pyramide</h2><div class="pyramid">${rows.map((row, rowIndex) =>

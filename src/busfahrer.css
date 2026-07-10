@@ -401,7 +401,7 @@
 
 .pyramid-panel { --phase-action-height: clamp(56.1px, 8.5dvh, 73.1px); position: relative; display: grid; grid-template-rows: auto minmax(0, 1fr) var(--phase-action-height); align-items: center; row-gap: clamp(6.8px, 1.3dvh, 13.6px); }
 .pyramid-panel h2 { margin: 0; }
-.pyramid { width: min(540px, 100%); min-height: 0; margin: auto; display: grid; place-self: center; align-content: center; gap: clamp(2px, .62dvh, 5px); transform: translateY(clamp(-4px, -0.7dvh, -2px)); }
+.pyramid { --pyramid-card-width: clamp(30px, min(7.9vw, 8.2vh), 60px); --pyramid-card-height: calc(var(--pyramid-card-width) * 7 / 5); width: min(540px, 100%); min-height: 0; margin: auto; display: grid; place-self: center; align-content: center; gap: clamp(2px, .62dvh, 5px); transform: translateY(clamp(-4px, -0.7dvh, -2px)); }
 .pyramid-panel > .feedback { position: absolute; z-index: 2; top: clamp(6px, 1.2vh, 12px); right: clamp(8px, 2vw, 18px); display: grid; width: min(130px, 29%); height: clamp(26px, 5dvh, 37px); min-height: 0; margin: 0; padding: 6px 9px; place-items: center; font-size: clamp(0.72rem, 1.6vw, 0.86rem); line-height: 1.08; pointer-events: none; }
 .pyramid-panel > .feedback-drinks { gap: 2px; line-height: 1; }
 .pyramid-panel > .feedback-drinks strong,
@@ -415,11 +415,11 @@
 .pyramid-decision > div > .game-button { min-width: 120px; min-height: var(--phase-action-height); }
 .pyramid-targets { max-height: 104px; padding: 2px; flex-wrap: wrap; overflow: auto; }
 .pyramid-targets .game-button { min-width: 0 !important; padding: 8px 12px; flex: 1 1 120px; }
-.pyramid-offer { display: grid; width: min(520px, 100%); grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: center; justify-content: center; gap: 12px; }
-.pyramid-offer-question { display: grid; width: 100%; height: var(--phase-action-height); padding: 12px 18px; place-items: center; border: 1px solid rgba(255, 255, 255, .16); border-radius: 14px; color: #fff; background: #352c48; font-size: clamp(1.12rem, 2.8vw, 1.28rem); font-weight: 800; line-height: 1; white-space: nowrap; }
-.pyramid-offer .game-button { height: var(--phase-action-height); white-space: nowrap; }
-.pyramid-side-choice { position: static; width: 100%; min-width: 0 !important; min-height: var(--phase-action-height); padding: 12px 18px; translate: none; z-index: 3; }
-.pyramid-choice-no, .pyramid-choice-yes { translate: none; }
+.pyramid-offer { position: absolute; left: 50%; bottom: clamp(6.8px, 1.7vh, 18.7px); z-index: 3; display: block; width: min(520px, calc(100% - 20px)); height: calc(100% - clamp(13.6px, 3.4vh, 37.4px)); transform: translateX(-50%); pointer-events: none; }
+.pyramid-offer-question { position: absolute; left: 0; right: 0; bottom: 0; display: grid; height: var(--phase-action-height); padding: 12px 18px; place-items: center; border: 1px solid rgba(255, 255, 255, .16); border-radius: 14px; color: #fff; background: #352c48; font-size: clamp(1.12rem, 2.8vw, 1.28rem); font-weight: 800; line-height: 1; white-space: nowrap; pointer-events: auto; }
+.pyramid-offer .game-button { position: absolute; top: calc(clamp(5px, 1.2vh, 14px) + clamp(1.25rem, 3.5vh, 2.4rem) + clamp(6.8px, 1.3dvh, 13.6px) + (var(--pyramid-card-height) * 2) + clamp(2px, .62dvh, 5px) - var(--phase-action-height) + clamp(-4px, -0.7dvh, -2px)); width: calc((100% - 24px) / 3); height: var(--phase-action-height); min-width: 0 !important; min-height: var(--phase-action-height); padding: 12px 18px; white-space: nowrap; pointer-events: auto; }
+.pyramid-choice-no { left: 0; }
+.pyramid-choice-yes { right: 0; }
 .pyramid-target-screen { --phase-action-height: clamp(44px, 7dvh, 50px); grid-row: 2 / 4; display: flex; min-height: 0; padding: clamp(18px, 4dvh, 36px); border: 1px solid rgba(255, 255, 255, .1); border-radius: 24px; flex-direction: column; align-items: center; justify-content: center; color: #f8f5ff; background: rgba(31, 25, 44, .9); box-shadow: 0 24px 70px rgba(0, 0, 0, .28); text-align: center; overflow: auto; }
 .pyramid-target-screen h2 { margin: 0 0 clamp(18px, 4dvh, 32px); color: #fff; font-size: clamp(1.35rem, 4vw, 2rem); }
 .drink-count-highlight { color: #dda15e; font-size: 1.22em; font-weight: 900; line-height: 1; }
@@ -430,7 +430,7 @@
 .pyramid-target-avatar .default-profile-icon { width: 68%; height: 68%; }
 .pyramid-row { position: relative; display: flex; justify-content: center; gap: 5px; }
 .pyramid-row::after { content: attr(data-drinks); position: absolute; left: calc(50% + 226px); top: 50%; color: #9c94aa; font-size: .68rem; transform: translateY(-50%); white-space: nowrap; }
-.pyramid .playing-card { width: clamp(30px, min(7.9vw, 8.2vh), 60px); }
+.pyramid .playing-card { width: var(--pyramid-card-width); }
 .pyramid .card-value { font-size: clamp(.68rem, 2.12vh, 1.18rem); }
 .pyramid .card-symbol { font-size: clamp(.5rem, 1.57vh, .86rem); }
 .pyramid-hit { animation: hit-glow 1s ease-in-out infinite alternate; }
@@ -580,7 +580,7 @@
 /* Die installierte Handy-App hat mehr nutzbare Höhe als der mobile Browser.
    Eine kompaktere Bühne hält alle drei Phasen optisch auf derselben Höhe. */
 @media (display-mode: standalone), (display-mode: fullscreen) {
-  .pyramid { width: min(600px, 100%); gap: clamp(5px, 1.15dvh, 10px); transform: none; }
+  .pyramid { --pyramid-card-width: clamp(38px, min(10vw, 10.3vh), 76px); width: min(600px, 100%); gap: clamp(5px, 1.15dvh, 10px); transform: translateY(clamp(-8px, -1.1dvh, -4px)); }
   .pyramid-row { gap: 5px; }
   .pyramid .playing-card { width: clamp(38px, min(10vw, 10.3vh), 76px); }
   .pyramid .card-value { font-size: clamp(.8rem, 2.58vh, 1.46rem); }
