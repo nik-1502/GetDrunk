@@ -1,5 +1,6 @@
 import './style.css'
 import { applyBusfahrerState, getBusfahrerState, mountBusfahrer, type BusfahrerGameState } from './busfahrer.ts'
+import { applyKlatschenState, getKlatschenState, mountKlatschen, type KlatschenGameState } from './games/klatschen/KlatschenGame.ts'
 import { avatarColor, avatarOptions, avatarSource, avatarVisualMarkup } from './profiles.ts'
 import {
   createOnlineGroup,
@@ -36,9 +37,11 @@ type ProfileStore = { profiles: StoredProfile[]; activeProfileId: string; lastUs
 type SetupPlayer = { id: string; profileId: string; name: string; avatarId: string | null; avatar: string; avatarColor: string }
 type ProfileEditorContext = { mode: 'primary' | 'new-player' | 'edit-player'; profileId?: string }
 type SetupMode = 'offline' | 'online'
+type GameKey = 'busfahrer' | 'klatschen'
 type OnlineModal = 'create' | 'join' | 'invite' | null
 type AuthModal = 'login' | 'register' | null
-type OnlineGroupState = { joined: boolean; isHost: boolean; inviteCode: string; groupId: string | null; status: 'lobby' | 'playing' | 'finished'; players: SetupPlayer[]; members: OnlineMember[]; gameState: BusfahrerGameState | null }
+type SharedGameState = BusfahrerGameState | KlatschenGameState
+type OnlineGroupState = { joined: boolean; isHost: boolean; inviteCode: string; groupId: string | null; gameKey: GameKey; status: 'lobby' | 'playing' | 'finished'; players: SetupPlayer[]; members: OnlineMember[]; gameState: SharedGameState | null }
 type VisualViewportLike = { height: number; offsetTop: number; addEventListener: Window['addEventListener']; removeEventListener: Window['removeEventListener'] }
 
 let unmountCurrentPage: (() => void) | undefined
@@ -48,8 +51,9 @@ let gamePlayerSnapshot: SetupPlayer[] = []
 let profileEditorContext: ProfileEditorContext = { mode: 'primary' }
 let pendingPlayerNameFocusId: string | undefined
 let setupMode: SetupMode = 'offline'
+let activeGame: GameKey = 'busfahrer'
 let activeOnlineModal: OnlineModal = null
-let onlineGroup: OnlineGroupState = { joined: false, isHost: false, inviteCode: 'BLOBBA-724', groupId: null, status: 'lobby', players: [], members: [], gameState: null }
+let onlineGroup: OnlineGroupState = { joined: false, isHost: false, inviteCode: 'BLOBBA-724', groupId: null, gameKey: 'busfahrer', status: 'lobby', players: [], members: [], gameState: null }
 let authSession: Session | null = null
 let authModal: AuthModal = null
 let authNotice = ''
@@ -163,21 +167,25 @@ function setupPlayerFromMember(member: OnlineMember): SetupPlayer {
 }
 
 function applyOnlineSnapshot(group: OnlineGroup, members: OnlineMember[]) {
+  const gameKey: GameKey = group.game_key === 'klatschen' ? 'klatschen' : 'busfahrer'
+  activeGame = gameKey
   onlineGroup = {
     joined: true,
     isHost: group.host_user_id === currentUser()?.id,
     inviteCode: group.invite_code,
     groupId: group.id,
+    gameKey,
     status: group.status,
     players: members.map(setupPlayerFromMember),
     members,
-    gameState: (group.game_state as BusfahrerGameState | null) ?? null,
+    gameState: (group.game_state as SharedGameState | null) ?? null,
   }
   gamePlayerSnapshot = onlineGroup.players
-  if (group.status === 'playing' && window.location.hash.split('?')[0] !== '#busfahrer') {
-    window.location.hash = 'busfahrer'
+  if (group.status === 'playing' && window.location.hash.split('?')[0] !== `#${gameKey}`) {
+    window.location.hash = gameKey
   } else if (group.status === 'playing' && onlineGroup.gameState) {
-    applyBusfahrerState(onlineGroup.gameState)
+    if (gameKey === 'klatschen' && 'players' in onlineGroup.gameState) applyKlatschenState(onlineGroup.gameState)
+    if (gameKey === 'busfahrer' && 'gamePlayers' in onlineGroup.gameState) applyBusfahrerState(onlineGroup.gameState)
   }
   reconcileDepartedPlayers()
 }
@@ -185,6 +193,19 @@ function applyOnlineSnapshot(group: OnlineGroup, members: OnlineMember[]) {
 function reconcileDepartedPlayers() {
   if (!onlineGroup.isHost || !onlineGroup.groupId || !onlineGroup.gameState || onlineGroup.status !== 'playing') return
   const memberIds = new Set(onlineGroup.members.map((member) => member.user_id))
+  if ('players' in onlineGroup.gameState) {
+    const previousPlayers = onlineGroup.gameState.players
+    const nextPlayers = previousPlayers.filter((player) => memberIds.has(player.id))
+    if (nextPlayers.length === previousPlayers.length || !nextPlayers.length) return
+    const previousActiveId = previousPlayers[onlineGroup.gameState.currentPlayerIndex]?.id
+    const nextActiveIndex = previousActiveId && memberIds.has(previousActiveId)
+      ? nextPlayers.findIndex((player) => player.id === previousActiveId)
+      : Math.min(onlineGroup.gameState.currentPlayerIndex, nextPlayers.length - 1)
+    const nextState: KlatschenGameState = { ...onlineGroup.gameState, players: nextPlayers, currentPlayerIndex: Math.max(0, nextActiveIndex) }
+    onlineGroup.gameState = nextState
+    void updateOnlineGameState(onlineGroup.groupId, nextState, 'playing')
+    return
+  }
   const previousPlayers = onlineGroup.gameState.gamePlayers
   const nextPlayers = previousPlayers.filter((player) => memberIds.has(player.id))
   if (nextPlayers.length === previousPlayers.length || !nextPlayers.length) return
@@ -208,7 +229,7 @@ async function refreshOnlineGroup() {
   if (!onlineGroup.groupId) return
   const snapshot = await fetchGroupSnapshot(onlineGroup.groupId)
   applyOnlineSnapshot(snapshot.group, snapshot.members)
-  if (window.location.hash.split('?')[0] !== '#busfahrer') renderModeMenu()
+  if (window.location.hash.split('?')[0] !== `#${activeGame}`) renderModeMenu()
 }
 
 function subscribeCurrentGroup() {
@@ -216,9 +237,10 @@ function subscribeCurrentGroup() {
   onlineUnsubscribe = onlineGroup.groupId ? subscribeToGroup(onlineGroup.groupId, () => { void refreshOnlineGroup() }) : undefined
 }
 
-function localPlayerIsCurrent(state: BusfahrerGameState) {
+function localPlayerIsCurrent(state: SharedGameState) {
   const userId = currentUser()?.id
-  return Boolean(userId && state.gamePlayers[state.currentPlayerIndex]?.id === userId)
+  const playerList = 'gamePlayers' in state ? state.gamePlayers : state.players
+  return Boolean(userId && playerList[state.currentPlayerIndex]?.id === userId)
 }
 
 async function leaveCurrentOnlineGroup() {
@@ -227,7 +249,7 @@ async function leaveCurrentOnlineGroup() {
   await leaveOnlineGroup(onlineGroup.groupId, userId)
   onlineUnsubscribe?.()
   onlineUnsubscribe = undefined
-  onlineGroup = { joined: false, isHost: false, inviteCode: 'BLOBBA-724', groupId: null, status: 'lobby', players: [], members: [], gameState: null }
+  onlineGroup = { joined: false, isHost: false, inviteCode: 'BLOBBA-724', groupId: null, gameKey: activeGame, status: 'lobby', players: [], members: [], gameState: null }
 }
 
 async function syncRemoteProfile() {
@@ -281,6 +303,14 @@ function playerAvatarMarkup(player: Pick<SetupPlayer, 'avatarId' | 'name' | 'ava
   return `<span class="${className} ${player.avatarId ? '' : 'is-default'}" style="--avatar-ring:${player.avatarColor}">${avatarVisualMarkup(player.avatarId, `Profilbild von ${escapeHtml(player.name)}`)}</span>`
 }
 
+function gameTitle() {
+  return activeGame === 'klatschen' ? 'BLOBBEN' : 'BLOBB-FAHRER'
+}
+
+function gameRoute(suffix = '') {
+  return `${activeGame}${suffix}`
+}
+
 function renderPage() {
   unmountCurrentPage?.()
   unmountCurrentPage = undefined
@@ -291,32 +321,56 @@ function renderPage() {
   const [routeBase, routeQuery = ''] = route.split('?')
   const inviteFromRoute = new URLSearchParams(routeQuery).get('invite')
   if (inviteFromRoute) pendingInviteCode = inviteFromRoute
-  const usesDarkTheme = routeBase.startsWith('#busfahrer') || routeBase === '#profile'
+  const usesDarkTheme = routeBase.startsWith('#busfahrer') || routeBase.startsWith('#klatschen') || routeBase === '#profile'
   document.documentElement.classList.toggle('busfahrer-active', usesDarkTheme)
   document.body.classList.toggle('busfahrer-active', usesDarkTheme)
 
   if (routeBase === '#busfahrer') {
+    activeGame = 'busfahrer'
     const snapshot = gamePlayerSnapshot.length ? gamePlayerSnapshot : players
     app.innerHTML = '<main class="busfahrer-page" id="busfahrer-game"></main>'
     unmountCurrentPage = mountBusfahrer(app.querySelector<HTMLElement>('#busfahrer-game')!, snapshot.map(({ profileId, name, avatar, avatarColor }) => ({ id: profileId, name, avatar, avatarColor })), setupMode === 'online' && onlineGroup.groupId ? {
       localPlayerId: authSession?.user.id,
-      initialState: onlineGroup.gameState,
+      initialState: onlineGroup.gameState && 'gamePlayers' in onlineGroup.gameState ? onlineGroup.gameState : null,
       onStateChange: (state) => { if (onlineGroup.groupId && localPlayerIsCurrent(state)) void updateOnlineGameState(onlineGroup.groupId, state, state.phase === 'final' ? 'finished' : 'playing') },
       onLeave: () => { void leaveCurrentOnlineGroup() },
     } : {})
     return
   }
-  if (routeBase === '#busfahrer-menu') return renderModeMenu()
-  if (routeBase === '#busfahrer-offline') {
+  if (routeBase === '#klatschen') {
+    activeGame = 'klatschen'
+    const snapshot = gamePlayerSnapshot.length ? gamePlayerSnapshot : players
+    app.innerHTML = '<main class="busfahrer-page" id="klatschen-game"></main>'
+    unmountCurrentPage = mountKlatschen(app.querySelector<HTMLElement>('#klatschen-game')!, snapshot.map(({ profileId, name, avatar, avatarColor }) => ({ id: profileId, name, avatar, avatarColor })), setupMode === 'online' && onlineGroup.groupId ? {
+      localPlayerId: authSession?.user.id,
+      initialState: onlineGroup.gameState && 'players' in onlineGroup.gameState ? onlineGroup.gameState : null,
+      onStateChange: (state) => { if (onlineGroup.groupId) void updateOnlineGameState(onlineGroup.groupId, state, state.phase === 'finished' ? 'finished' : 'playing') },
+      onLeave: () => { void leaveCurrentOnlineGroup() },
+    } : {})
+    return
+  }
+  if (routeBase === '#busfahrer-menu' || routeBase === '#klatschen-menu') {
+    activeGame = routeBase.startsWith('#klatschen') ? 'klatschen' : 'busfahrer'
+    return renderModeMenu()
+  }
+  if (routeBase === '#busfahrer-offline' || routeBase === '#klatschen-offline') {
+    activeGame = routeBase.startsWith('#klatschen') ? 'klatschen' : 'busfahrer'
     setupMode = 'offline'
     return renderOfflineMenu()
   }
-  if (routeBase === '#busfahrer-online') {
+  if (routeBase === '#busfahrer-online' || routeBase === '#klatschen-online') {
+    activeGame = routeBase.startsWith('#klatschen') ? 'klatschen' : 'busfahrer'
     setupMode = 'online'
     return renderOnlineMenu()
   }
-  if (routeBase === '#busfahrer-profile-picker') return renderProfilePicker()
-  if (routeBase === '#busfahrer-profile-editor') return renderProfileEditor()
+  if (routeBase === '#busfahrer-profile-picker' || routeBase === '#klatschen-profile-picker') {
+    activeGame = routeBase.startsWith('#klatschen') ? 'klatschen' : 'busfahrer'
+    return renderProfilePicker()
+  }
+  if (routeBase === '#busfahrer-profile-editor' || routeBase === '#klatschen-profile-editor') {
+    activeGame = routeBase.startsWith('#klatschen') ? 'klatschen' : 'busfahrer'
+    return renderProfileEditor()
+  }
   if (routeBase === '#profile') {
     profileEditorContext = { mode: 'primary', profileId: profileStore.activeProfileId }
     return renderProfileEditor()
@@ -337,13 +391,24 @@ function renderHome() {
         <img class="busfahrer-button-image" src="${busfahrerGameImage}" alt="">
         <span class="busfahrer-button-label">BLOBB-FAHRER</span>
       </button>
+      <button class="busfahrer-button klatschen-home-button" type="button" aria-label="Blobben öffnen">
+        <span class="klatschen-home-preview" aria-hidden="true">${Array.from({ length: 14 }, (_, index) => `<i style="--preview-angle:${index * (360 / 14)}deg"><b><em>B</em>B</b></i>`).join('')}</span>
+        <span class="busfahrer-button-label">BLOBBEN</span>
+      </button>
     </section>
   </main>`
   app.querySelector<HTMLButtonElement>('.home-profile-button')!.addEventListener('click', () => { window.location.hash = 'profile' })
   app.querySelector<HTMLButtonElement>('.busfahrer-button')!.addEventListener('click', () => {
+    activeGame = 'busfahrer'
     setupMode = 'offline'
     activeOnlineModal = null
     window.location.hash = 'busfahrer-menu'
+  })
+  app.querySelector<HTMLButtonElement>('.klatschen-home-button')!.addEventListener('click', () => {
+    activeGame = 'klatschen'
+    setupMode = 'offline'
+    activeOnlineModal = null
+    window.location.hash = 'klatschen-menu'
   })
 }
 
@@ -360,7 +425,7 @@ function renderModeMenu() {
   setupShell(`<div class="setup-panel setup-game-panel">
     ${renderModeSwitch()}
     ${setupMode === 'offline' ? renderOfflineSetupContent() : renderOnlineSetupContent()}
-  </div>${renderOnlineModal()}`, '')
+  </div>${renderOnlineModal()}`, '', gameTitle())
   app.querySelector<HTMLButtonElement>('[data-add-player]')?.replaceChildren('+ Spieler')
   bindSetupModeSwitch()
   setupMode === 'offline' ? bindOfflineSetup() : bindOnlineSetup()
@@ -387,8 +452,9 @@ function renderOfflineSetupContent() {
 function renderOnlineSetupContent() {
   const isReady = onlineAvailable()
   const isLoggedIn = Boolean(currentUser())
-  const canStart = onlineGroup.joined && onlineGroup.isHost && onlineGroup.players.length > 0
-  const link = onlineGroup.joined ? inviteUrl(onlineGroup.inviteCode) : ''
+  const groupMatches = onlineGroup.joined && onlineGroup.gameKey === activeGame
+  const canStart = groupMatches && onlineGroup.isHost && onlineGroup.players.length > 0
+  const link = groupMatches ? inviteUrl(onlineGroup.inviteCode, activeGame) : ''
   return `<section class="online-panel" aria-label="Online-Gruppe">
     <h2>Online-Gruppe</h2>
     ${!isReady ? '<p class="setup-copy">Supabase ist noch nicht konfiguriert. Der Gastmodus bleibt offline spielbar.</p>' : ''}
@@ -397,11 +463,11 @@ function renderOnlineSetupContent() {
       <button class="game-button" type="button" data-online-create>Gruppe erstellen</button>
       <button class="game-button" type="button" data-online-join>Gruppe beitreten</button>
     </div>` : ''}
-    ${onlineGroup.joined ? `<div class="online-group-tools"><button class="game-button setup-invite-button" type="button" data-online-invite>Einladen</button></div>
+    ${groupMatches ? `<div class="online-group-tools"><button class="game-button setup-invite-button" type="button" data-online-invite>Einladen</button></div>
       <div class="online-invite-link"><input class="player-name-input" value="${escapeHtml(link)}" readonly aria-label="Einladungslink"><button class="game-button" type="button" data-copy-invite>Kopieren</button><a class="game-button online-share-button" href="https://wa.me/?text=${encodeURIComponent(link)}" target="_blank" rel="noreferrer">WhatsApp</a></div>
       ${renderPlayerTable(onlineGroup.players, { editable: false, canRemove: onlineGroup.isHost })}` : '<p class="setup-copy">Erstelle eine Gruppe oder tritt einer bestehenden Gruppe bei.</p>'}
     ${onlineNotice ? `<p class="setup-copy">${escapeHtml(onlineNotice)}</p>` : ''}
-    <button class="game-button primary setup-start-game" type="button" data-start-game ${canStart ? '' : 'disabled'}>${onlineGroup.isHost ? 'Spiel starten' : 'Warten auf Host'}</button>
+    <button class="game-button primary setup-start-game" type="button" data-start-game ${canStart ? '' : 'disabled'}>${groupMatches && onlineGroup.isHost ? 'Spiel starten' : 'Warten auf Host'}</button>
   </section>`
 }
 
@@ -531,7 +597,7 @@ function bindOnlineSetup() {
     renderModeMenu()
   })
   app.querySelector<HTMLButtonElement>('[data-copy-invite]')?.addEventListener('click', () => {
-    void navigator.clipboard?.writeText(inviteUrl(onlineGroup.inviteCode))
+    void navigator.clipboard?.writeText(inviteUrl(onlineGroup.inviteCode, activeGame))
     onlineNotice = 'Einladungslink kopiert.'
     renderModeMenu()
   })
@@ -544,7 +610,7 @@ function bindOnlineSetup() {
     const groupId = onlineGroup.groupId
     startSetupGame(onlineGroup.players, false)
     window.setTimeout(() => {
-      const state = getBusfahrerState()
+      const state = activeGame === 'klatschen' ? getKlatschenState() : getBusfahrerState()
       onlineGroup.gameState = state
       void updateOnlineGameState(groupId, state, 'playing')
     }, 0)
@@ -581,7 +647,7 @@ async function submitOnlineModal(value: string) {
     await trySyncRemoteProfile()
     const wasCreate = activeOnlineModal === 'create'
     const group = wasCreate
-      ? await createOnlineGroup(user, profile.name, profile.avatarId)
+      ? await createOnlineGroup(user, profile.name, profile.avatarId, activeGame === 'klatschen' ? 'klatschen' : 'blobfahrer')
       : await joinOnlineGroup(value, user, profile.name, profile.avatarId)
     const snapshot = await fetchGroupSnapshot(group.id)
     applyOnlineSnapshot(snapshot.group, snapshot.members)
@@ -629,7 +695,7 @@ function startSetupGame(playerList: SetupPlayer[], rememberProfiles: boolean) {
       .filter((id) => profileStore.profiles.some((profile) => profile.id === id))
     saveProfileStore()
   }
-  window.location.hash = 'busfahrer'
+  window.location.hash = activeGame
 }
 
 function renderOldModeMenu() {
@@ -704,16 +770,16 @@ function renderProfilePicker() {
       <strong>${escapeHtml(profile.name || 'Profil ohne Namen')}</strong><span>Auswählen</span>
     </button>`).join('') : '<p class="profile-empty-copy">Alle gespeicherten Profile sind bereits im Spiel.</p>'}</div>
     <button class="game-button primary profile-create-button" type="button" data-create-profile>Neues Profil anlegen</button>
-  </div>`, 'busfahrer-offline')
+  </div>`, gameRoute('-offline'))
 
   app.querySelectorAll<HTMLButtonElement>('[data-select-profile]').forEach((button) => button.addEventListener('click', () => {
     const profile = profileStore.profiles.find((item) => item.id === button.dataset.selectProfile)
     if (profile && players.length < MAX_PLAYERS) players.push(setupPlayerFromProfile(profile))
-    window.location.hash = 'busfahrer-offline'
+    window.location.hash = gameRoute('-offline')
   }))
   app.querySelector<HTMLButtonElement>('[data-create-profile]')!.addEventListener('click', () => {
     profileEditorContext = { mode: 'new-player' }
-    window.location.hash = 'busfahrer-profile-editor'
+    window.location.hash = gameRoute('-profile-editor')
   })
 }
 
@@ -796,7 +862,7 @@ function renderProfileEditor() {
   const storedProfile = isNew ? undefined : profileStore.profiles.find((profile) => profile.id === profileEditorContext.profileId)
   const draftProfile: StoredProfile = storedProfile ? { ...storedProfile, avatarId: storedProfile.avatarId ?? DEFAULT_AVATAR_ID } : { id: createId(), name: '', avatarId: DEFAULT_AVATAR_ID }
   let selectedAvatarId = draftProfile.avatarId ?? DEFAULT_AVATAR_ID
-  const backTarget = isPrimary ? '' : profileEditorContext.mode === 'edit-player' ? 'busfahrer-offline' : 'busfahrer-profile-picker'
+  const backTarget = isPrimary ? '' : profileEditorContext.mode === 'edit-player' ? gameRoute('-offline') : gameRoute('-profile-picker')
 
   setupShell(`<form class="setup-panel profile-editor-panel" data-profile-form>
     <div class="profile-auth-row"><button class="game-button profile-auth-button" type="button" data-auth-action="${currentUser() ? 'logout' : 'login'}">${currentUser() ? 'Logout' : 'Login'}</button></div>
@@ -863,7 +929,7 @@ function renderProfileEditor() {
     }
     saveProfileStore()
     void trySyncRemoteProfile()
-    window.location.hash = isPrimary ? '' : 'busfahrer-offline'
+    window.location.hash = isPrimary ? '' : gameRoute('-offline')
   })
 }
 

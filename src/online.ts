@@ -100,11 +100,11 @@ export async function loadRemoteProfile(userId: string) {
   return data as { name: string; avatar_id: string | null } | null
 }
 
-export async function createOnlineGroup(user: User, name: string, avatarId: string | null) {
+export async function createOnlineGroup(user: User, name: string, avatarId: string | null, gameKey = 'blobfahrer') {
   const inviteCode = createInviteCode()
   const { data: group, error: groupError } = await requireClient()
     .from('game_groups')
-    .insert({ host_user_id: user.id, invite_code: inviteCode, game_key: 'blobfahrer', status: 'lobby' })
+    .insert({ host_user_id: user.id, invite_code: inviteCode, game_key: gameKey, status: 'lobby' })
     .select()
     .single()
   if (groupError) throw groupError
@@ -173,6 +173,6 @@ export async function updateOnlineGameState(groupId: string, gameState: unknown,
   if (error) throw error
 }
 
-export function inviteUrl(inviteCode: string) {
-  return `${window.location.origin}${window.location.pathname}#busfahrer-online?invite=${encodeURIComponent(inviteCode)}`
+export function inviteUrl(inviteCode: string, gameKey = 'busfahrer') {
+  return `${window.location.origin}${window.location.pathname}#${gameKey}-online?invite=${encodeURIComponent(inviteCode)}`
 }
