@@ -380,7 +380,7 @@
 .current-player-footer {
   position: absolute;
   left: 50%;
-  bottom: clamp(10px, 2.6dvh, 24px);
+  bottom: clamp(28px, 6dvh, 56px);
   z-index: 2;
   display: flex;
   width: fit-content;
@@ -401,8 +401,12 @@
 
 .pyramid-panel { --phase-action-height: clamp(56.1px, 8.5dvh, 73.1px); position: relative; display: grid; grid-template-rows: auto minmax(0, 1fr) var(--phase-action-height); align-items: center; row-gap: clamp(6.8px, 1.3dvh, 13.6px); }
 .pyramid-panel h2 { margin: 0; }
-.pyramid { width: min(540px, 100%); min-height: 0; margin: 0 auto auto; display: grid; place-self: start center; align-content: start; gap: clamp(3px, .8dvh, 7px); transform: none; }
-.pyramid-panel > .feedback { position: absolute; z-index: 2; top: clamp(6px, 1.2vh, 12px); right: clamp(8px, 2vw, 18px); max-width: 34%; min-height: 0; margin: 0; padding: 5px 8px; font-size: clamp(0.62rem, 1.5vw, 0.78rem); pointer-events: none; }
+.pyramid { width: min(540px, 100%); min-height: 0; margin: auto; display: grid; place-self: center; align-content: center; gap: clamp(2px, .62dvh, 5px); transform: translateY(clamp(-4px, -0.7dvh, -2px)); }
+.pyramid-panel > .feedback { position: absolute; z-index: 2; top: clamp(6px, 1.2vh, 12px); right: clamp(8px, 2vw, 18px); display: grid; width: min(130px, 29%); height: clamp(26px, 5dvh, 37px); min-height: 0; margin: 0; padding: 6px 9px; place-items: center; font-size: clamp(0.72rem, 1.6vw, 0.86rem); line-height: 1.08; pointer-events: none; }
+.pyramid-panel > .feedback-drinks { gap: 2px; line-height: 1; }
+.pyramid-panel > .feedback-drinks strong,
+.pyramid-panel > .feedback-drinks span { display: block; max-width: 100%; overflow: hidden; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
+.pyramid-panel > .feedback-drinks strong { font-weight: 900; }
 .pyramid-panel > .game-button { width: min(520px, 100%); justify-self: center; }
 .pyramid-panel > .game-button { height: var(--phase-action-height); min-height: var(--phase-action-height); }
 .pyramid-decision { width: min(620px, 100%); justify-self: center; }
@@ -424,11 +428,11 @@
 .pyramid-target-avatar { position: relative; display: grid; width: 34px; height: 34px; aspect-ratio: 1; border: 0; place-items: center; flex: 0 0 auto; overflow: visible; isolation: isolate; background: transparent; }
 .pyramid-target-avatar img { z-index: 0; display: block; width: 100%; height: 100%; aspect-ratio: 1; object-fit: contain; object-position: 50% 50%; transform: none; transform-origin: 50% 50%; }
 .pyramid-target-avatar .default-profile-icon { width: 68%; height: 68%; }
-.pyramid-row { position: relative; display: flex; justify-content: center; gap: 7px; }
+.pyramid-row { position: relative; display: flex; justify-content: center; gap: 5px; }
 .pyramid-row::after { content: attr(data-drinks); position: absolute; left: calc(50% + 226px); top: 50%; color: #9c94aa; font-size: .68rem; transform: translateY(-50%); white-space: nowrap; }
-.pyramid .playing-card { width: clamp(33px, min(8.7vw, 9.1vh), 66px); }
-.pyramid .card-value { font-size: clamp(.72rem, 2.35vh, 1.3rem); }
-.pyramid .card-symbol { font-size: clamp(.54rem, 1.74vh, .94rem); }
+.pyramid .playing-card { width: clamp(30px, min(7.9vw, 8.2vh), 60px); }
+.pyramid .card-value { font-size: clamp(.68rem, 2.12vh, 1.18rem); }
+.pyramid .card-symbol { font-size: clamp(.5rem, 1.57vh, .86rem); }
 .pyramid-hit { animation: hit-glow 1s ease-in-out infinite alternate; }
 .pyramid-hit .card-front { border: 3px solid #62df9b; box-shadow: inset 0 0 14px rgba(70, 230, 142, .42); }
 
@@ -560,8 +564,8 @@
   .question-panel .four-choices { gap: 5px; }
   .question-panel .four-choices .game-button { padding-inline: 5px; }
   .pyramid-row::after { display: none; }
-  .pyramid { gap: 5px; }
-  .pyramid-row { gap: 5px; }
+  .pyramid { gap: 3px; }
+  .pyramid-row { gap: 4px; }
   .hand-cards { justify-content: center; }
   .used-card-list { justify-content: center; padding: 0 8px 4px; }
   .used-card-list { gap: 4px; }
@@ -576,7 +580,8 @@
 /* Die installierte Handy-App hat mehr nutzbare Höhe als der mobile Browser.
    Eine kompaktere Bühne hält alle drei Phasen optisch auf derselben Höhe. */
 @media (display-mode: standalone), (display-mode: fullscreen) {
-  .pyramid { width: min(600px, 100%); gap: clamp(5px, 1.15dvh, 10px); }
+  .pyramid { width: min(600px, 100%); gap: clamp(5px, 1.15dvh, 10px); transform: none; }
+  .pyramid-row { gap: 5px; }
   .pyramid .playing-card { width: clamp(38px, min(10vw, 10.3vh), 76px); }
   .pyramid .card-value { font-size: clamp(.8rem, 2.58vh, 1.46rem); }
   .pyramid .card-symbol { font-size: clamp(.59rem, 1.92vh, 1.04rem); }

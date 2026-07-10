@@ -5,6 +5,7 @@ type CardColor = 'red' | 'blue'
 type SuitId = 'heart' | 'diamond' | 'star' | 'moon'
 type Card = { id: string; value: number; label: string; color: CardColor; suit: SuitId; suitLabel: string; symbol: string; numericValue: number }
 type FeedbackKind = 'success' | 'error' | 'info'
+type FeedbackState = { text: string; kind: FeedbackKind; playerName?: string; drinks?: number }
 type Phase = 'player-intro' | 'questions' | 'pyramid' | 'summary' | 'bus' | 'final'
 type GamePlayer = { id: string; name: string; avatar: string; avatarColor: string; hand: Card[]; questionResults: boolean[]; drinks: number }
 export type PlayerSetup = { id?: string; name: string; avatar: string; avatarColor: string }
@@ -20,7 +21,7 @@ export type BusfahrerGameState = {
   hand: Card[]
   questionResults: boolean[]
   answered: boolean
-  feedback: { text: string; kind: FeedbackKind }
+  feedback: FeedbackState
   pyramidCards: Card[]
   pyramidProgress: number
   pyramidHits: number[]
@@ -77,7 +78,7 @@ let questionIndex = 0
 let hand: Card[] = []
 let questionResults: boolean[] = []
 let answered = false
-let feedback = { text: '', kind: 'info' as FeedbackKind }
+let feedback: FeedbackState = { text: '', kind: 'info' }
 let pyramidCards: Card[] = []
 let pyramidProgress = 0
 let pyramidHits = new Set<number>()
@@ -139,7 +140,11 @@ function phaseHeader(current: number, subtitle: string) {
 }
 
 function feedbackMarkup() {
-  return feedback.text ? `<div class="feedback feedback-${feedback.kind}" aria-live="polite">${escapeHtml(feedback.text)}</div>` : '<div class="feedback is-empty" aria-live="polite"></div>'
+  if (!feedback.text) return '<div class="feedback is-empty" aria-live="polite"></div>'
+  if (feedback.playerName && feedback.drinks) {
+    return `<div class="feedback feedback-${feedback.kind} feedback-drinks" aria-live="polite"><strong>${escapeHtml(feedback.playerName)}</strong><span>${feedback.drinks} Schluck${feedback.drinks === 1 ? '' : 'e'}</span></div>`
+  }
+  return `<div class="feedback feedback-${feedback.kind}" aria-live="polite">${escapeHtml(feedback.text)}</div>`
 }
 
 function currentPlayer() {
@@ -222,7 +227,7 @@ function playerTargetAvatarMarkup(player: GamePlayer) {
 }
 
 function currentPlayerFooterMarkup() {
-  if (phase === 'player-intro') return ''
+  if (phase === 'player-intro' || phase === 'summary' || phase === 'final') return ''
   const player = currentPlayer()
   return `<div class="current-player-footer">${playerTargetAvatarMarkup(player)}<strong>${escapeHtml(player.name)}</strong></div>`
 }
@@ -350,7 +355,7 @@ function keepPyramidCard() {
 function assignPyramidDrinks(targetIndex: number) {
   if (!pyramidDecision || pyramidDecision.step !== 'target' || !gamePlayers[targetIndex]) return
   gamePlayers[targetIndex]!.drinks += pyramidDecision.drinks
-  feedback = { text: `${gamePlayers[targetIndex]!.name}: ${pyramidDecision.drinks} Schluck${pyramidDecision.drinks === 1 ? '' : 'e'}.`, kind: 'success' }
+  feedback = { text: `${gamePlayers[targetIndex]!.name}: ${pyramidDecision.drinks} Schluck${pyramidDecision.drinks === 1 ? '' : 'e'}.`, kind: 'success', playerName: gamePlayers[targetIndex]!.name, drinks: pyramidDecision.drinks }
   pyramidDecision = null
   renderGame()
 }
