@@ -13,16 +13,17 @@ type AvatarDefinition = {
 
 export type AvatarOption = Omit<AvatarDefinition, 'fileName'> & { src: string }
 
+// `color` is the exact flat fill of the light inner circle behind each motif.
 const avatarDefinitions: AvatarDefinition[] = [
-  { id: 'bier', fileName: 'bier.png', label: 'Bier', color: '#FF8E00' },
-  { id: 'shot', fileName: 'shot.png', label: 'Shotglas', color: '#284C02' },
-  { id: 'becher', fileName: 'Becher.png', label: 'Beerpong-Becher', color: '#4B0746' },
-  { id: 'cocktail', fileName: 'cocktail.png', label: 'Cocktail', color: '#046243' },
-  { id: 'whisky', fileName: 'whisky.png', label: 'Whisky', color: '#4C1600' },
-  { id: 'wein', fileName: 'wein.png', label: 'Weinglas', color: '#5F0403' },
-  { id: 'champagner', fileName: 'champagner.png', label: 'Champagner', color: '#5D1B01' },
-  { id: 'wuerfel', fileName: 'würfel.png', label: 'Würfel', color: '#19454B' },
-  { id: 'bierpong', fileName: 'bierpong.png', label: 'Beerpong', color: '#16464D' },
+  { id: 'bier', fileName: 'bier.png', label: 'Bier', color: '#E68931' },
+  { id: 'shot', fileName: 'shot.png', label: 'Shotglas', color: '#C3F4F8' },
+  { id: 'becher', fileName: 'Becher.png', label: 'Beerpong-Becher', color: '#FF669A' },
+  { id: 'cocktail', fileName: 'cocktail.png', label: 'Cocktail', color: '#4EA16B' },
+  { id: 'whisky', fileName: 'whisky.png', label: 'Whisky', color: '#DA804A' },
+  { id: 'wein', fileName: 'wein.png', label: 'Weinglas', color: '#F9817B' },
+  { id: 'champagner', fileName: 'champagner.png', label: 'Champagner', color: '#A3BF00' },
+  { id: 'wuerfel', fileName: 'würfel.png', label: 'Würfel', color: '#9377B5' },
+  { id: 'bierpong', fileName: 'bierpong.png', label: 'Beerpong', color: '#5FA1B4' },
 ]
 
 function moduleForFile(fileName: string) {

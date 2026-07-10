@@ -21,15 +21,16 @@
 .klatschen-drawn-back span { z-index: 1; font-weight: 900; }
 .klatschen-card-back i,
 .klatschen-drawn-back i { display: inline-block; font-style: normal; transform: scaleX(-1); }
-.klatschen-center-controls { position: absolute; left: 50%; top: 47%; z-index: 2; display: grid; width: min(480px, calc(var(--circle-radius) + var(--circle-radius) - var(--circle-card-width) - var(--circle-card-width) - 14px)); max-width: calc(100% - 20px); justify-items: center; gap: clamp(10px, 2vh, 18px); transform: translate(-50%,-50%); }
-.klatschen-turn { display: flex; width: 100%; max-width: 100%; align-items: center; justify-content: center; gap: 8px; color: #fff; white-space: nowrap; }
-.klatschen-turn strong { min-width: 0; color: #dda15e; font-size: clamp(2.15rem, 6vw, 4.15rem); font-weight: 900; line-height: 1; }
+.klatschen-center-controls { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.klatschen-turn { position: absolute; left: 50%; display: flex; width: min(480px, calc(var(--circle-radius) + var(--circle-radius) - var(--circle-card-width) - var(--circle-card-width) - 14px)); max-width: calc(100% - 20px); align-items: center; flex-direction: column; gap: clamp(3px,.8vh,7px); color: #fff; text-align: center; white-space: nowrap; transform: translateX(-50%); }
+.klatschen-turn strong { display: block; width: 100%; min-width: 0; color: var(--current-player-color); font-size: clamp(1.8rem, 5vw, 3.2rem); font-weight: 900; line-height: 1; text-align: center; }
 .klatschen-turn strong.is-long { font-size: clamp(1.45rem, 4vw, 2.65rem); }
 .klatschen-turn strong.is-very-long { font-size: clamp(1.05rem, 3vw, 1.8rem); }
-.klatschen-avatar { display: grid; width: clamp(56px, 8vw, 72px); height: clamp(56px, 8vw, 72px); place-items: center; flex: 0 0 auto; overflow: visible; }
+.klatschen-avatar { display: grid; width: clamp(38px, 6vw, 58px); height: clamp(38px, 6vw, 58px); place-items: center; overflow: visible; }
+.klatschen-turn .klatschen-avatar { width: clamp(132px, min(21.6vw, 26.4dvh), 216px); height: clamp(132px, min(21.6vw, 26.4dvh), 216px); }
 .klatschen-avatar img { width: 100%; height: 100%; object-fit: contain; }
 .klatschen-avatar .default-profile-icon { width: 68%; height: 68%; }
-.klatschen-draw-button { width: min(240px, 44vw); }
+.klatschen-draw-button { position: absolute; right: 0; left: 0; width: min(240px, calc(100% - 20px)); margin-inline: auto; pointer-events: auto; }
 .klatschen-held-cards { position: absolute; left: 50%; bottom: clamp(8px, 1.5vh, 16px); z-index: 4; width: min(720px,calc(100% - 20px)); transform: translateX(-50%); text-align: center; }
 .klatschen-held-cards h2 { margin: 0 0 7px; color: #d8d0e4; font-size: clamp(.72rem,2vw,.9rem); text-transform: uppercase; letter-spacing: .08em; }
 .klatschen-held-cards > div { display: flex; padding: 3px; justify-content: center; gap: 8px; overflow-x: auto; }
@@ -92,10 +93,8 @@
   .klatschen-play-screen,
   .klatschen-card-screen { --circle-radius: clamp(112px, 35vw, 165px); --circle-card-width: clamp(24px, 7vw, 34px); }
   .klatschen-card-circle { top: 43%; }
-  .klatschen-center-controls { top: 43%; }
-  .klatschen-turn { gap: 6px; }
-  .klatschen-turn strong { font-size: clamp(1.85rem,9vw,3rem); }
-  .klatschen-turn .klatschen-avatar { width: clamp(50px,14vw,64px); height: clamp(50px,14vw,64px); }
+  .klatschen-turn strong { font-size: clamp(1.45rem,7vw,2.35rem); }
+  .klatschen-turn .klatschen-avatar { width: clamp(112.8px,min(33.6vw,24dvh),174.4px); height: clamp(112.8px,min(33.6vw,24dvh),174.4px); }
   .klatschen-drawn-card { --draw-radius: clamp(112px,35vw,165px); top: 40%; width: clamp(175px,min(57vw,35dvh),245px); }
   .klatschen-drawn-front { padding: 14px; }
   .klatschen-card-actions { bottom: 7px; }

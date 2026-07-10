@@ -30,6 +30,7 @@ type KlatschenOptions = {
 let root: HTMLElement | null = null
 let state: KlatschenGameState
 let options: KlatschenOptions = {}
+let revealTimer: number | undefined
 
 function shuffle<T>(items: T[]) {
   const result = [...items]
@@ -91,7 +92,7 @@ function circleMarkup() {
 function playerTurnMarkup() {
   const player = currentPlayer()
   const nameSizeClass = player.name.length > 18 ? 'is-very-long' : player.name.length > 11 ? 'is-long' : ''
-  return `<div class="klatschen-turn">${avatarMarkup(player)}<strong class="${nameSizeClass}">${escapeHtml(player.name)}</strong></div>`
+  return `<div class="klatschen-turn" style="--current-player-color:${player.avatarColor}">${avatarMarkup(player)}<strong class="${nameSizeClass}">${escapeHtml(player.name)}</strong></div>`
 }
 
 function heldCardsMarkup() {
@@ -301,34 +302,77 @@ function positionDrawAnimation() {
 
 function fitCurrentPlayerDisplay() {
   const display = root?.querySelector<HTMLElement>('.klatschen-turn')
-  const avatar = display?.querySelector<HTMLElement>(':scope > .klatschen-avatar')
   const name = display?.querySelector<HTMLElement>(':scope > strong')
-  if (!display || !avatar || !name) return
+  if (!display || !name) return
 
-  avatar.style.removeProperty('width')
-  avatar.style.removeProperty('height')
   name.style.removeProperty('font-size')
 
-  const displayStyle = window.getComputedStyle(display)
-  const gap = Number.parseFloat(displayStyle.columnGap || displayStyle.gap) || 0
-  const avatarSize = avatar.getBoundingClientRect().width
   const nameFontSize = Number.parseFloat(window.getComputedStyle(name).fontSize)
-  const contentWidth = avatarSize + gap + name.scrollWidth
+  const contentWidth = name.scrollWidth
   const availableWidth = display.clientWidth
   if (!contentWidth || contentWidth <= availableWidth) return
 
   const scale = (availableWidth / contentWidth) * .98
-  avatar.style.width = `${avatarSize * scale}px`
-  avatar.style.height = `${avatarSize * scale}px`
   name.style.fontSize = `${nameFontSize * scale}px`
+}
+
+function positionMiddleLayout() {
+  const screen = root?.querySelector<HTMLElement>('.klatschen-play-screen')
+  const turn = screen?.querySelector<HTMLElement>('.klatschen-turn')
+  const avatar = turn?.querySelector<HTMLElement>(':scope > .klatschen-avatar')
+  const name = turn?.querySelector<HTMLElement>(':scope > strong')
+  const drawButton = screen?.querySelector<HTMLElement>('.klatschen-draw-button')
+  const slots = screen?.querySelectorAll<HTMLElement>('.klatschen-circle-slot')
+  if (!screen || !turn || !avatar || !name || !drawButton || !slots?.length) return
+
+  avatar.style.removeProperty('width')
+  avatar.style.removeProperty('height')
+  const screenRect = screen.getBoundingClientRect()
+  const slotRects = [...slots].map((slot) => slot.getBoundingClientRect())
+  const circleTop = Math.min(...slotRects.map((rect) => rect.top))
+  const circleBottom = Math.max(...slotRects.map((rect) => rect.bottom))
+
+  const turnStyle = window.getComputedStyle(turn)
+  const turnGap = Number.parseFloat(turnStyle.rowGap || turnStyle.gap) || 0
+  const naturalAvatarSize = avatar.getBoundingClientRect().width
+  const previousNaturalAvatarSize = naturalAvatarSize / .8
+  const freeCircleDiameter = turn.clientWidth
+  const maximumPreviousAvatarSize = Math.max(34, freeCircleDiameter - name.getBoundingClientRect().height - turnGap - 12)
+  const previousAvatarSize = Math.min(previousNaturalAvatarSize, maximumPreviousAvatarSize)
+  const avatarSize = previousAvatarSize * .8
+  avatar.style.width = `${avatarSize}px`
+  avatar.style.height = `${avatarSize}px`
+
+  const circleCenter = ((circleTop + circleBottom) / 2) - screenRect.top
+  const previousTurnHeight = turn.getBoundingClientRect().height + (previousAvatarSize - avatarSize)
+  const turnTop = circleCenter - (previousTurnHeight / 2)
+  turn.style.top = `${turnTop}px`
+
+  const freeBottomTop = Math.min(screenRect.bottom, circleBottom)
+  const buttonTop = ((freeBottomTop + screenRect.bottom) / 2) - screenRect.top - (drawButton.getBoundingClientRect().height / 2)
+  drawButton.style.top = `${buttonTop}px`
+}
+
+function updateMiddleLayout() {
+  fitCurrentPlayerDisplay()
+  positionMiddleLayout()
+}
+
+function removeRevealedCardBack() {
+  window.clearTimeout(revealTimer)
+  if (state.phase !== 'card') return
+  revealTimer = window.setTimeout(() => {
+    root?.querySelector('.klatschen-drawn-back')?.remove()
+  }, 900)
 }
 
 function render() {
   if (!root) return
   const content = state.phase === 'rule' ? renderRule() : state.phase === 'turn' ? renderTurn() : state.phase === 'card' ? renderCard() : renderFinished()
   root.innerHTML = `<div class="busfahrer-shell klatschen-shell"><header class="busfahrer-header"><button class="back-button bus-back" type="button" data-action="back">Beenden</button><div><p>GetDrunk präsentiert</p><h1>BLOBBEN</h1></div><button class="restart-button" type="button" data-klatschen-action="restart">Neu starten</button></header><div class="klatschen-global-rule">Sag nicht „trinken“ – sag „blobben“.</div><div class="klatschen-stage">${content}</div></div>`
-  fitCurrentPlayerDisplay()
+  updateMiddleLayout()
   positionDrawAnimation()
+  removeRevealedCardBack()
   applyControls()
 }
 
@@ -368,7 +412,7 @@ export function mountKlatschen(target: HTMLElement, players: KlatschenPlayerSetu
   state.openedHeldCardId ??= null
   state.selectedRuleMode ??= null
   root.addEventListener('click', handleClick)
-  window.addEventListener('resize', fitCurrentPlayerDisplay)
+  window.addEventListener('resize', updateMiddleLayout)
   render()
-  return () => { root?.removeEventListener('click', handleClick); window.removeEventListener('resize', fitCurrentPlayerDisplay); root = null; options = {} }
+  return () => { window.clearTimeout(revealTimer); root?.removeEventListener('click', handleClick); window.removeEventListener('resize', updateMiddleLayout); root = null; options = {} }
 }
