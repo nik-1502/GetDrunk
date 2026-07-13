@@ -596,12 +596,16 @@ html.is-standalone {
 
 html.is-standalone .app-neon-background {
   position: fixed;
-  inset: 0;
+  top: -10dvh;
+  right: -10vw;
+  bottom: -10dvh;
+  left: -10vw;
   z-index: 0;
   display: block;
-  width: 100vw;
-  height: 100dvh;
-  min-height: 100dvh;
+  width: 120vw;
+  height: 120dvh;
+  min-width: 120vw;
+  min-height: 120dvh;
   pointer-events: none;
   background: var(--app-background);
   background-attachment: fixed;
