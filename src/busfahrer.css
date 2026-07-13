@@ -699,7 +699,7 @@ html.is-ipad-standalone .game-button.primary.ipad-pwa-end-button {
 .setup-shell .busfahrer-header > span { min-width: 0; }
 .setup-shell .busfahrer-header p { display: none; }
 .setup-shell .busfahrer-header h1 { margin: 0; font-size: clamp(1.8rem, 5vw, 3rem); }
-.setup-stage { display: grid; flex: 1 1 auto; min-height: 0; padding-top: var(--setup-panel-top); padding-bottom: 18px; place-items: start center; overflow: auto; scroll-padding-bottom: 120px; }
+.setup-stage { display: grid; flex: 1 1 auto; min-height: 0; padding-top: var(--setup-panel-top); padding-bottom: calc(18px + var(--keyboard-position-space, 0px)); place-items: start center; overflow: auto; scroll-padding-bottom: 120px; }
 .setup-stack { display: grid; width: min(620px, 100%); justify-items: stretch; gap: clamp(10px, 1.8dvh, 18px); }
 .setup-title { margin: 0; color: #fff; font-size: clamp(1.8rem, 6vw, 3.6rem); line-height: 1; text-align: center; }
 .setup-panel { width: min(620px, 100%); min-height: clamp(190px, 28dvh, 260px); padding: clamp(18px, 4vw, 36px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; color: #f8f5ff; background: rgba(31, 25, 44, 0.9); box-shadow: 0 24px 70px rgba(0, 0, 0, 0.28); text-align: center; }

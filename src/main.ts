@@ -82,6 +82,7 @@ let authNotice = ''
 let onlineUnsubscribe: (() => void) | undefined
 let pendingInviteCode: string | null = null
 let onlineNotice = ''
+let pendingKeyboardPositionCleanup: (() => void) | undefined
 
 function updateIPadStandaloneMode() {
   const navigatorWithStandalone = navigator as Navigator & { standalone?: boolean }
@@ -330,6 +331,8 @@ function gameRoute(suffix = '') {
 }
 
 function renderPage() {
+  pendingKeyboardPositionCleanup?.()
+  pendingKeyboardPositionCleanup = undefined
   unmountCurrentPage?.()
   unmountCurrentPage = undefined
 
@@ -566,6 +569,8 @@ function updateCategoryMenu() {
 }
 
 function setupShell(content: string, backTarget: string, title = 'BLOBB-FAHRER', eyebrow = 'GetDrunk präsentiert', pageClass = '', centerTitle = true) {
+  pendingKeyboardPositionCleanup?.()
+  pendingKeyboardPositionCleanup = undefined
   app.innerHTML = `<main class="busfahrer-page setup-page ${pageClass}"><div class="busfahrer-shell setup-shell">
     <header class="busfahrer-header"><button class="back-button bus-back" type="button" data-setup-back>← Zurück</button>${centerTitle ? '<span></span>' : `<div><p>${eyebrow}</p><h1>${title}</h1></div>`}<span></span></header>
     <section class="setup-stage"><div class="setup-stack">${centerTitle ? `<h1 class="setup-title">${title}</h1>` : ''}${content}</div></section>
@@ -776,6 +781,37 @@ function focusPlayerNameInput(playerId: string) {
     input.select()
     input.setSelectionRange(0, input.value.length)
   })
+  positionAddPlayerOnceAboveKeyboard()
+}
+
+function positionAddPlayerOnceAboveKeyboard() {
+  pendingKeyboardPositionCleanup?.()
+  const viewport = window.visualViewport
+  const stage = app.querySelector<HTMLElement>('.setup-stage')
+  const addPlayerButton = app.querySelector<HTMLElement>('[data-add-player]')
+  if (!viewport || !stage || !addPlayerButton) return
+
+  const cleanup = () => {
+    viewport.removeEventListener('resize', position)
+    viewport.removeEventListener('scroll', position)
+    if (pendingKeyboardPositionCleanup === cleanup) pendingKeyboardPositionCleanup = undefined
+  }
+  const position = () => {
+    const keyboardHeight = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop)
+    if (keyboardHeight < 80) return
+    cleanup()
+    stage.style.setProperty('--keyboard-position-space', `${Math.ceil(keyboardHeight)}px`)
+    requestAnimationFrame(() => {
+      const keyboardTop = viewport.offsetTop + viewport.height
+      const delta = addPlayerButton.getBoundingClientRect().bottom - (keyboardTop - 8)
+      if (delta > 0) stage.scrollTop += delta
+    })
+  }
+
+  pendingKeyboardPositionCleanup = cleanup
+  viewport.addEventListener('resize', position)
+  viewport.addEventListener('scroll', position)
+  position()
 }
 
 function bindOnlineSetup() {
