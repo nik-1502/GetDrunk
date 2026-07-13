@@ -629,7 +629,8 @@ html.is-standalone .app-neon-background {
 
 html.is-standalone body {
   position: relative;
-  z-index: 1;
+  z-index: auto;
+  isolation: isolate;
   min-height: calc(100dvh + env(safe-area-inset-bottom, 0px));
   overflow: hidden;
   background: transparent;
@@ -638,6 +639,7 @@ html.is-standalone body {
 html.is-standalone #app {
   position: relative;
   z-index: 1;
+  isolation: isolate;
   min-height: calc(100dvh + env(safe-area-inset-bottom, 0px));
   overflow: hidden;
   background: transparent;
@@ -646,13 +648,20 @@ html.is-standalone #app {
 html.is-standalone #app > .home-page,
 html.is-standalone #app > .busfahrer-page,
 html.is-standalone #app > .busfahrer-page.profile-page {
+  position: relative;
+  z-index: 0;
+  isolation: isolate;
   background: transparent;
 }
 
+html.is-standalone #app > .home-page::before,
+html.is-standalone #app > .home-page::after,
 html.is-standalone #app > .busfahrer-page::before,
 html.is-standalone #app > .busfahrer-page::after,
 html.is-standalone #app > .busfahrer-page.profile-page::before,
 html.is-standalone #app > .busfahrer-page.profile-page::after {
   position: fixed;
   inset: 0;
+  z-index: -1;
+  pointer-events: none;
 }
