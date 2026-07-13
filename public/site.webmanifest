@@ -4,8 +4,8 @@
   "start_url": "/GetDrunk/",
   "scope": "/GetDrunk/",
   "display": "standalone",
-  "background_color": "#171321",
-  "theme_color": "#8c52cc",
+  "background_color": "#120012",
+  "theme_color": "#120012",
   "icons": [
     {
       "src": "/GetDrunk/app-icon.png",

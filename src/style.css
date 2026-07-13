@@ -1,9 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@700&display=swap');
 
 :root {
+  --app-background:
+    radial-gradient(ellipse 82% 70% at 18% 28%, rgba(255, 0, 132, .82) 0%, rgba(205, 0, 116, .48) 26%, rgba(92, 0, 91, .20) 50%, transparent 72%),
+    radial-gradient(ellipse 80% 72% at 86% 30%, rgba(0, 93, 255, .82) 0%, rgba(0, 45, 184, .52) 30%, rgba(25, 0, 95, .22) 54%, transparent 76%),
+    radial-gradient(circle at 52% 45%, rgba(168, 39, 255, .48) 0%, rgba(94, 15, 153, .28) 34%, transparent 62%),
+    radial-gradient(ellipse 115% 85% at 50% 114%, rgba(159, 0, 255, .32) 0%, rgba(26, 2, 54, .36) 42%, transparent 68%),
+    linear-gradient(118deg, #120012 0%, #3b003b 24%, #22083e 48%, #071754 74%, #001435 100%);
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: #fff;
-  background: #05020b;
+  background: var(--app-background);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -25,24 +31,22 @@ body,
 #app {
   min-width: 320px;
   min-height: 100%;
+  min-height: 100dvh;
   margin: 0;
+  background: var(--app-background);
 }
 
 html,
 body {
   overscroll-behavior: none;
-  background: #05020b;
-}
-
-html.busfahrer-active,
-body.busfahrer-active {
-  background: #171321;
+  background: var(--app-background);
 }
 
 body {
   min-height: 100vh;
   min-height: 100svh;
-  background: #05020b;
+  min-height: 100dvh;
+  background: var(--app-background);
 }
 
 .home-page {
@@ -57,12 +61,7 @@ body {
   gap: clamp(12px, 2.2vh, 26px);
   padding: clamp(18px, 4vh, 40px) clamp(16px, 4vw, 48px) clamp(36px, 7vh, 72px);
   overflow: hidden;
-  background:
-    radial-gradient(ellipse 82% 70% at 18% 28%, rgba(255, 0, 132, .82) 0%, rgba(205, 0, 116, .48) 26%, rgba(92, 0, 91, .20) 50%, transparent 72%),
-    radial-gradient(ellipse 80% 72% at 86% 30%, rgba(0, 93, 255, .82) 0%, rgba(0, 45, 184, .52) 30%, rgba(25, 0, 95, .22) 54%, transparent 76%),
-    radial-gradient(circle at 52% 45%, rgba(168, 39, 255, .48) 0%, rgba(94, 15, 153, .28) 34%, transparent 62%),
-    radial-gradient(ellipse 115% 85% at 50% 114%, rgba(159, 0, 255, .32) 0%, rgba(26, 2, 54, .36) 42%, transparent 68%),
-    linear-gradient(118deg, #120012 0%, #3b003b 24%, #22083e 48%, #071754 74%, #001435 100%);
+  background: var(--app-background);
   background-attachment: fixed;
 }
 
@@ -117,14 +116,21 @@ body {
 
 .home-settings-button {
   position: absolute;
-  top: clamp(16px, 4vw, 40px);
+  top: calc(clamp(16px, 4vw, 40px) + 8px);
   left: clamp(16px, 4vw, 40px);
 }
 
 .home-user-button {
   position: absolute;
-  top: clamp(16px, 4vw, 40px);
+  top: calc(clamp(16px, 4vw, 40px) + 8px);
   right: clamp(16px, 4vw, 40px);
+}
+
+@media (display-mode: standalone) {
+  .home-settings-button,
+  .home-user-button {
+    top: calc(env(safe-area-inset-top, 0px) + clamp(16px, 4vw, 40px) + 8px);
+  }
 }
 
 .home-profile-button img {

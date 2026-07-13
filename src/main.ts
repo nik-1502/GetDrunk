@@ -84,6 +84,7 @@ let onlineUnsubscribe: (() => void) | undefined
 let pendingInviteCode: string | null = null
 let onlineNotice = ''
 let keyboardViewportCleanup: (() => void) | undefined
+let pendingSetupScrollTop: number | undefined
 
 function updateIPadStandaloneMode() {
   const navigatorWithStandalone = navigator as Navigator & { standalone?: boolean }
@@ -628,7 +629,7 @@ function renderOnlineSetupContent() {
 }
 
 function renderPlayerTable(playerList: SetupPlayer[], options: { editable: boolean; canRemove: boolean }) {
-  return `<div class="player-table" role="list">${playerList.map((player, index) => `<div class="player-row" role="listitem">
+  return `<div class="player-table" role="list">${playerList.map((player, index) => `<div class="player-row${player.id === pendingPlayerNameFocusId ? ' is-new' : ''}" role="listitem" data-player-row="${player.id}">
     ${options.editable
       ? `<button class="player-avatar-trigger" type="button" data-edit-player-avatar="${player.id}" aria-label="Profilbild von ${escapeHtml(player.name || defaultPlayerName(index + 1))} ändern" title="Profilbild ändern">${playerAvatarMarkup(player)}</button>`
       : playerAvatarMarkup(player)}
@@ -756,6 +757,7 @@ function bindOfflineSetup() {
   }))
   app.querySelector<HTMLButtonElement>('[data-add-player]')!.addEventListener('click', () => {
     if (players.length >= MAX_PLAYERS) return
+    pendingSetupScrollTop = app.querySelector<HTMLElement>('.setup-stage')?.scrollTop ?? 0
     const player = createLocalPlayer(players.length + 1)
     players.push(player)
     pendingPlayerNameFocusId = player.id
@@ -765,24 +767,14 @@ function bindOfflineSetup() {
     startSetupGame(players, true)
   })
   if (pendingPlayerNameFocusId) {
-    const input = app.querySelector<HTMLInputElement>(`[data-player-name="${pendingPlayerNameFocusId}"]`)
+    const newPlayerId = pendingPlayerNameFocusId
+    const stage = app.querySelector<HTMLElement>('.setup-stage')
+    const row = app.querySelector<HTMLElement>(`[data-player-row="${newPlayerId}"]`)
+    if (stage && pendingSetupScrollTop !== undefined) stage.scrollTop = pendingSetupScrollTop
     pendingPlayerNameFocusId = undefined
-    focusAndSelectInput(input)
+    pendingSetupScrollTop = undefined
+    requestAnimationFrame(() => row?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' }))
   }
-}
-
-function focusAndSelectInput(input: HTMLInputElement | null) {
-  if (!input) return
-  const focusSelectAndScroll = (behavior: ScrollBehavior = 'smooth') => {
-    input.focus({ preventScroll: true })
-    input.select()
-    input.setSelectionRange(0, input.value.length)
-    input.scrollIntoView({ behavior, block: 'center', inline: 'nearest' })
-  }
-  focusSelectAndScroll('auto')
-  requestAnimationFrame(() => focusSelectAndScroll('smooth'))
-  window.setTimeout(() => focusSelectAndScroll('smooth'), 380)
-  window.setTimeout(() => focusSelectAndScroll('smooth'), 620)
 }
 
 function bindKeyboardViewportPadding() {
