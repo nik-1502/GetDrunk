@@ -58,6 +58,15 @@
   overflow: hidden;
 }
 
+/* viewport-fit=cover legt installierte iOS-Web-Apps hinter die Statusleiste.
+   Nur Unterseiten erhalten deshalb den Safe-Area-Ausgleich; die Startseite
+   behält ihre bestehende Positionierung. */
+@media (display-mode: standalone), (display-mode: fullscreen) {
+  .busfahrer-page > .busfahrer-shell {
+    padding-top: calc(env(safe-area-inset-top, 0px) + clamp(8px, 2vh, 20px));
+  }
+}
+
 .busfahrer-header {
   display: grid;
   grid-template-columns: 1fr auto 1fr;

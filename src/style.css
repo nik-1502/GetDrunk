@@ -127,6 +127,10 @@ body {
 }
 
 @media (display-mode: standalone) {
+  .home-page {
+    min-height: 100dvh;
+  }
+
   .home-settings-button,
   .home-user-button {
     top: calc(env(safe-area-inset-top, 0px) + clamp(16px, 4vw, 40px) + 8px);
