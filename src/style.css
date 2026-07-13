@@ -611,7 +611,7 @@ html.is-standalone {
 }
 
 html.is-standalone .app-neon-background {
-  position: absolute;
+  position: fixed;
   top: -10dvh;
   right: -10vw;
   bottom: -10dvh;
@@ -647,4 +647,12 @@ html.is-standalone #app > .home-page,
 html.is-standalone #app > .busfahrer-page,
 html.is-standalone #app > .busfahrer-page.profile-page {
   background: transparent;
+}
+
+html.is-standalone #app > .busfahrer-page::before,
+html.is-standalone #app > .busfahrer-page::after,
+html.is-standalone #app > .busfahrer-page.profile-page::before,
+html.is-standalone #app > .busfahrer-page.profile-page::after {
+  position: fixed;
+  inset: 0;
 }
