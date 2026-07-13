@@ -584,39 +584,43 @@ body {
   .game-filters { width: min(100%, 340px); }
 }
 
-/* Eine einzige feste Neon-Ebene deckt in der installierten App auch die
-   untere iOS-Safe-Area ab. Die Root-Farbe bleibt nur als Lade-Fallback. */
-@media (display-mode: standalone) {
-  body {
-    position: relative;
-    isolation: isolate;
-  }
+/* iOS meldet installierte Apps zusätzlich über navigator.standalone. */
+html.is-standalone {
+  position: relative;
+  isolation: isolate;
+}
 
-  body::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    right: 0;
-    bottom: calc(-1 * env(safe-area-inset-bottom, 0px));
-    left: 0;
-    z-index: 0;
-    width: 100%;
-    height: calc(100dvh + env(safe-area-inset-bottom, 0px));
-    min-height: calc(100dvh + env(safe-area-inset-bottom, 0px));
-    pointer-events: none;
-    background: var(--app-background);
-    background-attachment: fixed;
-  }
+.app-neon-background {
+  display: none;
+}
 
-  #app {
-    position: relative;
-    z-index: 1;
-    background: transparent;
-  }
+html.is-standalone .app-neon-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  display: block;
+  width: 100vw;
+  height: 100dvh;
+  min-height: 100dvh;
+  pointer-events: none;
+  background: var(--app-background);
+  background-attachment: fixed;
+}
 
-  #app > .home-page,
-  #app > .busfahrer-page,
-  #app > .busfahrer-page.profile-page {
-    background: transparent;
-  }
+html.is-standalone body {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+}
+
+html.is-standalone #app {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+}
+
+html.is-standalone #app > .home-page,
+html.is-standalone #app > .busfahrer-page,
+html.is-standalone #app > .busfahrer-page.profile-page {
+  background: transparent;
 }

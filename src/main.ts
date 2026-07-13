@@ -91,6 +91,7 @@ function updateIPadStandaloneMode() {
   const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigatorWithStandalone.standalone === true
   const hasIPadDimensions = window.innerWidth >= 768 && window.innerWidth <= 1366
   const isTouchTablet = navigator.maxTouchPoints > 1
+  document.documentElement.classList.toggle('is-standalone', isStandalone)
   document.documentElement.classList.toggle('is-ipad-tablet', hasIPadDimensions && isTouchTablet)
   document.documentElement.classList.toggle('is-ipad-standalone', isStandalone && hasIPadDimensions && isTouchTablet)
 }
