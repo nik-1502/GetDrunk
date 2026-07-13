@@ -667,7 +667,7 @@ function renderPlayerAvatarEditor() {
 
 function playerNameInputMarkup(player: SetupPlayer, index: number) {
   const safeId = player.id.replace(/[^a-zA-Z0-9_-]/g, '-')
-  return `<input class="player-name-input" id="player-name-${safeId}" name="player-name-${safeId}" data-player-name="${player.id}" value="${escapeHtml(player.name || defaultPlayerName(index + 1))}" maxlength="24" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" inputmode="text" aria-label="Name von Spieler ${index + 1}">`
+  return `<input class="player-name-input" id="player-name-${safeId}" name="blobba-player-name" type="text" data-player-name="${player.id}" value="${escapeHtml(player.name || defaultPlayerName(index + 1))}" maxlength="24" autocomplete="off" autocorrect="off" autocapitalize="words" spellcheck="false" inputmode="text" aria-label="Name von Spieler ${index + 1}">`
 }
 
 function renderOnlineModal() {
@@ -709,7 +709,6 @@ function bindOfflineSetup() {
     const selectName = () => requestAnimationFrame(() => {
       input.select()
       input.setSelectionRange(0, input.value.length)
-      requestAnimationFrame(() => positionFocusedPlayerRow())
     })
     input.addEventListener('focus', selectName)
     input.addEventListener('click', (event) => {
@@ -781,7 +780,6 @@ function focusPlayerNameInput(playerId: string) {
   requestAnimationFrame(() => {
     input.select()
     input.setSelectionRange(0, input.value.length)
-    requestAnimationFrame(() => positionFocusedPlayerRow())
   })
 }
 
@@ -811,15 +809,38 @@ function bindKeyboardViewportPadding() {
   const stage = app.querySelector<HTMLElement>('.setup-stage')
   let restingScrollTop = stage?.scrollTop ?? 0
   let keyboardWasOpen = false
+  let appliedKeyboardHeight = 0
+  let positionedInput: HTMLInputElement | null = null
+  let positionScheduled = false
   const updatePadding = () => {
     const keyboardHeight = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop)
-    page.style.setProperty('--keyboard-bottom-offset', `${Math.ceil(keyboardHeight)}px`)
     const keyboardIsOpen = keyboardHeight >= 80
     if (keyboardIsOpen) {
-      if (!keyboardWasOpen && stage) restingScrollTop = stage.scrollTop
-      requestAnimationFrame(() => positionFocusedPlayerRow())
-    } else if (keyboardWasOpen && stage) {
-      stage.scrollTo({ top: restingScrollTop, behavior: 'smooth' })
+      const keyboardHeightChanged = keyboardWasOpen && Math.abs(keyboardHeight - appliedKeyboardHeight) >= 60
+      if (!keyboardWasOpen || keyboardHeightChanged) {
+        if (!keyboardWasOpen && stage) restingScrollTop = stage.scrollTop
+        appliedKeyboardHeight = keyboardHeight
+        positionedInput = null
+        page.style.setProperty('--keyboard-bottom-offset', `${Math.ceil(keyboardHeight)}px`)
+      }
+
+      const activeInput = document.activeElement instanceof HTMLInputElement && document.activeElement.matches('[data-player-name]')
+        ? document.activeElement
+        : null
+      if (activeInput && activeInput !== positionedInput && !positionScheduled) {
+        positionScheduled = true
+        requestAnimationFrame(() => {
+          positionFocusedPlayerRow()
+          positionedInput = activeInput
+          positionScheduled = false
+        })
+      }
+    } else {
+      page.style.setProperty('--keyboard-bottom-offset', '0px')
+      appliedKeyboardHeight = 0
+      positionedInput = null
+      positionScheduled = false
+      if (keyboardWasOpen && stage) stage.scrollTo({ top: restingScrollTop, behavior: 'smooth' })
     }
     keyboardWasOpen = keyboardIsOpen
   }
