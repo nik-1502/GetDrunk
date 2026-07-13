@@ -79,7 +79,9 @@ body {
 }
 
 .home-page::before,
-.home-page::after {
+.home-page::after,
+.app-neon-background::before,
+.app-neon-background::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -87,7 +89,8 @@ body {
   pointer-events: none;
 }
 
-.home-page::before {
+.home-page::before,
+.app-neon-background::before {
   opacity: .22;
   background:
     radial-gradient(circle at center, rgba(255, 255, 255, .15) 0 1px, transparent 1.4px) 0 0 / 16px 16px,
@@ -100,7 +103,8 @@ body {
     radial-gradient(ellipse 58% 42% at 76% 42%, #000 0%, transparent 72%);
 }
 
-.home-page::after {
+.home-page::after,
+.app-neon-background::after {
   background:
     linear-gradient(90deg, rgba(255, 255, 255, .035) 1px, transparent 1px) 0 0 / 3px 3px,
     linear-gradient(0deg, rgba(0, 0, 0, .045) 1px, transparent 1px) 0 0 / 4px 4px,
@@ -625,11 +629,11 @@ html.is-standalone .app-neon-background {
 
 html.is-standalone body {
   position: fixed;
-  inset: 0;
+  inset: 0 0 auto;
   z-index: 1;
   width: 100%;
-  height: 100dvh;
-  min-height: 0;
+  height: calc(100dvh + env(safe-area-inset-bottom, 0px));
+  min-height: calc(100dvh + env(safe-area-inset-bottom, 0px));
   overflow: hidden;
   background: transparent;
 }
