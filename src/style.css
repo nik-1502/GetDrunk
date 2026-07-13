@@ -9,7 +9,7 @@
     linear-gradient(118deg, #120012 0%, #3b003b 24%, #22083e 48%, #071754 74%, #001435 100%);
   --pwa-neon-background:
     radial-gradient(ellipse 76% 70% at 16% 28%, rgba(255, 0, 132, .82) 0%, rgba(205, 0, 116, .50) 28%, rgba(92, 0, 91, .21) 52%, transparent 74%),
-    radial-gradient(ellipse 76% 70% at 80% 28%, rgba(0, 93, 255, .82) 0%, rgba(0, 45, 184, .50) 28%, rgba(25, 0, 95, .21) 52%, transparent 74%),
+    radial-gradient(ellipse 76% 70% at 74% 28%, rgba(0, 93, 255, .82) 0%, rgba(0, 45, 184, .50) 28%, rgba(25, 0, 95, .21) 52%, transparent 74%),
     radial-gradient(circle at 50% 45%, rgba(168, 39, 255, .48) 0%, rgba(94, 15, 153, .28) 34%, transparent 62%),
     radial-gradient(ellipse 115% 85% at 50% 114%, rgba(159, 0, 255, .32) 0%, rgba(26, 2, 54, .36) 42%, transparent 68%),
     linear-gradient(90deg, #120012 0%, #3b003b 20%, #22083e 50%, #071754 80%, #001435 100%);
