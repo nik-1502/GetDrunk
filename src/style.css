@@ -665,3 +665,12 @@ html.is-standalone #app > .busfahrer-page.profile-page::after {
   z-index: -1;
   pointer-events: none;
 }
+
+html.is-standalone #app > .setup-page {
+  height: calc(100dvh + env(safe-area-inset-bottom, 0px));
+  min-height: calc(100dvh + env(safe-area-inset-bottom, 0px));
+}
+
+html.is-standalone #app > .setup-page > .setup-shell {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
