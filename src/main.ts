@@ -709,6 +709,7 @@ function bindOfflineSetup() {
     const selectName = () => requestAnimationFrame(() => {
       input.select()
       input.setSelectionRange(0, input.value.length)
+      requestAnimationFrame(() => positionFocusedPlayerRow())
     })
     input.addEventListener('focus', selectName)
     input.addEventListener('click', (event) => {
@@ -717,12 +718,6 @@ function bindOfflineSetup() {
     })
     input.addEventListener('pointerdown', (event) => {
       event.stopPropagation()
-      input.setPointerCapture?.(event.pointerId)
-      if (document.activeElement !== input) {
-        event.preventDefault()
-        input.focus({ preventScroll: true })
-      }
-      selectName()
     })
     input.addEventListener('pointerup', (event) => event.stopPropagation())
     input.addEventListener('touchstart', (event) => event.stopPropagation(), { passive: true })
@@ -763,6 +758,7 @@ function bindOfflineSetup() {
     players.push(player)
     pendingPlayerNameFocusId = player.id
     renderModeMenu()
+    focusPlayerNameInput(player.id)
   })
   app.querySelector<HTMLButtonElement>('[data-start-game]')!.addEventListener('click', () => {
     startSetupGame(players, true)
@@ -774,17 +770,58 @@ function bindOfflineSetup() {
     if (stage && pendingSetupScrollTop !== undefined) stage.scrollTop = pendingSetupScrollTop
     pendingPlayerNameFocusId = undefined
     pendingSetupScrollTop = undefined
-    requestAnimationFrame(() => row?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' }))
+    row?.classList.add('is-new')
   }
+}
+
+function focusPlayerNameInput(playerId: string) {
+  const input = app.querySelector<HTMLInputElement>(`[data-player-name="${playerId}"]`)
+  if (!input) return
+  input.focus({ preventScroll: true })
+  requestAnimationFrame(() => {
+    input.select()
+    input.setSelectionRange(0, input.value.length)
+    requestAnimationFrame(() => positionFocusedPlayerRow())
+  })
+}
+
+function positionFocusedPlayerRow() {
+  const viewport = window.visualViewport
+  const input = document.activeElement instanceof HTMLInputElement && document.activeElement.matches('[data-player-name]')
+    ? document.activeElement
+    : undefined
+  const stage = app.querySelector<HTMLElement>('.setup-stage')
+  const offlineButton = app.querySelector<HTMLElement>('[data-setup-mode="offline"]')
+  const row = input?.closest<HTMLElement>('[data-player-row]')
+  if (!viewport || !input || !stage || !offlineButton || !row) return
+
+  const keyboardHeight = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop)
+  if (keyboardHeight < 80) return
+
+  const keyboardTop = viewport.offsetTop + viewport.height
+  const desiredGap = offlineButton.getBoundingClientRect().height
+  const delta = row.getBoundingClientRect().bottom - (keyboardTop - desiredGap)
+  if (delta > 1) stage.scrollBy({ top: delta, behavior: 'smooth' })
 }
 
 function bindKeyboardViewportPadding() {
   const viewport = window.visualViewport as VisualViewportLike | undefined
   const page = app.querySelector<HTMLElement>('.busfahrer-page')
   if (!viewport || !page) return undefined
+  const stage = app.querySelector<HTMLElement>('.setup-stage')
+  let restingScrollTop = stage?.scrollTop ?? 0
+  let keyboardWasOpen = false
   const updatePadding = () => {
     const keyboardHeight = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop)
     page.style.setProperty('--keyboard-bottom-offset', `${Math.ceil(keyboardHeight)}px`)
+    const keyboardIsOpen = keyboardHeight >= 80
+    if (keyboardIsOpen) {
+      if (!keyboardWasOpen && stage) restingScrollTop = stage.scrollTop
+      requestAnimationFrame(() => positionFocusedPlayerRow())
+    } else if (keyboardWasOpen && stage) {
+      stage.scrollTo({ top: restingScrollTop, behavior: 'smooth' })
+    }
+    keyboardWasOpen = keyboardIsOpen
   }
   updatePadding()
   viewport.addEventListener('resize', updatePadding)
