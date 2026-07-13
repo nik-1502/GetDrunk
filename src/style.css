@@ -541,6 +541,7 @@ body {
 }
 
 .busfahrer-page.profile-page > .busfahrer-shell {
+  --setup-panel-top: clamp(4px, 1dvh, 12px);
   position: relative;
   z-index: 1;
 }

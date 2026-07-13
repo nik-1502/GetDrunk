@@ -629,11 +629,18 @@ function renderOnlineSetupContent() {
 
 function renderPlayerTable(playerList: SetupPlayer[], options: { editable: boolean; canRemove: boolean }) {
   return `<div class="player-table" role="list">${playerList.map((player, index) => `<div class="player-row" role="listitem">
-    <div class="player-row-main">${playerAvatarMarkup(player)}${options.editable
+    ${options.editable
+      ? `<button class="player-avatar-trigger" type="button" data-edit-player-avatar="${player.id}" aria-label="Profilbild von ${escapeHtml(player.name || defaultPlayerName(index + 1))} ändern" title="Profilbild ändern">${playerAvatarMarkup(player)}</button>`
+      : playerAvatarMarkup(player)}
+    ${options.editable
       ? playerNameInputMarkup(player, index)
-      : `<strong class="player-name">${escapeHtml(player.name || defaultPlayerName(index + 1))}</strong>`}</div>
-    ${options.canRemove ? `<div class="player-row-actions">${options.editable ? `<button class="player-avatar-edit" type="button" data-edit-player-avatar="${player.id}">Bild</button>` : ''}<button class="player-remove" type="button" data-remove-player="${player.id}" ${playerList.length === 1 ? 'disabled' : ''}>Entfernen</button></div>` : ''}
+      : `<strong class="player-name">${escapeHtml(player.name || defaultPlayerName(index + 1))}</strong>`}
+    ${options.canRemove ? removePlayerButtonMarkup(player.id, playerList.length === 1) : ''}
   </div>`).join('')}</div>`
+}
+
+function removePlayerButtonMarkup(playerId: string, disabled: boolean) {
+  return `<button class="player-remove" type="button" data-remove-player="${playerId}" aria-label="Spieler entfernen" title="Spieler entfernen" ${disabled ? 'disabled' : ''}><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3m3 0-1 14H7L6 7m4 4v6m4-6v6"></path></svg></button>`
 }
 
 function renderPlayerAvatarEditor() {
@@ -697,6 +704,15 @@ function bindSetupModeSwitch() {
 
 function bindOfflineSetup() {
   app.querySelectorAll<HTMLInputElement>('[data-player-name]').forEach((input) => {
+    const selectName = () => requestAnimationFrame(() => input.select())
+    input.addEventListener('focus', selectName)
+    input.addEventListener('click', () => input.select())
+    input.addEventListener('pointerdown', (event) => {
+      if (document.activeElement === input) return
+      event.preventDefault()
+      input.focus()
+      selectName()
+    })
     input.addEventListener('input', () => {
       players = players.map((player) => player.id === input.dataset.playerName ? { ...player, name: input.value } : player)
     })
@@ -909,49 +925,6 @@ function renderOnlineMenu() {
 function renderOfflineMenu() {
   setupMode = 'offline'
   renderModeMenu()
-  return
-  setupShell(`<div class="setup-panel offline-panel"><p class="eyebrow">Offline</p><h2>Spieler</h2>
-    <div class="player-table" role="list">${players.map((player, index) => `<div class="player-row" role="listitem">
-      <div class="player-row-main">${playerAvatarMarkup(player)}${playerNameInputMarkup(player, index)}</div>
-      <button class="player-remove" type="button" data-remove-player="${player.id}" ${players.length === 1 ? 'disabled' : ''}>Entfernen</button>
-    </div>`).join('')}</div>
-    <button class="game-button setup-add-player" type="button" data-add-player ${players.length >= MAX_PLAYERS ? 'disabled' : ''}>+ Spieler hinzufügen</button>
-    <button class="game-button primary setup-start-game" type="button" data-start-game>Spiel starten</button>
-  </div>`, 'busfahrer-menu')
-
-  app.querySelectorAll<HTMLInputElement>('[data-player-name]').forEach((input) => {
-    input.addEventListener('input', () => {
-      players = players.map((player) => player.id === input.dataset.playerName ? { ...player, name: input.value } : player)
-    })
-  })
-  app.querySelectorAll<HTMLButtonElement>('[data-remove-player]').forEach((button) => button.addEventListener('click', () => {
-    if (players.length === 1) return
-    players = players.filter((player) => player.id !== button.dataset.removePlayer)
-    renderOfflineMenu()
-  }))
-  app.querySelector<HTMLButtonElement>('[data-add-player]')!.addEventListener('click', () => {
-    if (players.length >= MAX_PLAYERS) return
-    const player = createLocalPlayer(players.length + 1)
-    players.push(player)
-    pendingPlayerNameFocusId = player.id
-    renderOfflineMenu()
-  })
-  app.querySelector<HTMLButtonElement>('[data-start-game]')!.addEventListener('click', () => {
-    gamePlayerSnapshot = players.map((player, index) => ({ ...player, name: player.name.trim() || defaultPlayerName(index + 1) }))
-    profileStore.lastUsedProfileIds = players
-      .map((player) => player.profileId)
-      .filter((id) => profileStore.profiles.some((profile) => profile.id === id))
-    saveProfileStore()
-    window.location.hash = 'busfahrer'
-  })
-  if (pendingPlayerNameFocusId) {
-    const input = app.querySelector<HTMLInputElement>(`[data-player-name="${pendingPlayerNameFocusId}"]`)
-    pendingPlayerNameFocusId = undefined
-    window.setTimeout(() => {
-      input?.focus()
-      input?.select()
-    }, 0)
-  }
 }
 
 function renderProfilePicker() {
