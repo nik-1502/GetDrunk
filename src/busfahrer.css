@@ -70,6 +70,60 @@
 .busfahrer-header h1 { margin: 2px 0 0; color: #fff; font-size: clamp(1.8rem, 5vw, 3rem); }
 .restart-button { justify-self: end; }
 
+/* Nur die installierte iPad-PWA; die Klasse wird inklusive navigator.standalone gesetzt. */
+html.is-ipad-standalone .ipad-pwa-header-button {
+  width: 124px;
+  min-width: 124px;
+  max-width: 124px;
+  height: 48px;
+  min-height: 48px;
+  max-height: 48px;
+  padding: 10px 16px;
+  box-sizing: border-box;
+  display: inline-flex;
+  flex: 0 0 124px;
+  align-items: center;
+  justify-content: center;
+  border-width: 1px;
+  border-radius: 12px;
+  font-size: 1.16rem;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+}
+
+html.is-ipad-standalone .pyramid-row::after,
+html.is-ipad-standalone .pyramid-panel > .feedback-drinks {
+  display: none;
+}
+
+html.is-ipad-standalone .end-actions,
+html.is-ipad-standalone .klatschen-summary-actions {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+html.is-ipad-standalone .ipad-pwa-end-button,
+html.is-ipad-standalone .game-button.primary.ipad-pwa-end-button {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  height: 54px;
+  min-height: 54px;
+  max-height: 54px;
+  padding: 12px 18px;
+  box-sizing: border-box;
+  display: inline-flex;
+  grid-column: auto;
+  align-items: center;
+  justify-content: center;
+  border-width: 1px;
+  border-radius: 14px;
+  font-size: 1.2rem;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+}
+
 .bus-back,
 .restart-button {
   min-height: 44px;
@@ -670,6 +724,10 @@
 .player-name-input:focus { box-shadow: 0 0 0 3px rgba(138, 92, 255, .24); }
 .player-remove { padding: 9px 10px; border: 1px solid rgba(255, 99, 124, .38); border-radius: 9px; color: #ff9bac; background: rgba(228, 54, 82, .12); font: inherit; font-size: 1rem; font-weight: 800; cursor: pointer; }
 .player-remove:disabled { cursor: not-allowed; opacity: .35; }
+.player-row-actions { display: grid; grid-template-columns: repeat(2, 92px); align-items: center; gap: 8px; }
+.player-row-actions > button { width: 92px; height: 40px; min-width: 92px; min-height: 40px; padding: 9px 10px; box-sizing: border-box; border-radius: 9px; font: inherit; font-size: 1rem; font-weight: 800; line-height: 1; cursor: pointer; }
+.player-avatar-edit { border: 1px solid rgba(180, 132, 255, .48); color: #eadcff; background: rgba(125, 75, 190, .24); }
+.player-avatar-edit:hover { background: rgba(145, 91, 218, .36); }
 .setup-add-player, .setup-start-game { width: 100%; }
 .setup-add-player { margin-bottom: 12px; }
 .setup-start-game:disabled { cursor: not-allowed; opacity: .45; }
@@ -697,7 +755,38 @@
 .avatar-choice { display: grid; min-width: 0; padding: 8px; border: 2px solid transparent; border-radius: 14px; color: #d9d2e7; background: rgba(255, 255, 255, .05); place-items: center; font: inherit; cursor: pointer; transition: border-color 150ms ease, background 150ms ease, transform 150ms ease; }
 .avatar-choice:hover { transform: translateY(-2px); background: rgba(255, 255, 255, .09); }
 .avatar-choice.is-selected { border-color: #a77cff; background: rgba(138, 92, 255, .2); box-shadow: 0 0 0 2px rgba(138, 92, 255, .16); }
+.avatar-choice.is-unavailable { filter: grayscale(1); cursor: not-allowed; opacity: .28; }
+.avatar-choice.is-unavailable:hover { transform: none; background: rgba(255, 255, 255, .05); }
 .avatar-choice-visual, .profile-card-avatar { position: relative; display: grid; width: 58px; height: 58px; overflow: visible; isolation: isolate; place-items: center; }
+.player-avatar-dialog { width: min(560px, calc(100% - 32px)); }
+
+@media (min-width: 768px) and (max-width: 1366px) {
+  .profile-editor-panel .avatar-choice-grid,
+  .player-avatar-dialog .avatar-choice-grid {
+    display: grid;
+    width: min(100%, 520px);
+    margin-right: auto;
+    margin-left: auto;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-flow: row;
+    grid-auto-rows: 1fr;
+    gap: 16px;
+  }
+
+  .profile-editor-panel .avatar-choice,
+  .player-avatar-dialog .avatar-choice {
+    width: 100%;
+    min-width: 0;
+    aspect-ratio: 1;
+    padding: 12px;
+  }
+
+  .profile-editor-panel .avatar-choice-visual,
+  .player-avatar-dialog .avatar-choice-visual {
+    width: clamp(78px, 10vw, 112px);
+    height: clamp(78px, 10vw, 112px);
+  }
+}
 .avatar-choice-visual .default-profile-icon, .profile-preview .default-profile-icon, .profile-card-avatar .default-profile-icon { width: 66%; height: 66%; }
 .profile-save-button { width: 100%; }
 .saved-profile-grid { display: grid; max-height: min(48dvh, 430px); margin-bottom: 18px; overflow: auto; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }

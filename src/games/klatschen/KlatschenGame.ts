@@ -172,7 +172,7 @@ function renderCard() {
 
 function renderFinished() {
   const sorted = [...state.players].sort((left, right) => right.drinks - left.drinks)
-  return `<section class="klatschen-summary"><h2>Alle Karten wurden gezogen</h2><div class="klatschen-stats">${sorted.map((player) => `<div>${avatarMarkup(player)}<strong>${escapeHtml(player.name)}</strong><span>${player.drinks} Schluck${player.drinks === 1 ? '' : 'e'}</span></div>`).join('')}</div><div class="klatschen-summary-actions"><button class="game-button primary" data-klatschen-action="exit">Beenden</button><button class="game-button primary" data-klatschen-action="restart">Neustarten</button></div></section>`
+  return `<section class="klatschen-summary"><h2>Alle Karten wurden gezogen</h2><div class="klatschen-stats">${sorted.map((player) => `<div>${avatarMarkup(player)}<strong>${escapeHtml(player.name)}</strong><span>${player.drinks} Schluck${player.drinks === 1 ? '' : 'e'}</span></div>`).join('')}</div><div class="klatschen-summary-actions"><button class="game-button primary ipad-pwa-end-button" data-klatschen-action="exit">Beenden</button><button class="game-button primary ipad-pwa-end-button" data-klatschen-action="restart">Neustarten</button></div></section>`
 }
 
 function addDrinks(playerIndex: number, amount: number, includePartner = true) {
@@ -414,7 +414,7 @@ function removeRevealedCardBack() {
 function render() {
   if (!root) return
   const content = state.phase === 'rule' ? renderRule() : state.phase === 'turn' ? renderTurn() : state.phase === 'card' ? renderCard() : renderFinished()
-  root.innerHTML = `<div class="busfahrer-shell klatschen-shell"><header class="busfahrer-header"><button class="back-button bus-back" type="button" data-action="back">Beenden</button><div><p>GetDrunk präsentiert</p><h1>BLOBBEN</h1></div><button class="restart-button" type="button" data-klatschen-action="restart">Neu starten</button></header><div class="klatschen-global-rule">Sag nicht „trinken“ – sag „blobben“.</div><div class="klatschen-stage">${content}</div></div>`
+  root.innerHTML = `<div class="busfahrer-shell klatschen-shell"><header class="busfahrer-header"><button class="back-button bus-back ipad-pwa-header-button" type="button" data-action="back">Beenden</button><div><p>GetDrunk präsentiert</p><h1>BLOBBEN</h1></div><button class="restart-button ipad-pwa-header-button" type="button" data-klatschen-action="restart">Neu starten</button></header><div class="klatschen-global-rule">Sag nicht „trinken“ – sag „blobben“.</div><div class="klatschen-stage">${content}</div></div>`
   updateMiddleLayout()
   positionDrawAnimation()
   removeRevealedCardBack()

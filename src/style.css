@@ -93,7 +93,7 @@ body {
 .home-profile-button {
   position: absolute;
   z-index: 2;
-  top: clamp(18px, 4vh, 38px);
+  top: calc(clamp(18px, 4vh, 38px) + 16px);
   right: clamp(16px, 4vw, 40px);
   display: grid;
   width: clamp(50px, 7vw, 58px);
@@ -137,25 +137,36 @@ body {
   z-index: 1;
   display: grid;
   width: min(860px, 92vw);
-  margin-top: clamp(10px, 2vh, 24px);
+  margin-top: 0;
   place-items: center;
+  transform: translateY(16px);
 }
 
 .hero-logo {
   display: block;
-  width: min(100%, clamp(300px, 64vw, 760px));
+  width: min(
+    100%,
+    56vw,
+    560px,
+    calc(100vw - clamp(16px, 4vw, 40px) - clamp(16px, 4vw, 40px) - clamp(50px, 7vw, 58px) - clamp(50px, 7vw, 58px) - 24px)
+  );
   height: auto;
   object-fit: contain;
 }
 
 .busfahrer-button {
+  --game-tile-radius: 18px;
   width: min(100%, clamp(220px, 58vw, 360px));
   padding: clamp(10px, 2.6vw, 16px);
-  border: 1px solid rgba(255, 255, 255, .26);
-  border-radius: 18px;
+  border: 2px solid rgba(255, 255, 255, .48);
+  border-radius: var(--game-tile-radius);
+  overflow: hidden;
   color: #fff;
   background: linear-gradient(135deg, rgba(255, 0, 140, .34), rgba(36, 71, 255, .34));
-  box-shadow: 0 16px 38px rgba(11, 0, 34, .52), inset 0 1px 0 rgba(255, 255, 255, .24);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, .16),
+    0 0 8px rgba(255, 255, 255, .14),
+    0 8px 20px rgba(0, 0, 0, .28);
   font: inherit;
   font-weight: 700;
   cursor: pointer;
@@ -169,7 +180,18 @@ body {
   display: block;
   width: 100%;
   max-height: clamp(150px, 32dvh, 260px);
+  border-radius: var(--game-tile-radius);
+  clip-path: inset(0 round var(--game-tile-radius));
+  overflow: hidden;
   object-fit: contain;
+}
+
+.blobfahrer-home-button {
+  background: #01115a;
+}
+
+.klatschen-home-button {
+  background: #01073f;
 }
 
 .busfahrer-button-label {
@@ -205,15 +227,212 @@ body {
   gap: 12px;
 }
 
+.home-games-area {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: 100%;
+  justify-items: center;
+  gap: clamp(12px, 2.2vh, 26px);
+  transform: translateY(-48px);
+}
+
+.game-filters {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  width: min(780px, 100%);
+  gap: 12px;
+}
+
+.game-toolbar {
+  display: grid;
+  width: 100%;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  transform: translateY(calc(clamp(6px, 1.1vh, 13px) - 6px));
+}
+
+.game-search,
+.categories-filter-button,
+.favorites-filter-button {
+  display: flex;
+  width: 100%;
+  height: 48px;
+  min-width: 0;
+  padding: 0 14px;
+  border: 1px solid rgba(255, 255, 255, .34);
+  border-radius: var(--game-control-radius, 18px);
+  align-items: center;
+  gap: 9px;
+  color: #fff;
+  background: rgba(17, 10, 51, .72);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .12), 0 7px 18px rgba(0, 0, 0, .2);
+}
+
+.game-search svg,
+.categories-filter-button svg,
+.favorites-filter-button svg {
+  width: 20px;
+  height: 20px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.game-search input {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  color: #fff;
+  background: transparent;
+  font: inherit;
+  font-weight: 700;
+}
+
+.game-search input::placeholder { color: rgba(255, 255, 255, .68); }
+.game-search:focus-within { border-color: rgba(255, 255, 255, .72); box-shadow: 0 0 0 3px rgba(255, 255, 255, .12), 0 7px 18px rgba(0, 0, 0, .2); }
+
+.games-search-bar {
+  background: rgba(255, 255, 255, .16);
+  border-color: rgba(255, 255, 255, .25);
+  backdrop-filter: blur(6px);
+}
+
+.categories-filter-button,
+.favorites-filter-button {
+  justify-content: center;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+}
+
+.categories-filter-button.is-active,
+.favorites-filter-button.is-active {
+  border-color: rgba(255, 65, 167, .9);
+  background: rgba(189, 0, 105, .58);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12), 0 0 18px rgba(255, 0, 145, .3), 0 7px 18px rgba(0, 0, 0, .22);
+}
+
+.categories-filter-button.is-active svg,
+.favorites-filter-button.is-active svg { fill: #ff3f9f; stroke: #ff3f9f; }
+
+.category-menu {
+  display: flex;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, .22);
+  border-radius: 18px;
+  flex-wrap: wrap;
+  gap: 8px;
+  background: rgba(17, 10, 51, .9);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, .3);
+  backdrop-filter: blur(8px);
+}
+
+.category-menu[hidden] { display: none; }
+
+.category-chip {
+  min-height: 36px;
+  padding: 7px 12px;
+  border: 1px solid rgba(255, 255, 255, .24);
+  border-radius: 999px;
+  color: #fff;
+  background: rgba(255, 255, 255, .07);
+  font: inherit;
+  font-size: .88rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.category-chip.is-selected {
+  border-color: rgba(255, 65, 167, .9);
+  background: rgba(189, 0, 105, .58);
+  box-shadow: 0 0 12px rgba(255, 0, 145, .24);
+}
+
+.category-chip:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+.game-tile-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+}
+
+.game-tile-wrap[hidden] { display: none; }
 .game-list .busfahrer-button { width: 100%; height: 100%; }
+
+.favorite-heart-button {
+  position: absolute;
+  top: clamp(16px, 3vw, 22px);
+  right: clamp(16px, 3vw, 22px);
+  z-index: 3;
+  display: grid;
+  width: 42px;
+  height: 42px;
+  padding: 9px;
+  border: 0;
+  border-radius: 50%;
+  place-items: center;
+  color: rgba(255, 255, 255, .92);
+  background: rgba(3, 7, 48, .34);
+  cursor: pointer;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .55));
+}
+
+.favorite-heart-button svg {
+  width: 100%;
+  height: 100%;
+  fill: transparent;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.favorite-heart-button.is-favorite { color: #ff3f9f; }
+.favorite-heart-button.is-favorite svg { fill: currentColor; }
+.favorite-heart-button:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+
+.game-filter-empty {
+  grid-column: 1 / -1;
+  width: 100%;
+  margin: clamp(34px, 8vh, 72px) 0;
+  color: #fff;
+  font-size: clamp(1.05rem, 3vw, 1.35rem);
+  font-weight: 800;
+  text-align: center;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, .5);
+}
+
+.game-filter-empty[hidden] { display: none; }
 .klatschen-home-preview { position: relative; display: block; width: 100%; height: clamp(150px, 32dvh, 260px); }
 .klatschen-home-preview > i { position: absolute; left: 50%; top: 50%; display: grid; width: clamp(26px, 5.8vw, 42px); aspect-ratio: 5 / 7; place-items: center; border: 2px solid #fff; border-radius: 6px; color: #fff; background: repeating-linear-gradient(45deg,#5d3bb6 0 5px,#7957d3 5px 10px); box-shadow: 0 5px 10px rgba(0,0,0,.35); font-style: normal; transform: translate(-50%,-50%) rotate(var(--preview-angle)) translateY(clamp(-54px,-8vw,-38px)); transform-origin: center; }
 .klatschen-home-preview b { font-size: clamp(.62rem,1.5vw,.9rem); }
 .klatschen-home-preview em { display: inline-block; font-style: normal; transform: scaleX(-1); }
 
 @media (max-width: 620px) {
-  .game-list { width: 100%; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+  .home-games-area { transform: translateY(-44px); }
+  .game-list,
+  .game-filters { width: 100%; gap: 8px; }
+  .game-toolbar { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; transform: translateY(calc(clamp(6px, 1.1vh, 13px) - 4px)); }
+  .game-search,
+  .categories-filter-button,
+  .favorites-filter-button { height: 44px; padding-inline: 10px; gap: 6px; font-size: clamp(.72rem, 3.4vw, .92rem); }
+  .game-search svg,
+  .categories-filter-button svg,
+  .favorites-filter-button svg { width: 17px; height: 17px; }
+  .category-menu { padding: 8px; gap: 6px; }
+  .category-chip { min-height: 34px; padding: 6px 10px; font-size: .78rem; }
   .game-list .busfahrer-button { min-width: 0; padding: 8px; }
+  .favorite-heart-button { top: 12px; right: 12px; width: 38px; height: 38px; padding: 8px; }
   .game-list .busfahrer-button-image,
   .klatschen-home-preview { height: clamp(105px,20dvh,155px); }
   .game-list .busfahrer-button-label { font-size: clamp(.82rem,3.6vw,1.08rem); }
@@ -299,7 +518,7 @@ body {
 @media (max-width: 620px) {
   .home-page { padding-top: 76px; background-attachment: scroll; }
   .busfahrer-page.profile-page { background-attachment: scroll; }
-  .hero-header { width: min(100%, 430px); margin-top: 0; }
-  .hero-logo { width: min(100%, 380px); }
-  .game-list { width: min(100%, 340px); }
+  .hero-header { width: min(100%, 430px); top: calc(clamp(18px, 4vh, 38px) - 76px); }
+  .game-list,
+  .game-filters { width: min(100%, 340px); }
 }

@@ -25,12 +25,35 @@ import {
 import type { Session } from '@supabase/supabase-js'
 import userButtonImage from './assets/benutzer/4c0c56d3-a7e5-4be3-81b0-fda84fd67cbf.png'
 import busfahrerGameImage from './assets/spielbild icons/91c70169-1e14-42c9-b836-6eacc3325af0.png'
+import blobbenGameImage from './assets/spielbild icons/55490394-9fa1-45b5-adba-ce8260738e69.png'
 import heroLogo from './assets/überschrift/ebe5baf7-8dca-44a0-a5bc-ba2f48425dc2.png'
 
 const app = document.querySelector<HTMLDivElement>('#app')!
 const PROFILE_STORAGE_KEY = 'getdrunk.profiles.v1'
+const FAVORITE_GAMES_STORAGE_KEY = 'blobbaFavoriteGames'
 const MAX_PLAYERS = 9
 const DEFAULT_AVATAR_ID = 'bier'
+const HOME_GAME_CATEGORIES = ['Kartenspiele', 'Schnell', 'Klassiker', 'Lustig', 'Denkspiele', 'Verteilspiele', 'Teamspiele', 'Wettkampf'] as const
+type HomeGameCategory = 'Alle' | typeof HOME_GAME_CATEGORIES[number]
+
+const HOME_GAMES = [
+  {
+    id: 'blobfahrer',
+    categories: ['Kartenspiele', 'Klassiker', 'Verteilspiele', 'Wettkampf'],
+    searchTerms: ['blobfahrer', 'blobb-fahrer', 'busfahrer', 'bus', 'pyramide', 'karten'],
+  },
+  {
+    id: 'blobben',
+    categories: ['Kartenspiele', 'Lustig', 'Denkspiele', 'Teamspiele'],
+    searchTerms: ['blobben', 'klatschen', 'klatsch', 'kartenkreis', 'regeln', 'aktionskarten'],
+  },
+] as const
+
+let homeSearchQuery = ''
+let favoritesOnly = false
+let selectedHomeCategory: HomeGameCategory = 'Alle'
+let categoryMenuOpen = false
+const favoriteGameIds = loadFavoriteGameIds()
 
 type StoredProfile = { id: string; name: string; avatarId: string | null }
 type ProfileStore = { profiles: StoredProfile[]; activeProfileId: string; lastUsedProfileIds: string[] }
@@ -50,6 +73,7 @@ let players = suggestedPlayers()
 let gamePlayerSnapshot: SetupPlayer[] = []
 let profileEditorContext: ProfileEditorContext = { mode: 'primary' }
 let pendingPlayerNameFocusId: string | undefined
+let avatarEditorPlayerId: string | null = null
 let setupMode: SetupMode = 'offline'
 let activeGame: GameKey = 'busfahrer'
 let activeOnlineModal: OnlineModal = null
@@ -65,6 +89,18 @@ let keyboardViewportCleanup: (() => void) | undefined
 const viewportMeta = document.querySelector<HTMLMetaElement>('meta[name="viewport"]')!
 const zoomableViewport = 'width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=5.0'
 const resetViewport = 'width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0'
+
+function updateIPadStandaloneMode() {
+  const navigatorWithStandalone = navigator as Navigator & { standalone?: boolean }
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigatorWithStandalone.standalone === true
+  const hasIPadDimensions = window.innerWidth >= 768 && window.innerWidth <= 1366
+  const isTouchTablet = navigator.maxTouchPoints > 1
+  document.documentElement.classList.toggle('is-ipad-tablet', hasIPadDimensions && isTouchTablet)
+  document.documentElement.classList.toggle('is-ipad-standalone', isStandalone && hasIPadDimensions && isTouchTablet)
+}
+
+updateIPadStandaloneMode()
+window.addEventListener('resize', updateIPadStandaloneMode)
 
 function createId() {
   return crypto.randomUUID()
@@ -386,19 +422,47 @@ function renderHome() {
     <header class="hero-header">
       <img class="hero-logo" src="${heroLogo}" alt="BLOBBA">
     </header>
-    <section class="game-list" aria-label="Spiele">
-      <button class="busfahrer-button" type="button" aria-label="Busfahrer öffnen">
-        <img class="busfahrer-button-image" src="${busfahrerGameImage}" alt="">
-        <span class="busfahrer-button-label">BLOBB-FAHRER</span>
-      </button>
-      <button class="busfahrer-button klatschen-home-button" type="button" aria-label="Blobben öffnen">
-        <span class="klatschen-home-preview" aria-hidden="true">${Array.from({ length: 14 }, (_, index) => `<i style="--preview-angle:${index * (360 / 14)}deg"><b><em>B</em>B</b></i>`).join('')}</span>
-        <span class="busfahrer-button-label">BLOBBEN</span>
-      </button>
-    </section>
+    <div class="home-games-area">
+      <section class="game-filters" aria-label="Spiele filtern">
+      <label class="game-search games-search-bar">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m16.5 16.5 4 4"></path></svg>
+        <input type="search" placeholder="Spiele suchen" value="${escapeHtml(homeSearchQuery)}" aria-label="Spiele suchen">
+      </label>
+      <div class="game-toolbar">
+        <button class="categories-filter-button" type="button" aria-expanded="${categoryMenuOpen}" aria-controls="home-category-menu">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"></path></svg>
+          <span>Kategorien</span>
+        </button>
+        <button class="favorites-filter-button" type="button" aria-pressed="${favoritesOnly}">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 20.4 3.7 12.7a5.2 5.2 0 0 1 7.4-7.3l.9.9.9-.9a5.2 5.2 0 0 1 7.4 7.3Z"></path></svg>
+          <span>Favoriten</span>
+        </button>
+      </div>
+      <div class="category-menu" id="home-category-menu"${categoryMenuOpen ? '' : ' hidden'}>
+        ${(['Alle', ...HOME_GAME_CATEGORIES] as HomeGameCategory[]).map((category) => `<button class="category-chip${selectedHomeCategory === category ? ' is-selected' : ''}" type="button" data-home-category="${category}" aria-pressed="${selectedHomeCategory === category}">${category}</button>`).join('')}
+      </div>
+      </section>
+      <section class="game-list" aria-label="Spiele">
+      <div class="game-tile-wrap" data-home-game="blobfahrer">
+        <button class="busfahrer-button blobfahrer-home-button" type="button" aria-label="Busfahrer öffnen">
+          <img class="busfahrer-button-image" src="${busfahrerGameImage}" alt="">
+          <span class="busfahrer-button-label">BLOBB-FAHRER</span>
+        </button>
+        ${favoriteHeartMarkup('blobfahrer')}
+      </div>
+      <div class="game-tile-wrap" data-home-game="blobben">
+        <button class="busfahrer-button klatschen-home-button" type="button" aria-label="Blobben öffnen">
+          <img class="busfahrer-button-image" src="${blobbenGameImage}" alt="">
+          <span class="busfahrer-button-label">BLOBBEN</span>
+        </button>
+        ${favoriteHeartMarkup('blobben')}
+      </div>
+        <p class="game-filter-empty" role="status" hidden></p>
+      </section>
+    </div>
   </main>`
   app.querySelector<HTMLButtonElement>('.home-profile-button')!.addEventListener('click', () => { window.location.hash = 'profile' })
-  app.querySelector<HTMLButtonElement>('.busfahrer-button')!.addEventListener('click', () => {
+  app.querySelector<HTMLButtonElement>('.blobfahrer-home-button')!.addEventListener('click', () => {
     activeGame = 'busfahrer'
     setupMode = 'offline'
     activeOnlineModal = null
@@ -409,6 +473,106 @@ function renderHome() {
     setupMode = 'offline'
     activeOnlineModal = null
     window.location.hash = 'klatschen-menu'
+  })
+  app.querySelector<HTMLInputElement>('.game-search input')!.addEventListener('input', (event) => {
+    homeSearchQuery = (event.currentTarget as HTMLInputElement).value
+    updateHomeFilters()
+  })
+  app.querySelector<HTMLButtonElement>('.categories-filter-button')!.addEventListener('click', () => {
+    categoryMenuOpen = !categoryMenuOpen
+    updateCategoryMenu()
+  })
+  app.querySelectorAll<HTMLButtonElement>('.category-chip').forEach((button) => {
+    button.addEventListener('click', () => {
+      selectedHomeCategory = button.dataset.homeCategory as HomeGameCategory
+      categoryMenuOpen = false
+      updateCategoryMenu()
+      updateHomeFilters()
+    })
+  })
+  app.querySelector<HTMLButtonElement>('.favorites-filter-button')!.addEventListener('click', () => {
+    favoritesOnly = !favoritesOnly
+    updateHomeFilters()
+  })
+  app.querySelectorAll<HTMLButtonElement>('.favorite-heart-button').forEach((button) => {
+    button.addEventListener('click', (event) => {
+      event.preventDefault()
+      event.stopPropagation()
+      const gameId = button.dataset.favoriteGame!
+      favoriteGameIds.has(gameId) ? favoriteGameIds.delete(gameId) : favoriteGameIds.add(gameId)
+      try {
+        localStorage.setItem(FAVORITE_GAMES_STORAGE_KEY, JSON.stringify([...favoriteGameIds]))
+      } catch {
+        // Favoriten funktionieren weiterhin für die aktuelle Sitzung.
+      }
+      updateHomeFilters()
+    })
+  })
+  updateCategoryMenu()
+  updateHomeFilters()
+}
+
+function normalizeGameSearch(value: string) {
+  return value.trim().toLocaleLowerCase('de-DE').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ß/g, 'ss').replace(/[^a-z0-9]/g, '')
+}
+
+function loadFavoriteGameIds() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(FAVORITE_GAMES_STORAGE_KEY) || '[]')
+    const validIds = new Set<string>(HOME_GAMES.map((game) => game.id))
+    return new Set<string>(Array.isArray(stored) ? stored.filter((id): id is string => typeof id === 'string' && validIds.has(id)) : [])
+  } catch {
+    return new Set<string>()
+  }
+}
+
+function favoriteHeartMarkup(gameId: string) {
+  const isFavorite = favoriteGameIds.has(gameId)
+  return `<button class="favorite-heart-button${isFavorite ? ' is-favorite' : ''}" type="button" data-favorite-game="${gameId}" aria-label="${isFavorite ? 'Aus Favoriten entfernen' : 'Zu Favoriten hinzufügen'}" aria-pressed="${isFavorite}"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 20.4 3.7 12.7a5.2 5.2 0 0 1 7.4-7.3l.9.9.9-.9a5.2 5.2 0 0 1 7.4 7.3Z"></path></svg></button>`
+}
+
+function updateHomeFilters() {
+  const normalizedQuery = normalizeGameSearch(homeSearchQuery)
+  let visibleCount = 0
+  HOME_GAMES.forEach((game) => {
+    const searchableTerms = game.searchTerms.map(normalizeGameSearch)
+    const matchesSearch = !normalizedQuery || searchableTerms.some((term) => term.includes(normalizedQuery))
+    const matchesCategory = selectedHomeCategory === 'Alle' || (game.categories as readonly string[]).includes(selectedHomeCategory)
+    const visible = matchesSearch && matchesCategory && (!favoritesOnly || favoriteGameIds.has(game.id))
+    const tile = app.querySelector<HTMLElement>(`[data-home-game="${game.id}"]`)
+    if (tile) tile.hidden = !visible
+    if (visible) visibleCount += 1
+    const heart = tile?.querySelector<HTMLButtonElement>('.favorite-heart-button')
+    const isFavorite = favoriteGameIds.has(game.id)
+    heart?.classList.toggle('is-favorite', isFavorite)
+    heart?.setAttribute('aria-pressed', String(isFavorite))
+    heart?.setAttribute('aria-label', isFavorite ? 'Aus Favoriten entfernen' : 'Zu Favoriten hinzufügen')
+  })
+  const filterButton = app.querySelector<HTMLButtonElement>('.favorites-filter-button')
+  filterButton?.classList.toggle('is-active', favoritesOnly)
+  filterButton?.setAttribute('aria-pressed', String(favoritesOnly))
+  const emptyMessage = app.querySelector<HTMLElement>('.game-filter-empty')
+  if (!emptyMessage) return
+  emptyMessage.hidden = visibleCount > 0
+  if (visibleCount === 0) {
+    emptyMessage.textContent = favoritesOnly
+      ? favoriteGameIds.size === 0 && !normalizedQuery && selectedHomeCategory === 'Alle' ? 'Noch keine Favoriten' : 'Keine passenden Favoriten'
+      : normalizedQuery && selectedHomeCategory !== 'Alle' ? 'Kein passendes Spiel gefunden'
+        : normalizedQuery ? 'Kein Spiel gefunden'
+          : 'Keine Spiele in dieser Kategorie'
+  }
+}
+
+function updateCategoryMenu() {
+  const menu = app.querySelector<HTMLElement>('.category-menu')
+  const button = app.querySelector<HTMLButtonElement>('.categories-filter-button')
+  if (menu) menu.hidden = !categoryMenuOpen
+  button?.setAttribute('aria-expanded', String(categoryMenuOpen))
+  button?.classList.toggle('is-active', categoryMenuOpen || selectedHomeCategory !== 'Alle')
+  app.querySelectorAll<HTMLButtonElement>('.category-chip').forEach((chip) => {
+    const selected = chip.dataset.homeCategory === selectedHomeCategory
+    chip.classList.toggle('is-selected', selected)
+    chip.setAttribute('aria-pressed', String(selected))
   })
 }
 
@@ -446,7 +610,7 @@ function renderOfflineSetupContent() {
     ${renderPlayerTable(players, { editable: true, canRemove: true })}
     <button class="game-button setup-add-player" type="button" data-add-player ${players.length >= MAX_PLAYERS ? 'disabled' : ''}>+ Spieler hinzufÃ¼gen</button>
     <button class="game-button primary setup-start-game" type="button" data-start-game>Spiel starten</button>
-  </section>`
+  </section>${renderPlayerAvatarEditor()}`
 }
 
 function renderOnlineSetupContent() {
@@ -476,8 +640,28 @@ function renderPlayerTable(playerList: SetupPlayer[], options: { editable: boole
     <div class="player-row-main">${playerAvatarMarkup(player)}${options.editable
       ? playerNameInputMarkup(player, index)
       : `<strong class="player-name">${escapeHtml(player.name || defaultPlayerName(index + 1))}</strong>`}</div>
-    ${options.canRemove ? `<button class="player-remove" type="button" data-remove-player="${player.id}" ${playerList.length === 1 ? 'disabled' : ''}>Entfernen</button>` : ''}
+    ${options.canRemove ? `<div class="player-row-actions">${options.editable ? `<button class="player-avatar-edit" type="button" data-edit-player-avatar="${player.id}">Bild</button>` : ''}<button class="player-remove" type="button" data-remove-player="${player.id}" ${playerList.length === 1 ? 'disabled' : ''}>Entfernen</button></div>` : ''}
   </div>`).join('')}</div>`
+}
+
+function renderPlayerAvatarEditor() {
+  const player = players.find((item) => item.id === avatarEditorPlayerId)
+  if (!player) return ''
+  const usedByOtherPlayers = new Set(players
+    .filter((item) => item.id !== player.id)
+    .map((item) => item.avatarId)
+    .filter((avatarId): avatarId is string => Boolean(avatarId)))
+  return `<div class="setup-modal-backdrop player-avatar-modal" role="dialog" aria-modal="true" aria-labelledby="player-avatar-title">
+    <div class="setup-modal player-avatar-dialog">
+      <h2 id="player-avatar-title">Profilbild für ${escapeHtml(player.name)}</h2>
+      <div class="avatar-choice-grid">${avatarOptions.map((avatar) => {
+        const unavailable = usedByOtherPlayers.has(avatar.id)
+        const selected = player.avatarId === avatar.id
+        return `<button class="avatar-choice ${selected ? 'is-selected' : ''} ${unavailable ? 'is-unavailable' : ''}" type="button" data-player-avatar-id="${avatar.id}" aria-label="${avatar.label}${unavailable ? ' – bereits verwendet' : ''}" aria-pressed="${selected}" ${unavailable ? 'disabled' : ''}><span class="avatar-choice-visual" style="--avatar-ring:${avatar.color}">${avatarVisualMarkup(avatar.id)}</span></button>`
+      }).join('')}</div>
+      <button class="game-button" type="button" data-close-player-avatar>Schließen</button>
+    </div>
+  </div>`
 }
 
 function playerNameInputMarkup(player: SetupPlayer, index: number) {
@@ -528,6 +712,23 @@ function bindOfflineSetup() {
   app.querySelectorAll<HTMLButtonElement>('[data-remove-player]').forEach((button) => button.addEventListener('click', () => {
     if (players.length === 1) return
     players = players.filter((player) => player.id !== button.dataset.removePlayer)
+    renderModeMenu()
+  }))
+  app.querySelectorAll<HTMLButtonElement>('[data-edit-player-avatar]').forEach((button) => button.addEventListener('click', () => {
+    avatarEditorPlayerId = button.dataset.editPlayerAvatar ?? null
+    renderModeMenu()
+  }))
+  app.querySelector<HTMLButtonElement>('[data-close-player-avatar]')?.addEventListener('click', () => {
+    avatarEditorPlayerId = null
+    renderModeMenu()
+  })
+  app.querySelectorAll<HTMLButtonElement>('[data-player-avatar-id]').forEach((button) => button.addEventListener('click', () => {
+    const avatarId = button.dataset.playerAvatarId
+    if (!avatarId || !avatarEditorPlayerId || button.disabled) return
+    players = players.map((player) => player.id === avatarEditorPlayerId
+      ? { ...player, avatarId, avatar: avatarSource(avatarId), avatarColor: avatarColor(avatarId) }
+      : player)
+    avatarEditorPlayerId = null
     renderModeMenu()
   }))
   app.querySelector<HTMLButtonElement>('[data-add-player]')!.addEventListener('click', () => {
