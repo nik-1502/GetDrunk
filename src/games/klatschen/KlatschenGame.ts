@@ -113,14 +113,15 @@ function playerTurnMarkup() {
 function heldCardLabel(card: KlatschenCard) {
   if (card.title === 'Nasen-Blobb') return 'Nasen...'
   if (card.title === 'Daumen-Blobb') return 'Daumen...'
-  if (card.title === 'Fragenmeister') return 'Regel...'
+  if (card.title === 'Fragenmeister') return 'FragenM...'
   if (card.title === 'Doppel-Blobb') return 'Doppel...'
   return card.title
 }
 
 function heldCardsMarkup() {
   const cards: string[] = []
-  state.players.forEach((player) => {
+  const visiblePlayers = [currentPlayer()]
+  visiblePlayers.forEach((player) => {
     const stacks = player.heldCards.reduce<Array<{ card: KlatschenCard; count: number }>>((result, cardId) => {
       const card = klatschenCardMap.get(cardId)
       if (!card || card.id === 'clap-partner') return result
@@ -134,7 +135,7 @@ function heldCardsMarkup() {
     })
   })
   const renderedPairs = new Set<string>()
-  state.players.forEach((player) => {
+  visiblePlayers.forEach((player) => {
     const partner = player.partnerPlayerId ? state.players.find((item) => item.id === player.partnerPlayerId) : undefined
     if (!partner) return
     const pairKey = [player.id, partner.id].sort().join('|')
