@@ -804,6 +804,20 @@ html.is-ipad-standalone .game-button.primary.ipad-pwa-end-button {
 }
 .avatar-choice-visual .default-profile-icon, .profile-preview .default-profile-icon, .profile-card-avatar .default-profile-icon { width: 66%; height: 66%; }
 .profile-save-button { width: 100%; }
+.sound-settings-panel { display: grid; gap: 22px; }
+.sound-setting-row { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.sound-setting-row strong, .sound-volume-row > span { color: #fff; font-size: 1.05rem; }
+.sound-setting-row .setup-copy { margin: 5px 0 0; text-align: left; }
+.sound-toggle { position: relative; flex: 0 0 auto; width: 54px; height: 30px; }
+.sound-toggle input { position: absolute; opacity: 0; pointer-events: none; }
+.sound-toggle span { position: absolute; inset: 0; border: 1px solid rgba(255,255,255,.28); border-radius: 999px; background: rgba(255,255,255,.1); cursor: pointer; transition: background 160ms ease, border-color 160ms ease; }
+.sound-toggle span::after { content: ''; position: absolute; top: 4px; left: 4px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: transform 160ms ease; }
+.sound-toggle input:checked + span { border-color: rgba(120,174,255,.8); background: linear-gradient(90deg, #c62c8f, #376ee3); }
+.sound-toggle input:checked + span::after { transform: translateX(24px); }
+.sound-toggle input:focus-visible + span { outline: 3px solid rgba(157,115,255,.45); outline-offset: 3px; }
+.sound-volume-row { display: grid; grid-template-columns: auto 1fr 52px; align-items: center; gap: 14px; }
+.sound-volume-row input { min-width: 0; accent-color: #8b70ff; }
+.sound-volume-row output { color: #d7d0e4; text-align: right; font-weight: 750; }
 .saved-profile-grid { display: grid; max-height: min(48dvh, 430px); margin-bottom: 18px; overflow: auto; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .saved-profile-card { display: grid; min-width: 0; padding: 16px 10px; border: 1px solid rgba(255, 255, 255, .12); border-radius: 16px; color: #fff; background: rgba(255, 255, 255, .05); place-items: center; gap: 7px; font: inherit; font-size: 1.08rem; cursor: pointer; transition: transform 150ms ease, border-color 150ms ease, background 150ms ease; }
 .saved-profile-card:hover { transform: translateY(-2px); border-color: #9d73ff; background: rgba(138, 92, 255, .14); }

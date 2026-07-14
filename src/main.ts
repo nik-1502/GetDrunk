@@ -2,6 +2,7 @@ import './style.css'
 import { applyBusfahrerState, getBusfahrerState, mountBusfahrer, type BusfahrerGameState } from './busfahrer.ts'
 import { applyKlatschenState, getKlatschenState, mountKlatschen, type KlatschenGameState } from './games/klatschen/KlatschenGame.ts'
 import { avatarColor, avatarOptions, avatarSource, avatarVisualMarkup } from './profiles.ts'
+import { getSoundSettings, playSound, setSoundEffectsEnabled, setSoundEffectsVolume } from './audio/audioManager.ts'
 import {
   createOnlineGroup,
   fetchGroupSnapshot,
@@ -514,15 +515,17 @@ function renderHome() {
       </section>
     </div>
   </main>`
-  app.querySelector<HTMLButtonElement>('.home-user-button')!.addEventListener('click', () => { window.location.hash = 'profile' })
-  app.querySelector<HTMLButtonElement>('.home-settings-button')!.addEventListener('click', () => { window.location.hash = 'settings' })
+  app.querySelector<HTMLButtonElement>('.home-user-button')!.addEventListener('click', () => { playSound('ui-click'); window.location.hash = 'profile' })
+  app.querySelector<HTMLButtonElement>('.home-settings-button')!.addEventListener('click', () => { playSound('ui-click'); window.location.hash = 'settings' })
   app.querySelector<HTMLButtonElement>('.blobfahrer-home-button')!.addEventListener('click', () => {
+    playSound('ui-click')
     activeGame = 'busfahrer'
     setupMode = 'offline'
     activeOnlineModal = null
     window.location.hash = 'busfahrer-menu'
   })
   app.querySelector<HTMLButtonElement>('.klatschen-home-button')!.addEventListener('click', () => {
+    playSound('ui-click')
     activeGame = 'klatschen'
     setupMode = 'offline'
     activeOnlineModal = null
@@ -533,11 +536,13 @@ function renderHome() {
     updateHomeFilters()
   })
   app.querySelector<HTMLButtonElement>('.categories-filter-button')!.addEventListener('click', () => {
+    playSound('ui-click')
     categoryMenuOpen = !categoryMenuOpen
     updateCategoryMenu()
   })
   app.querySelectorAll<HTMLButtonElement>('.category-chip').forEach((button) => {
     button.addEventListener('click', () => {
+      playSound('ui-click')
       selectedHomeCategory = button.dataset.homeCategory as HomeGameCategory
       categoryMenuOpen = false
       updateCategoryMenu()
@@ -545,6 +550,7 @@ function renderHome() {
     })
   })
   app.querySelector<HTMLButtonElement>('.favorites-filter-button')!.addEventListener('click', () => {
+    playSound('ui-click')
     favoritesOnly = !favoritesOnly
     updateHomeFilters()
   })
@@ -553,7 +559,9 @@ function renderHome() {
       event.preventDefault()
       event.stopPropagation()
       const gameId = button.dataset.favoriteGame!
-      favoriteGameIds.has(gameId) ? favoriteGameIds.delete(gameId) : favoriteGameIds.add(gameId)
+      const wasFavorite = favoriteGameIds.has(gameId)
+      wasFavorite ? favoriteGameIds.delete(gameId) : favoriteGameIds.add(gameId)
+      playSound(wasFavorite ? 'favorite-off' : 'favorite-on')
       try {
         localStorage.setItem(FAVORITE_GAMES_STORAGE_KEY, JSON.stringify([...favoriteGameIds]))
       } catch {
@@ -567,7 +575,26 @@ function renderHome() {
 }
 
 function renderSettingsPlaceholder() {
-  setupShell('<div class="setup-panel"><h2>Einstellungen</h2><p class="setup-copy">Die Einstellungen werden später ergänzt.</p></div>', '', 'EINSTELLUNGEN')
+  const sound = getSoundSettings()
+  setupShell(`<div class="setup-panel sound-settings-panel"><h2>Einstellungen</h2>
+    <div class="sound-setting-row"><div><strong>Soundeffekte</strong><p class="setup-copy">Töne für Bedienung und Spielaktionen</p></div><label class="sound-toggle"><input type="checkbox" data-sound-enabled ${sound.enabled ? 'checked' : ''}><span aria-hidden="true"></span></label></div>
+    <label class="sound-volume-row"><span>Lautstärke</span><input type="range" min="0" max="100" step="1" value="${Math.round(sound.volume * 100)}" data-sound-volume ${sound.enabled ? '' : 'disabled'}><output data-sound-volume-output>${Math.round(sound.volume * 100)} %</output></label>
+  </div>`, '', 'EINSTELLUNGEN')
+  const enabled = app.querySelector<HTMLInputElement>('[data-sound-enabled]')!
+  const volume = app.querySelector<HTMLInputElement>('[data-sound-volume]')!
+  const output = app.querySelector<HTMLOutputElement>('[data-sound-volume-output]')!
+  enabled.addEventListener('change', () => {
+    if (!enabled.checked) playSound('ui-click')
+    setSoundEffectsEnabled(enabled.checked)
+    volume.disabled = !enabled.checked
+    if (enabled.checked) playSound('ui-confirm')
+  })
+  volume.addEventListener('input', () => {
+    const value = Number(volume.value)
+    setSoundEffectsVolume(value / 100)
+    output.value = `${value} %`
+  })
+  volume.addEventListener('change', () => playSound('ui-confirm'))
 }
 
 function normalizeGameSearch(value: string) {
@@ -641,7 +668,7 @@ function setupShell(content: string, backTarget: string, title = 'BLOBB-FAHRER',
     <header class="busfahrer-header"><button class="back-button bus-back" type="button" data-setup-back>← Zurück</button>${centerTitle ? '<span></span>' : `<div><p>${eyebrow}</p><h1>${title}</h1></div>`}<span></span></header>
     <section class="setup-stage"><div class="setup-stack">${centerTitle ? `<h1 class="setup-title">${title}</h1>` : ''}${content}</div></section>
   </div></main>`
-  app.querySelector<HTMLButtonElement>('[data-setup-back]')!.addEventListener('click', () => { window.location.hash = backTarget })
+  app.querySelector<HTMLButtonElement>('[data-setup-back]')!.addEventListener('click', () => { playSound('ui-back'); window.location.hash = backTarget })
 }
 
 function renderModeMenu() {
@@ -765,6 +792,7 @@ function renderOnlineModal() {
 
 function bindSetupModeSwitch() {
   app.querySelectorAll<HTMLButtonElement>('[data-setup-mode]').forEach((button) => button.addEventListener('click', () => {
+    playSound('ui-click')
     setupMode = button.dataset.setupMode === 'online' ? 'online' : 'offline'
     activeOnlineModal = null
     renderModeMenu()
@@ -804,22 +832,26 @@ function bindOfflineSetup() {
   })
   app.querySelectorAll<HTMLButtonElement>('[data-remove-player]').forEach((button) => button.addEventListener('click', () => {
     if (players.length === 1) return
+    playSound('ui-delete')
     if (editingPlayerId === button.dataset.removePlayer) editingPlayerId = null
     players = players.filter((player) => player.id !== button.dataset.removePlayer)
     renderModeMenu()
   }))
   app.querySelectorAll<HTMLButtonElement>('[data-edit-player-avatar]').forEach((button) => button.addEventListener('click', () => {
+    playSound('ui-click')
     editingPlayerId = null
     avatarEditorPlayerId = button.dataset.editPlayerAvatar ?? null
     renderModeMenu()
   }))
   app.querySelector<HTMLButtonElement>('[data-close-player-avatar]')?.addEventListener('click', () => {
+    playSound('ui-back')
     avatarEditorPlayerId = null
     renderModeMenu()
   })
   app.querySelectorAll<HTMLButtonElement>('[data-player-avatar-id]').forEach((button) => button.addEventListener('click', () => {
     const avatarId = button.dataset.playerAvatarId
     if (!avatarId || !avatarEditorPlayerId || button.disabled) return
+    playSound('ui-confirm')
     players = players.map((player) => player.id === avatarEditorPlayerId
       ? { ...player, avatarId, avatar: avatarSource(avatarId), avatarColor: avatarColor(avatarId) }
       : player)
@@ -828,6 +860,7 @@ function bindOfflineSetup() {
   }))
   app.querySelector<HTMLButtonElement>('[data-add-player]')!.addEventListener('click', () => {
     if (players.length >= MAX_PLAYERS) return
+    playSound('ui-confirm')
     const player = createLocalPlayer(players.length + 1)
     players.push(player)
     editingPlayerId = player.id
@@ -989,6 +1022,7 @@ async function submitOnlineInvite(inviteCode: string) {
 }
 
 function startSetupGame(playerList: SetupPlayer[], rememberProfiles: boolean) {
+  playSound('game-start')
   gamePlayerSnapshot = playerList.map((player, index) => ({ ...player, name: player.name.trim() || defaultPlayerName(index + 1) }))
   if (rememberProfiles) {
     profileStore.lastUsedProfileIds = players
@@ -1186,6 +1220,7 @@ function renderProfileEditor() {
       syncSetupPlayers(storedProfile)
     }
     saveProfileStore()
+    playSound('ui-confirm')
     void trySyncRemoteProfile()
     window.location.hash = isPrimary ? '' : gameRoute('-offline')
   })

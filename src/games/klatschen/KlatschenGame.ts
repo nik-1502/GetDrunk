@@ -1,5 +1,6 @@
 import './klatschen.css'
 import { defaultProfileIconMarkup } from '../../profiles.ts'
+import { playSound } from '../../audio/audioManager.ts'
 import { klatschenCardMap, klatschenCards, type KlatschenCard } from './klatschenCards.ts'
 
 export type KlatschenPlayerSetup = { id?: string; name: string; avatar: string; avatarColor: string }
@@ -222,8 +223,12 @@ function drawCard() {
   state.currentCardId = state.deck[state.drawIndex++] ?? null
   state.selectedTargetIndex = null
   state.phase = 'card'
+  const heldCardCount = currentPlayer().heldCards.length
   const card = state.currentCardId ? klatschenCardMap.get(state.currentCardId) : undefined
   if (card) applyAutomaticDrinks(card)
+  playSound('card-draw')
+  window.setTimeout(() => playSound('card-flip'), 640)
+  if (currentPlayer().heldCards.length > heldCardCount) window.setTimeout(() => playSound('collect-card'), 900)
   render()
   publish()
 }
@@ -247,10 +252,14 @@ function selectTarget(index: number) {
 
 function nextTurn() {
   if (!canControl() || state.phase !== 'card') return
-  if (!state.remainingSlots.length) state.phase = 'finished'
+  if (!state.remainingSlots.length) {
+    state.phase = 'finished'
+    playSound('game-finish')
+  }
   else {
     state.currentPlayerIndex = (state.currentPlayerIndex + 1) % state.players.length
     state.phase = 'turn'
+    playSound('player-change')
   }
   state.currentCardId = null
   state.drawnSlot = null
@@ -278,7 +287,7 @@ function handleClick(event: Event) {
   }
   if (button.dataset.klatschenTarget !== undefined) return selectTarget(Number(button.dataset.klatschenTarget))
   const action = button.dataset.klatschenAction
-  if (action === 'start' && canControl()) { state.phase = 'turn'; render(); publish() }
+  if (action === 'start' && canControl()) { playSound('game-start'); state.phase = 'turn'; render(); publish() }
   if (action === 'draw') drawCard()
   if (action === 'next') nextTurn()
   if (action === 'cancel-held') { state.openedHeldCardId = null; state.openedHeldCardOwnerId = null; render(); publish() }
@@ -294,11 +303,12 @@ function handleClick(event: Event) {
     }
     state.openedHeldCardId = null
     state.openedHeldCardOwnerId = null
+    playSound('remove-card')
     render(); publish()
   }
-  if (action === 'restart') { options.onLeave?.(); window.location.hash = 'klatschen-menu' }
-  if (action === 'exit') { options.onLeave?.(); window.location.hash = '' }
-  if (button.dataset.action === 'back') { options.onLeave?.(); window.location.hash = '' }
+  if (action === 'restart') { playSound('ui-back'); options.onLeave?.(); window.location.hash = 'klatschen-menu' }
+  if (action === 'exit') { playSound('ui-back'); options.onLeave?.(); window.location.hash = '' }
+  if (button.dataset.action === 'back') { playSound('ui-back'); options.onLeave?.(); window.location.hash = '' }
 }
 
 function applyControls() {
@@ -426,6 +436,7 @@ export function getKlatschenState() {
 }
 
 export function applyKlatschenState(nextState: KlatschenGameState) {
+  const previous = root ? structuredClone(state) : null
   state = structuredClone(nextState)
   state.players.forEach((player) => {
     player.heldCards ??= []
@@ -434,6 +445,16 @@ export function applyKlatschenState(nextState: KlatschenGameState) {
   state.openedHeldCardId ??= null
   state.openedHeldCardOwnerId ??= null
   render()
+  if (!previous) return
+  if (state.drawIndex > previous.drawIndex) {
+    playSound('card-draw')
+    window.setTimeout(() => playSound('card-flip'), 640)
+  }
+  const heldCount = state.players.reduce((sum, player) => sum + player.heldCards.length, 0)
+  const previousHeldCount = previous.players.reduce((sum, player) => sum + player.heldCards.length, 0)
+  if (heldCount > previousHeldCount) playSound('collect-card')
+  if (state.currentPlayerIndex !== previous.currentPlayerIndex) playSound('player-change')
+  if (state.phase === 'finished' && previous.phase !== 'finished') playSound('game-finish')
 }
 
 export function mountKlatschen(target: HTMLElement, players: KlatschenPlayerSetup[], gameOptions: KlatschenOptions = {}) {

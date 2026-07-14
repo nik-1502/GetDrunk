@@ -1,5 +1,6 @@
 import './busfahrer.css'
 import { defaultProfileIconMarkup } from './profiles.ts'
+import { playSound } from './audio/audioManager.ts'
 
 type CardColor = 'red' | 'blue'
 type SuitId = 'heart' | 'diamond' | 'star' | 'moon'
@@ -193,10 +194,20 @@ export function getBusfahrerState() {
 }
 
 export function applyBusfahrerState(state: BusfahrerGameState) {
+  const previous = gameRoot ? snapshotGameState() : null
   suppressStatePublish = true
   applyGameState(state)
   renderGame()
   suppressStatePublish = false
+  if (!previous) return
+  const drewCard = state.hand.length > previous.hand.length || state.busCards.length > previous.busCards.length || state.pyramidProgress > previous.pyramidProgress
+  if (drewCard) {
+    playSound('card-draw')
+    window.setTimeout(() => playSound('card-flip'), 120)
+  }
+  if (state.feedback.text !== previous.feedback.text && state.feedback.kind !== 'info') playSound(state.feedback.kind === 'success' ? 'correct' : 'wrong')
+  if (state.currentPlayerIndex !== previous.currentPlayerIndex) playSound('player-change')
+  if (state.phase === 'final' && previous.phase !== 'final') playSound('game-finish')
 }
 
 function publishState() {
@@ -277,6 +288,9 @@ function answerQuestion(choice: string) {
   if (answered) return
   const card = drawCard()
   const correct = evaluateQuestion(choice, card)
+  playSound('card-draw')
+  window.setTimeout(() => playSound('card-flip'), 120)
+  window.setTimeout(() => playSound(correct ? 'correct' : 'wrong'), 220)
   hand.push(card)
   questionResults.push(correct)
   if (!correct) currentPlayer().drinks += 1
@@ -326,6 +340,8 @@ function revealPyramid() {
   if (pyramidProgress >= 10 || pyramidDecision) return
   const index = pyramidOrder[pyramidProgress]!
   const card = pyramidCards[index]!
+  playSound('card-draw')
+  window.setTimeout(() => playSound('card-flip'), 120)
   const matchingCard = hand.find((heldCard) => heldCard.value === card.value)
   const match = Boolean(matchingCard)
   if (match) pyramidHits.add(index)
@@ -340,6 +356,7 @@ function usePyramidCard() {
   if (!pyramidDecision || pyramidDecision.step !== 'offer') return
   const cardIndex = hand.findIndex((card) => card.id === pyramidDecision!.cardId)
   if (cardIndex >= 0) {
+    playSound('remove-card')
     hand.splice(cardIndex, 1)
     questionResults.splice(cardIndex, 1)
     syncCurrentPlayerCards()
@@ -366,6 +383,7 @@ function assignPyramidDrinks(targetIndex: number) {
 function finishPlayerPyramid() {
   if (pyramidProgress !== 10 || pyramidDecision) return
   if (currentPlayerIndex < gamePlayers.length - 1) {
+    playSound('player-change')
     currentPlayerIndex += 1
     hand = currentPlayer().hand
     questionResults = currentPlayer().questionResults
@@ -443,6 +461,8 @@ function answerBus(choice: string) {
   if (busFailed || busLost || busFeedbackPending) return
   const previousCard = busCards[busProgress - 1]
   const card = drawBusCard()
+  playSound('card-draw')
+  window.setTimeout(() => playSound('card-flip'), 120)
   busCards.push(card)
   const correct = busProgress === 0
     ? choice === card.color
@@ -452,11 +472,13 @@ function answerBus(choice: string) {
         ? card.numericValue < previousCard!.numericValue
         : card.numericValue === previousCard!.numericValue
   if (!correct) {
+    window.setTimeout(() => playSound('wrong'), 220)
     feedback = { text: 'Falsch – trinken.', kind: 'error' }
     currentPlayer().drinks += 1
     busFailed = true; renderGame(); return
   }
   busProgress += 1
+  window.setTimeout(() => playSound(busProgress === busRoundLength ? 'success' : 'correct'), 220)
   feedback = busProgress === busRoundLength
     ? { text: 'Geschafft! Du bist aus dem Bus.', kind: 'success' }
     : { text: 'Richtig!', kind: 'success' }
@@ -530,6 +552,7 @@ function handleClick(event: Event) {
   const button = (event.target as HTMLElement).closest<HTMLButtonElement>('button')
   if (!button) return
   if (button.dataset.action === 'back') {
+    playSound('ui-back')
     onlineOptions.onLeave?.()
     window.location.hash = ''
     return
@@ -543,12 +566,14 @@ function handleClick(event: Event) {
   if (button.dataset.action === 'keep-pyramid-card') keepPyramidCard()
   if (button.dataset.action === 'finish-player-pyramid') finishPlayerPyramid()
   if (button.dataset.action === 'start-player-round') {
+    playSound('player-change')
     phase = 'questions'
     feedback = { text: '', kind: 'info' }
     renderGame()
   }
   if (button.dataset.action === 'start-bus') startBus()
   if (button.dataset.action === 'show-final-summary') {
+    playSound('game-finish')
     finalResult = `${currentPlayer().name} hat die BLOBB-FAHRER-Runde geschafft!`
     phase = 'final'
     renderGame()
