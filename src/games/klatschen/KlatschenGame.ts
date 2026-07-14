@@ -236,7 +236,7 @@ function drawCard() {
   const heldCardCount = currentPlayer().heldCards.length
   const card = state.currentCardId ? klatschenCardMap.get(state.currentCardId) : undefined
   if (card) applyAutomaticDrinks(card)
-  playSound('card-draw')
+  playSound('blobben-card-draw')
   window.setTimeout(() => playSound('card-flip'), 640)
   if (currentPlayer().heldCards.length > heldCardCount) window.setTimeout(() => playSound('collect-card'), 900)
   render()
@@ -515,7 +515,7 @@ export function applyKlatschenState(nextState: KlatschenGameState) {
   if (!previous) return
   if (startsDeal) playDealSequence()
   if (state.drawIndex > previous.drawIndex) {
-    playSound('card-draw')
+    playSound('blobben-card-draw')
     window.setTimeout(() => playSound('card-flip'), 640)
   }
   const heldCount = state.players.reduce((sum, player) => sum + player.heldCards.length, 0)

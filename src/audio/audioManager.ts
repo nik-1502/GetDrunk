@@ -1,9 +1,10 @@
 import cardDrawUrl from '../assets/audio/card-draw.mp3'
 import correctSoundUrl from '../assets/audio/richtig-sound.mp3'
+import blobbenCardDrawUrl from '../assets/audio/blobben-card-draw.mp3'
 
 export type SoundName =
   | 'ui-click' | 'ui-back' | 'ui-confirm' | 'ui-delete'
-  | 'game-start' | 'card-draw' | 'card-flip' | 'correct' | 'wrong'
+  | 'game-start' | 'card-draw' | 'blobben-card-draw' | 'card-flip' | 'correct' | 'wrong'
   | 'success' | 'player-change' | 'notification' | 'favorite-on'
   | 'favorite-off' | 'collect-card' | 'remove-card' | 'game-finish'
 
@@ -28,6 +29,13 @@ const correctSoundPool = Array.from({ length: 3 }, () => {
   return audio
 })
 let correctSoundPoolIndex = 0
+const blobbenCardDrawPool = Array.from({ length: 3 }, () => {
+  const audio = new Audio(blobbenCardDrawUrl)
+  audio.preload = 'auto'
+  audio.setAttribute('playsinline', '')
+  return audio
+})
+let blobbenCardDrawPoolIndex = 0
 
 function playCardDraw() {
   const audio = cardDrawPool[cardDrawPoolIndex]!
@@ -50,6 +58,18 @@ function playCorrectSound() {
   audio.volume = Math.min(1, readVolume())
   void audio.play().catch((error) => {
     if (import.meta.env.DEV) console.warn('[Audio] Richtig-Sound konnte nicht abgespielt werden.', error)
+  })
+}
+
+function playBlobbenCardDraw() {
+  const audio = blobbenCardDrawPool[blobbenCardDrawPoolIndex]!
+  blobbenCardDrawPoolIndex = (blobbenCardDrawPoolIndex + 1) % blobbenCardDrawPool.length
+  audio.pause()
+  audio.currentTime = 0
+  audio.muted = false
+  audio.volume = Math.min(1, readVolume() * .9)
+  void audio.play().catch((error) => {
+    if (import.meta.env.DEV) console.warn('[Audio] Blobben-Kartenziehsound konnte nicht abgespielt werden.', error)
   })
 }
 
@@ -191,6 +211,7 @@ function renderSound(name: SoundName) {
     case 'ui-delete': n(.1, .08, 900); t(190, .13, .11, 0, 95, 'square'); break
     case 'game-start': t(260, .12, .09); t(390, .13, .1, .09); t(620, .2, .11, .18); break
     case 'card-draw': break
+    case 'blobben-card-draw': break
     case 'card-flip': n(.045, .07, 2600); t(620, .045, .045, .03, 390, 'triangle'); break
     case 'correct': break
     case 'wrong': t(330, .24, .07, 0, 310, 'triangle'); t(247, .31, .075, .13, 220, 'sine'); t(123, .2, .018, .135, 110, 'sine'); break
@@ -210,6 +231,11 @@ export function playSound(name: SoundName) {
   ensureMediaChannel()
   if (name === 'card-draw') {
     playCardDraw()
+    if (!unlocked || context?.state !== 'running') void unlockAudio()
+    return
+  }
+  if (name === 'blobben-card-draw') {
+    playBlobbenCardDraw()
     if (!unlocked || context?.state !== 'running') void unlockAudio()
     return
   }
