@@ -52,10 +52,10 @@
 .klatschen-held-dialog .klatschen-cancel-remove { background: #b92e4b; }
 
 .klatschen-drawn-card { --draw-radius: clamp(118px, min(29vw, 27dvh), 255px); position: absolute; left: 50%; top: 43%; z-index: 5; width: clamp(190px, min(50vw, 31dvh), 310px); aspect-ratio: 5 / 7; perspective: 1200px; transform: translate(-50%,-50%); }
-.klatschen-drawn-inner { position: relative; width: 100%; height: 100%; animation: klatschen-draw 900ms cubic-bezier(.2,.72,.2,1) both; transform-style: preserve-3d; }
+.klatschen-drawn-inner { position: relative; width: 100%; height: 100%; animation: klatschen-draw 900ms cubic-bezier(.2,.72,.2,1) both; -webkit-transform-style: preserve-3d; transform-style: preserve-3d; }
 .klatschen-drawn-back,
-.klatschen-drawn-front { position: absolute; inset: 0; border-radius: clamp(15px, 3vw, 24px); backface-visibility: hidden; }
-.klatschen-drawn-front { display: flex; padding: clamp(16px, 3vw, 26px); box-sizing: border-box; border: 4px solid var(--blobba-yellow); flex-direction: column; align-items: center; justify-content: space-between; color: #271d35; background: linear-gradient(145deg,#fff,#efe9f6); box-shadow: 0 22px 55px rgba(0,0,0,.45), inset 0 0 0 2px rgba(255,255,255,.7); text-align: center; transform: rotateY(180deg); overflow: hidden; }
+.klatschen-drawn-front { position: absolute; inset: 0; border-radius: clamp(15px, 3vw, 24px); -webkit-backface-visibility: hidden; backface-visibility: hidden; }
+.klatschen-drawn-front { display: flex; padding: clamp(16px, 3vw, 26px); box-sizing: border-box; border: 4px solid var(--blobba-yellow); flex-direction: column; align-items: center; justify-content: space-between; color: #271d35; background: linear-gradient(145deg,#fff,#efe9f6); box-shadow: 0 22px 55px rgba(0,0,0,.45), inset 0 0 0 2px rgba(255,255,255,.7); text-align: center; -webkit-transform: rotateY(180deg); transform: rotateY(180deg); overflow: hidden; }
 .klatschen-drawn-front h2 { margin: 0; color: #6d45c4; font-size: clamp(1.2rem, 3.5vw, 1.8rem); }
 .klatschen-card-symbol { font-size: clamp(2.4rem, 9vw, 4.5rem); line-height: 1; }
 .klatschen-drawn-front p { margin: 0; font-size: clamp(.88rem, 2.4vw, 1.1rem); font-weight: 700; line-height: 1.25; }
