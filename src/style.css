@@ -168,14 +168,14 @@ body {
   }
 }
 
-@media (pointer: coarse) and (max-width: 620px) {
+@media (max-width: 620px) {
   html:not(.is-standalone) .home-settings-button,
   html:not(.is-standalone) .home-user-button {
     top: calc(clamp(16px, 4vw, 40px) + 8px + 59px);
   }
 }
 
-@media (pointer: coarse) and (min-width: 621px) and (max-width: 1366px) {
+@media (min-width: 621px) and (max-width: 1366px) {
   html:not(.is-standalone) .home-settings-button,
   html:not(.is-standalone) .home-user-button {
     top: calc(clamp(16px, 4vw, 40px) + 8px + 24px);
