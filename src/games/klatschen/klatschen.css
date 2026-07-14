@@ -11,8 +11,10 @@
 .klatschen-play-screen,
 .klatschen-card-screen { --circle-radius: clamp(118px, min(29vw, 27dvh), 255px); --circle-card-width: clamp(25px, min(5.8vw, 5.5dvh), 48px); position: relative; width: 100%; height: 100%; min-height: 0; border: 1px solid rgba(255,255,255,.1); border-radius: 24px; background: rgba(31,25,44,.82); box-shadow: 0 24px 70px rgba(0,0,0,.28); overflow: hidden; }
 .klatschen-card-circle { position: absolute; left: 50%; top: 47%; width: 0; height: 0; }
-.klatschen-circle-slot { position: absolute; left: calc(var(--circle-card-width) / -2); top: calc(var(--circle-card-width) * -.7); width: var(--circle-card-width); aspect-ratio: 5 / 7; transform: rotate(var(--slot-angle)) translateY(calc(var(--circle-radius) * -1)); transform-origin: 50% 50%; }
+.klatschen-circle-slot { position: absolute; left: calc(var(--circle-card-width) / -2); top: calc(var(--circle-card-width) * -.7); z-index: var(--slot-layer); width: var(--circle-card-width); aspect-ratio: 5 / 7; transform: rotate(var(--slot-angle)) translateY(calc(var(--circle-radius) * -1)); transform-origin: 50% 50%; }
 .klatschen-circle-slot.is-empty { visibility: hidden; }
+.klatschen-card-circle.is-dealing .klatschen-card-back { opacity: 0; }
+.klatschen-card-circle.is-dealing.is-dealing-active .klatschen-card-back { animation: klatschen-deal-card var(--deal-card-duration) cubic-bezier(.18,.76,.25,1) var(--deal-delay) forwards; }
 .klatschen-card-back,
 .klatschen-drawn-back { position: absolute; inset: 0; display: grid; place-items: center; border: clamp(2px, .35vw, 4px) solid #fff; border-radius: clamp(4px, .8vw, 9px); color: rgba(255,255,255,.92); background: repeating-linear-gradient(45deg,#5d3bb6 0 6px,#7957d3 6px 12px); box-shadow: 0 5px 13px rgba(0,0,0,.34); overflow: hidden; backface-visibility: hidden; }
 .klatschen-card-back::after,
@@ -80,6 +82,11 @@
   0% { transform: translate(var(--draw-x),var(--draw-y)) scale(var(--draw-scale)) rotateY(0); }
   18% { transform: translate(var(--draw-x),calc(var(--draw-y) - 12px)) scale(var(--draw-lift-scale)) rotateY(18deg); }
   100% { transform: rotate(0) translateY(0) scale(1) rotateY(180deg); }
+}
+@keyframes klatschen-deal-card {
+  from { opacity: 0; transform: translateY(-13px) scale(.78) rotate(-5deg); }
+  65% { opacity: 1; transform: translateY(2px) scale(1.03) rotate(1deg); }
+  to { opacity: 1; transform: translateY(0) scale(1) rotate(0); }
 }
 @keyframes klatschen-actions-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 

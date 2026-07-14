@@ -1,7 +1,8 @@
 import './klatschen.css'
 import { defaultProfileIconMarkup } from '../../profiles.ts'
-import { playSound } from '../../audio/audioManager.ts'
+import { getSoundSettings, playSound } from '../../audio/audioManager.ts'
 import { klatschenCardMap, klatschenCards, type KlatschenCard } from './klatschenCards.ts'
+import blobbenCardDealUrl from '../../assets/audio/blobben-card-deal.mp3'
 
 export type KlatschenPlayerSetup = { id?: string; name: string; avatar: string; avatarColor: string }
 export type KlatschenPlayer = KlatschenPlayerSetup & { id: string; drinks: number; heldCards: string[]; partnerPlayerId: string | null }
@@ -32,6 +33,11 @@ let root: HTMLElement | null = null
 let state: KlatschenGameState
 let options: KlatschenOptions = {}
 let revealTimer: number | undefined
+let dealTimer: number | undefined
+let dealAnimationActive = false
+const dealAudio = new Audio(blobbenCardDealUrl)
+dealAudio.preload = 'auto'
+dealAudio.setAttribute('playsinline', '')
 
 function shuffle<T>(items: T[]) {
   const result = [...items]
@@ -86,11 +92,11 @@ function publish() {
 function cardBackMarkup(slot: number) {
   const angle = (slot / state.deck.length) * 360
   const present = state.remainingSlots.includes(slot)
-  return `<div class="klatschen-circle-slot ${present ? '' : 'is-empty'}" style="--slot-angle:${angle}deg" aria-hidden="${present ? 'false' : 'true'}">${present ? `<div class="klatschen-card-back"><span><i>B</i>B</span></div>` : ''}</div>`
+  return `<div class="klatschen-circle-slot ${present ? '' : 'is-empty'}" style="--slot-angle:${angle}deg;--slot-layer:${state.deck.length - slot}" aria-hidden="${present ? 'false' : 'true'}">${present ? `<div class="klatschen-card-back"><span><i>B</i>B</span></div>` : ''}</div>`
 }
 
 function circleMarkup() {
-  return `<div class="klatschen-card-circle" aria-label="Kartenkreis">${state.deck.map((_, slot) => cardBackMarkup(slot)).join('')}</div>`
+  return `<div class="klatschen-card-circle${dealAnimationActive ? ' is-dealing' : ''}" aria-label="Kartenkreis">${state.deck.map((_, slot) => cardBackMarkup(slot)).join('')}</div>`
 }
 
 function playerTurnMarkup() {
@@ -147,7 +153,7 @@ function renderRule() {
 }
 
 function renderTurn() {
-  return `<section class="klatschen-play-screen">${circleMarkup()}<div class="klatschen-center-controls">${playerTurnMarkup()}<button class="game-button primary klatschen-draw-button" data-klatschen-action="draw">Nächste Karte ziehen</button></div>${heldCardsMarkup()}${heldCardDialogMarkup()}</section>`
+  return `<section class="klatschen-play-screen">${circleMarkup()}<div class="klatschen-center-controls">${playerTurnMarkup()}<button class="game-button primary klatschen-draw-button" data-klatschen-action="draw" ${dealAnimationActive ? 'disabled' : ''}>Nächste Karte ziehen</button></div>${heldCardsMarkup()}${heldCardDialogMarkup()}</section>`
 }
 
 function drawnCardMarkup(card: KlatschenCard) {
@@ -216,7 +222,7 @@ function applyAutomaticDrinks(card: KlatschenCard) {
 }
 
 function drawCard() {
-  if (!canControl() || state.phase !== 'turn' || !state.remainingSlots.length) return
+  if (!canControl() || dealAnimationActive || state.phase !== 'turn' || !state.remainingSlots.length) return
   const slotPosition = Math.floor(Math.random() * state.remainingSlots.length)
   state.drawnSlot = state.remainingSlots[slotPosition]!
   state.remainingSlots.splice(slotPosition, 1)
@@ -268,6 +274,56 @@ function nextTurn() {
   publish()
 }
 
+function startDealVisual(duration: number) {
+  const circle = root?.querySelector<HTMLElement>('.klatschen-card-circle.is-dealing')
+  const cards = circle?.querySelectorAll<HTMLElement>('.klatschen-card-back')
+  if (!circle || !cards?.length) return
+  const totalDuration = Number.isFinite(duration) && duration > 0 ? duration : .648
+  const cardDuration = Math.min(.14, totalDuration / Math.max(2, cards.length / 2))
+  const interval = cards.length > 1 ? (totalDuration - cardDuration) / (cards.length - 1) : 0
+  cards.forEach((card, index) => {
+    card.style.setProperty('--deal-delay', `${index * interval}s`)
+    card.style.setProperty('--deal-card-duration', `${cardDuration}s`)
+  })
+  requestAnimationFrame(() => circle.classList.add('is-dealing-active'))
+  window.clearTimeout(dealTimer)
+  dealTimer = window.setTimeout(() => {
+    dealAnimationActive = false
+    circle.classList.remove('is-dealing', 'is-dealing-active')
+    circle.querySelectorAll<HTMLElement>('.klatschen-card-back').forEach((card) => {
+      card.style.removeProperty('--deal-delay')
+      card.style.removeProperty('--deal-card-duration')
+    })
+    root?.querySelector<HTMLButtonElement>('.klatschen-draw-button')?.removeAttribute('disabled')
+  }, Math.ceil(totalDuration * 1000) + 20)
+}
+
+function playDealSequence() {
+  const startVisual = () => startDealVisual(dealAudio.duration)
+  const sound = getSoundSettings()
+  if (!sound.enabled) {
+    startVisual()
+    return
+  }
+  dealAudio.pause()
+  dealAudio.currentTime = 0
+  dealAudio.muted = false
+  dealAudio.volume = sound.volume
+  void dealAudio.play().then(startVisual).catch((error) => {
+    if (import.meta.env.DEV) console.warn('[Audio] Blobben-Austeilsound konnte nicht abgespielt werden.', error)
+    startVisual()
+  })
+}
+
+function startGameWithDeal() {
+  if (!canControl() || state.phase !== 'rule') return
+  dealAnimationActive = true
+  state.phase = 'turn'
+  render()
+  publish()
+  playDealSequence()
+}
+
 function handleClick(event: Event) {
   const target = event.target as HTMLElement
   if (target.classList.contains('klatschen-held-dialog-backdrop')) {
@@ -287,7 +343,7 @@ function handleClick(event: Event) {
   }
   if (button.dataset.klatschenTarget !== undefined) return selectTarget(Number(button.dataset.klatschenTarget))
   const action = button.dataset.klatschenAction
-  if (action === 'start' && canControl()) { playSound('game-start'); state.phase = 'turn'; render(); publish() }
+  if (action === 'start') startGameWithDeal()
   if (action === 'draw') drawCard()
   if (action === 'next') nextTurn()
   if (action === 'cancel-held') { state.openedHeldCardId = null; state.openedHeldCardOwnerId = null; render(); publish() }
@@ -437,6 +493,8 @@ export function getKlatschenState() {
 
 export function applyKlatschenState(nextState: KlatschenGameState) {
   const previous = root ? structuredClone(state) : null
+  const startsDeal = previous?.phase === 'rule' && nextState.phase === 'turn'
+  if (startsDeal) dealAnimationActive = true
   state = structuredClone(nextState)
   state.players.forEach((player) => {
     player.heldCards ??= []
@@ -446,6 +504,7 @@ export function applyKlatschenState(nextState: KlatschenGameState) {
   state.openedHeldCardOwnerId ??= null
   render()
   if (!previous) return
+  if (startsDeal) playDealSequence()
   if (state.drawIndex > previous.drawIndex) {
     playSound('card-draw')
     window.setTimeout(() => playSound('card-flip'), 640)
@@ -460,6 +519,7 @@ export function applyKlatschenState(nextState: KlatschenGameState) {
 export function mountKlatschen(target: HTMLElement, players: KlatschenPlayerSetup[], gameOptions: KlatschenOptions = {}) {
   root = target
   options = gameOptions
+  dealAnimationActive = false
   state = gameOptions.initialState ? structuredClone(gameOptions.initialState) : createState(players)
   state.players.forEach((player) => {
     player.heldCards ??= []
@@ -470,5 +530,5 @@ export function mountKlatschen(target: HTMLElement, players: KlatschenPlayerSetu
   root.addEventListener('click', handleClick)
   window.addEventListener('resize', updateMiddleLayout)
   render()
-  return () => { window.clearTimeout(revealTimer); root?.removeEventListener('click', handleClick); window.removeEventListener('resize', updateMiddleLayout); root = null; options = {} }
+  return () => { window.clearTimeout(revealTimer); window.clearTimeout(dealTimer); dealAudio.pause(); dealAudio.currentTime = 0; dealAnimationActive = false; root?.removeEventListener('click', handleClick); window.removeEventListener('resize', updateMiddleLayout); root = null; options = {} }
 }
