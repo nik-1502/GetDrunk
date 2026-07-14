@@ -116,6 +116,53 @@ function preventDesktopZoom() {
 
 preventDesktopZoom()
 
+function constrainTouchZoom() {
+  if (!window.matchMedia('(pointer: coarse)').matches && navigator.maxTouchPoints < 2) return
+  const viewportMeta = document.querySelector<HTMLMetaElement>('meta[name="viewport"]')
+  if (!viewportMeta) return
+
+  const scalableViewport = 'width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=5, viewport-fit=cover'
+  const resetViewport = 'width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, viewport-fit=cover'
+  let gestureStartScale = 1
+  let isPinching = false
+  let resetScheduled = false
+
+  const resetZoomToDefault = () => {
+    if (resetScheduled || (window.visualViewport?.scale ?? 1) <= 1) return
+    resetScheduled = true
+    viewportMeta.content = resetViewport
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      viewportMeta.content = scalableViewport
+      resetScheduled = false
+    }))
+  }
+
+  document.addEventListener('gesturestart', (event) => {
+    const gesture = event as Event & { scale?: number }
+    gestureStartScale = window.visualViewport?.scale ?? gesture.scale ?? 1
+    isPinching = true
+  }, { passive: true })
+  document.addEventListener('gesturechange', (event) => {
+    const gesture = event as Event & { scale?: number }
+    const relativeScale = gesture.scale ?? 1
+    if (gestureStartScale * relativeScale < 1) event.preventDefault()
+  }, { passive: false })
+  document.addEventListener('gestureend', () => {
+    isPinching = false
+    resetZoomToDefault()
+  }, { passive: true })
+  document.addEventListener('touchstart', (event) => {
+    if (event.touches.length === 2) isPinching = true
+  }, { passive: true })
+  document.addEventListener('touchend', (event) => {
+    if (!isPinching || event.touches.length !== 0) return
+    isPinching = false
+    resetZoomToDefault()
+  }, { passive: true })
+}
+
+constrainTouchZoom()
+
 function createId() {
   return crypto.randomUUID()
 }
