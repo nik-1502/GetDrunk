@@ -168,7 +168,8 @@ function drawnCardMarkup(card: KlatschenCard) {
 }
 
 function needsTarget(card: KlatschenCard) {
-  return card.id === 'clap-partner' && state.players.length > 1
+  void card
+  return false
 }
 
 function targetMarkup(card: KlatschenCard) {
