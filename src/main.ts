@@ -97,6 +97,25 @@ function updateIPadStandaloneMode() {
 updateIPadStandaloneMode()
 window.addEventListener('resize', updateIPadStandaloneMode)
 
+function preventDesktopZoom() {
+  const isDesktopPointer = () => window.matchMedia('(hover: hover) and (pointer: fine)').matches
+  window.addEventListener('wheel', (event) => {
+    if (isDesktopPointer() && event.ctrlKey) event.preventDefault()
+  }, { passive: false })
+  window.addEventListener('keydown', (event) => {
+    if (!isDesktopPointer() || (!event.ctrlKey && !event.metaKey)) return
+    if (['+', '-', '=', '0'].includes(event.key)) event.preventDefault()
+  })
+  window.addEventListener('gesturestart', (event) => {
+    if (isDesktopPointer()) event.preventDefault()
+  }, { passive: false })
+  window.addEventListener('gesturechange', (event) => {
+    if (isDesktopPointer()) event.preventDefault()
+  }, { passive: false })
+}
+
+preventDesktopZoom()
+
 function createId() {
   return crypto.randomUUID()
 }
