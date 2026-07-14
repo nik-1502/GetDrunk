@@ -15,6 +15,7 @@ let noiseBuffer: AudioBuffer | null = null
 let unlocked = false
 let unlockPromise: Promise<boolean> | null = null
 let mediaChannelAudio: HTMLAudioElement | null = null
+const activeWebAudioSources = new Set<AudioScheduledSourceNode>()
 const cardDrawPool = Array.from({ length: 3 }, () => {
   const audio = new Audio(cardDrawUrl)
   audio.preload = 'auto'
@@ -62,10 +63,20 @@ function playCorrectSound() {
 }
 
 function playBlobbenCardDraw() {
+  activeWebAudioSources.forEach((source) => {
+    try { source.stop() } catch { /* Source has already ended. */ }
+  })
+  activeWebAudioSources.clear()
+  ;[...cardDrawPool, ...correctSoundPool].forEach((entry) => {
+    entry.pause()
+    entry.currentTime = 0
+  })
+  blobbenCardDrawPool.forEach((entry) => {
+    entry.pause()
+    entry.currentTime = 0
+  })
   const audio = blobbenCardDrawPool[blobbenCardDrawPoolIndex]!
   blobbenCardDrawPoolIndex = (blobbenCardDrawPoolIndex + 1) % blobbenCardDrawPool.length
-  audio.pause()
-  audio.currentTime = 0
   audio.muted = false
   audio.volume = Math.min(1, readVolume() * .9)
   void audio.play().catch((error) => {
@@ -172,6 +183,8 @@ function tone(ctx: AudioContext, frequency: number, duration: number, gainValue:
   gain.gain.exponentialRampToValueAtTime(Math.max(0.0001, gainValue), start + 0.008)
   gain.gain.exponentialRampToValueAtTime(0.0001, start + duration)
   oscillator.connect(gain).connect(ctx.destination)
+  activeWebAudioSources.add(oscillator)
+  oscillator.addEventListener('ended', () => activeWebAudioSources.delete(oscillator), { once: true })
   oscillator.start(start)
   oscillator.stop(start + duration + 0.02)
 }
@@ -194,6 +207,8 @@ function noise(ctx: AudioContext, duration: number, gainValue: number, frequency
   gain.gain.exponentialRampToValueAtTime(Math.max(0.0001, gainValue), start + 0.006)
   gain.gain.exponentialRampToValueAtTime(0.0001, start + duration)
   source.connect(filter).connect(gain).connect(ctx.destination)
+  activeWebAudioSources.add(source)
+  source.addEventListener('ended', () => activeWebAudioSources.delete(source), { once: true })
   source.start(start)
   source.stop(start + duration + 0.02)
 }

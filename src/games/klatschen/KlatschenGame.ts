@@ -35,6 +35,7 @@ let options: KlatschenOptions = {}
 let revealTimer: number | undefined
 let dealTimer: number | undefined
 let dealAnimationActive = false
+let lastSoundedDrawIndex = 0
 const dealAudio = new Audio(blobbenCardDealUrl)
 dealAudio.preload = 'auto'
 dealAudio.setAttribute('playsinline', '')
@@ -225,6 +226,12 @@ function applyAutomaticDrinks(card: KlatschenCard) {
   if (card.id !== 'clap-partner' && (card.type === 'collectible-action' || card.keepUntilUsed)) currentPlayer().heldCards.push(card.id)
 }
 
+function playDrawSoundOnce() {
+  if (state.drawIndex <= lastSoundedDrawIndex) return
+  lastSoundedDrawIndex = state.drawIndex
+  playSound('blobben-card-draw')
+}
+
 function drawCard() {
   if (!canControl() || dealAnimationActive || state.phase !== 'turn' || !state.remainingSlots.length) return
   const slotPosition = Math.floor(Math.random() * state.remainingSlots.length)
@@ -235,7 +242,7 @@ function drawCard() {
   state.phase = 'card'
   const card = state.currentCardId ? klatschenCardMap.get(state.currentCardId) : undefined
   if (card) applyAutomaticDrinks(card)
-  playSound('blobben-card-draw')
+  playDrawSoundOnce()
   render()
   publish()
 }
@@ -512,7 +519,7 @@ export function applyKlatschenState(nextState: KlatschenGameState) {
   if (!previous) return
   if (startsDeal) playDealSequence()
   if (state.drawIndex > previous.drawIndex) {
-    playSound('blobben-card-draw')
+    playDrawSoundOnce()
   }
   const heldCount = state.players.reduce((sum, player) => sum + player.heldCards.length, 0)
   const previousHeldCount = previous.players.reduce((sum, player) => sum + player.heldCards.length, 0)
@@ -532,6 +539,7 @@ export function mountKlatschen(target: HTMLElement, players: KlatschenPlayerSetu
   })
   state.openedHeldCardId ??= null
   state.openedHeldCardOwnerId ??= null
+  lastSoundedDrawIndex = state.drawIndex
   root.addEventListener('click', handleClick)
   window.addEventListener('resize', updateMiddleLayout)
   render()
