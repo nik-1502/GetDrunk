@@ -1,4 +1,5 @@
 import cardDrawUrl from '../assets/audio/card-draw.mp3'
+import correctSoundUrl from '../assets/audio/richtig-sound.mp3'
 
 export type SoundName =
   | 'ui-click' | 'ui-back' | 'ui-confirm' | 'ui-delete'
@@ -20,6 +21,13 @@ const cardDrawPool = Array.from({ length: 3 }, () => {
   return audio
 })
 let cardDrawPoolIndex = 0
+const correctSoundPool = Array.from({ length: 3 }, () => {
+  const audio = new Audio(correctSoundUrl)
+  audio.preload = 'auto'
+  audio.setAttribute('playsinline', '')
+  return audio
+})
+let correctSoundPoolIndex = 0
 
 function playCardDraw() {
   const audio = cardDrawPool[cardDrawPoolIndex]!
@@ -30,6 +38,18 @@ function playCardDraw() {
   audio.volume = Math.min(1, readVolume() * .9)
   void audio.play().catch((error) => {
     if (import.meta.env.DEV) console.warn('[Audio] Kartenaufnahme konnte nicht abgespielt werden.', error)
+  })
+}
+
+function playCorrectSound() {
+  const audio = correctSoundPool[correctSoundPoolIndex]!
+  correctSoundPoolIndex = (correctSoundPoolIndex + 1) % correctSoundPool.length
+  audio.pause()
+  audio.currentTime = 0
+  audio.muted = false
+  audio.volume = Math.min(1, readVolume())
+  void audio.play().catch((error) => {
+    if (import.meta.env.DEV) console.warn('[Audio] Richtig-Sound konnte nicht abgespielt werden.', error)
   })
 }
 
@@ -172,7 +192,7 @@ function renderSound(name: SoundName) {
     case 'game-start': t(260, .12, .09); t(390, .13, .1, .09); t(620, .2, .11, .18); break
     case 'card-draw': break
     case 'card-flip': n(.045, .07, 2600); t(620, .045, .045, .03, 390, 'triangle'); break
-    case 'correct': t(523, .2, .065); t(1046, .16, .018, .008, 1046, 'triangle'); t(784, .25, .08, .1); t(1568, .16, .018, .108, 1320, 'triangle'); break
+    case 'correct': break
     case 'wrong': t(330, .24, .07, 0, 310, 'triangle'); t(247, .31, .075, .13, 220, 'sine'); t(123, .2, .018, .135, 110, 'sine'); break
     case 'success': t(440, .1, .08); t(660, .11, .1, .08); t(880, .2, .11, .17); break
     case 'player-change': t(360, .08, .07); t(540, .1, .08, .07); break
@@ -190,6 +210,11 @@ export function playSound(name: SoundName) {
   ensureMediaChannel()
   if (name === 'card-draw') {
     playCardDraw()
+    if (!unlocked || context?.state !== 'running') void unlockAudio()
+    return
+  }
+  if (name === 'correct') {
+    playCorrectSound()
     if (!unlocked || context?.state !== 'running') void unlockAudio()
     return
   }
