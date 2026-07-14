@@ -9,6 +9,7 @@ const VOLUME_KEY = 'blobbaSoundEffectsVolume'
 let context: AudioContext | null = null
 let noiseBuffer: AudioBuffer | null = null
 let unlocked = false
+let unlockPromise: Promise<boolean> | null = null
 
 function readEnabled() {
   return localStorage.getItem(ENABLED_KEY) !== 'false'
@@ -36,20 +37,27 @@ export function setSoundEffectsVolume(volume: number) {
   localStorage.setItem(VOLUME_KEY, String(Math.min(1, Math.max(0, volume))))
 }
 
-export async function unlockAudio() {
-  if (unlocked) return
-  try {
+export function unlockAudio() {
+  if (unlocked && context?.state === 'running') return Promise.resolve(true)
+  if (unlockPromise) return unlockPromise
+  unlockPromise = (async () => {
+    try {
     const ctx = audioContext()
-    if (ctx.state === 'suspended') await ctx.resume()
+    if (ctx.state !== 'running') await ctx.resume()
     const buffer = ctx.createBuffer(1, 1, ctx.sampleRate)
     const source = ctx.createBufferSource()
     source.buffer = buffer
     source.connect(ctx.destination)
     source.start()
-    unlocked = true
-  } catch {
-    // Audio remains optional when a browser blocks Web Audio.
-  }
+    unlocked = ctx.state === 'running'
+    return unlocked
+    } catch {
+      return false
+    } finally {
+      unlockPromise = null
+    }
+  })()
+  return unlockPromise
 }
 
 function tone(ctx: AudioContext, frequency: number, duration: number, gainValue: number, delay = 0, endFrequency = frequency, type: OscillatorType = 'sine') {
@@ -89,10 +97,8 @@ function noise(ctx: AudioContext, duration: number, gainValue: number, frequency
   source.stop(start + duration + 0.02)
 }
 
-export function playSound(name: SoundName) {
-  if (!readEnabled() || !unlocked) return
+function renderSound(name: SoundName) {
   const ctx = audioContext()
-  if (ctx.state === 'suspended') void ctx.resume()
   const volume = readVolume()
   const t = (frequency: number, duration: number, gain: number, delay = 0, end = frequency, type: OscillatorType = 'sine') => tone(ctx, frequency, duration, gain * volume, delay, end, type)
   const n = (duration: number, gain: number, frequency: number, delay = 0) => noise(ctx, duration, gain * volume, frequency, delay)
@@ -116,6 +122,17 @@ export function playSound(name: SoundName) {
     case 'remove-card': n(.11, .09, 1100); t(390, .1, .08, 0, 220, 'triangle'); break
     case 'game-finish': t(330, .12, .08); t(495, .14, .09, .09); t(660, .16, .1, .19); t(990, .3, .11, .3); break
   }
+}
+
+export function playSound(name: SoundName) {
+  if (!readEnabled()) return
+  if (unlocked && context?.state === 'running') {
+    renderSound(name)
+    return
+  }
+  void unlockAudio().then((ready) => {
+    if (ready && readEnabled()) renderSound(name)
+  })
 }
 
 const unlock = () => { void unlockAudio() }
