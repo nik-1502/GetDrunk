@@ -1,14 +1,14 @@
 {
-  "name": "GetDrunk",
-  "short_name": "GetDrunk",
-  "start_url": "/GetDrunk/",
-  "scope": "/GetDrunk/",
+  "name": "BLOBBA",
+  "short_name": "BLOBBA",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#120012",
   "theme_color": "#120012",
   "icons": [
     {
-      "src": "/GetDrunk/app-icon.png",
+      "src": "app-icon.png",
       "sizes": "1254x1254",
       "type": "image/png",
       "purpose": "any maskable"

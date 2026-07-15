@@ -29,7 +29,8 @@ import blobbenGameImage from './assets/spielbild icons/55490394-9fa1-45b5-adba-c
 import heroLogo from './assets/überschrift/ebe5baf7-8dca-44a0-a5bc-ba2f48425dc2.png'
 
 const app = document.querySelector<HTMLDivElement>('#app')!
-const PROFILE_STORAGE_KEY = 'getdrunk.profiles.v1'
+const PROFILE_STORAGE_KEY = 'blobba.profiles.v1'
+const PREVIOUS_PROFILE_STORAGE_KEY = atob('Z2V0ZHJ1bmsucHJvZmlsZXMudjE=')
 const FAVORITE_GAMES_STORAGE_KEY = 'blobbaFavoriteGames'
 const MAX_PLAYERS = 9
 const DEFAULT_AVATAR_ID = 'bier'
@@ -175,7 +176,9 @@ function createDefaultProfileStore(): ProfileStore {
 
 function loadProfileStore(): ProfileStore {
   try {
-    const parsed = JSON.parse(localStorage.getItem(PROFILE_STORAGE_KEY) ?? '') as Partial<ProfileStore>
+    const storedProfiles = localStorage.getItem(PROFILE_STORAGE_KEY) ?? localStorage.getItem(PREVIOUS_PROFILE_STORAGE_KEY)
+    if (storedProfiles && !localStorage.getItem(PROFILE_STORAGE_KEY)) localStorage.setItem(PROFILE_STORAGE_KEY, storedProfiles)
+    const parsed = JSON.parse(storedProfiles ?? '') as Partial<ProfileStore>
     const validAvatarIds = new Set(avatarOptions.map((avatar) => avatar.id))
     const profiles = Array.isArray(parsed.profiles)
       ? parsed.profiles.filter((profile): profile is StoredProfile => Boolean(profile && typeof profile.id === 'string' && typeof profile.name === 'string'))
@@ -661,7 +664,7 @@ function updateCategoryMenu() {
   })
 }
 
-function setupShell(content: string, backTarget: string, title = 'BLOBB-FAHRER', eyebrow = 'GetDrunk präsentiert', pageClass = '', centerTitle = true) {
+function setupShell(content: string, backTarget: string, title = 'BLOBB-FAHRER', eyebrow = 'BLOBBA präsentiert', pageClass = '', centerTitle = true) {
   pendingKeyboardPositionCleanup?.()
   pendingKeyboardPositionCleanup = undefined
   app.innerHTML = `<main class="busfahrer-page setup-page ${pageClass}"><div class="busfahrer-shell setup-shell">
@@ -1167,7 +1170,7 @@ function renderProfileEditor() {
       ${avatarOptions.map((avatar) => `<button class="avatar-choice ${selectedAvatarId === avatar.id ? 'is-selected' : ''}" type="button" data-avatar-id="${avatar.id}" aria-label="${avatar.label}" aria-pressed="${selectedAvatarId === avatar.id}"><span class="avatar-choice-visual" style="--avatar-ring:${avatar.color}">${avatarVisualMarkup(avatar.id)}</span></button>`).join('')}
     </div></fieldset>
     <button class="game-button primary profile-save-button" type="submit">Speichern</button>
-  </form>${renderAuthModal()}`, backTarget, 'Profil', 'GetDrunk', 'profile-page', false)
+  </form>${renderAuthModal()}`, backTarget, 'Profil', 'BLOBBA', 'profile-page', false)
 
   const preview = app.querySelector<HTMLElement>('[data-profile-preview]')!
   const input = app.querySelector<HTMLInputElement>('#profile-name')!
