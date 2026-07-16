@@ -12,6 +12,7 @@ const ENABLED_KEY = 'blobbaSoundEffectsEnabled'
 const VOLUME_KEY = 'blobbaSoundEffectsVolume'
 let context: AudioContext | null = null
 let noiseBuffer: AudioBuffer | null = null
+let reverbBuffer: AudioBuffer | null = null
 let unlocked = false
 let unlockPromise: Promise<boolean> | null = null
 let mediaChannelAudio: HTMLAudioElement | null = null
@@ -191,6 +192,42 @@ function tone(ctx: AudioContext, frequency: number, duration: number, gainValue:
   oscillator.stop(start + duration + 0.02)
 }
 
+function hallTone(ctx: AudioContext, frequency: number, duration: number, gainValue: number, delay = 0, endFrequency = frequency) {
+  if (!reverbBuffer || reverbBuffer.sampleRate !== ctx.sampleRate) {
+    const reverbDuration = 0.72
+    reverbBuffer = ctx.createBuffer(2, Math.ceil(ctx.sampleRate * reverbDuration), ctx.sampleRate)
+    for (let channel = 0; channel < reverbBuffer.numberOfChannels; channel += 1) {
+      const impulse = reverbBuffer.getChannelData(channel)
+      for (let index = 0; index < impulse.length; index += 1) {
+        const decay = Math.pow(1 - (index / impulse.length), 2.7)
+        impulse[index] = ((Math.random() * 2) - 1) * decay
+      }
+    }
+  }
+  const start = ctx.currentTime + delay
+  const oscillator = ctx.createOscillator()
+  const envelope = ctx.createGain()
+  const dry = ctx.createGain()
+  const wet = ctx.createGain()
+  const convolver = ctx.createConvolver()
+  oscillator.type = 'triangle'
+  oscillator.frequency.setValueAtTime(frequency, start)
+  oscillator.frequency.exponentialRampToValueAtTime(Math.max(20, endFrequency), start + duration)
+  envelope.gain.setValueAtTime(0.0001, start)
+  envelope.gain.exponentialRampToValueAtTime(Math.max(0.0001, gainValue), start + 0.012)
+  envelope.gain.exponentialRampToValueAtTime(0.0001, start + duration)
+  dry.gain.value = 0.78
+  wet.gain.value = 0.28
+  convolver.buffer = reverbBuffer
+  oscillator.connect(envelope)
+  envelope.connect(dry).connect(ctx.destination)
+  envelope.connect(convolver).connect(wet).connect(ctx.destination)
+  activeWebAudioSources.add(oscillator)
+  oscillator.addEventListener('ended', () => activeWebAudioSources.delete(oscillator), { once: true })
+  oscillator.start(start)
+  oscillator.stop(start + duration + 0.02)
+}
+
 function noise(ctx: AudioContext, duration: number, gainValue: number, frequency: number, delay = 0) {
   if (!noiseBuffer || noiseBuffer.sampleRate !== ctx.sampleRate) {
     noiseBuffer = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate)
@@ -219,6 +256,7 @@ function renderSound(name: SoundName) {
   const ctx = audioContext()
   const volume = readVolume()
   const t = (frequency: number, duration: number, gain: number, delay = 0, end = frequency, type: OscillatorType = 'sine') => tone(ctx, frequency, duration, gain * volume, delay, end, type)
+  const h = (frequency: number, duration: number, gain: number, delay = 0, end = frequency) => hallTone(ctx, frequency, duration, gain * volume, delay, end)
   const n = (duration: number, gain: number, frequency: number, delay = 0) => noise(ctx, duration, gain * volume, frequency, delay)
 
   switch (name) {
@@ -231,7 +269,7 @@ function renderSound(name: SoundName) {
     case 'blobben-card-draw': break
     case 'card-flip': n(.045, .07, 2600); t(620, .045, .045, .03, 390, 'triangle'); break
     case 'correct': break
-    case 'wrong': t(520, .18, .32, 0, 470, 'triangle'); t(380, .18, .32, .23, 340, 'triangle'); t(245, .26, .32, .46, 210, 'triangle'); break
+    case 'wrong': h(520, .18, .32, 0, 470); h(380, .18, .32, .23, 340); h(245, .26, .32, .46, 210); break
     case 'success': t(440, .1, .08); t(660, .11, .1, .08); t(880, .2, .11, .17); break
     case 'player-change': t(360, .08, .07); t(540, .1, .08, .07); break
     case 'notification': t(720, .08, .08); t(920, .1, .07, .09); break
