@@ -231,7 +231,7 @@ function renderSound(name: SoundName) {
     case 'blobben-card-draw': break
     case 'card-flip': n(.045, .07, 2600); t(620, .045, .045, .03, 390, 'triangle'); break
     case 'correct': break
-    case 'wrong': t(520, .3, .16, 0, 470, 'triangle'); t(380, .3, .16, .38, 340, 'triangle'); t(245, .42, .17, .76, 210, 'triangle'); break
+    case 'wrong': t(520, .18, .16, 0, 470, 'triangle'); t(380, .18, .16, .23, 340, 'triangle'); t(245, .26, .17, .46, 210, 'triangle'); break
     case 'success': t(440, .1, .08); t(660, .11, .1, .08); t(880, .2, .11, .17); break
     case 'player-change': t(360, .08, .07); t(540, .1, .08, .07); break
     case 'notification': t(720, .08, .08); t(920, .1, .07, .09); break
