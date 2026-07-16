@@ -12,6 +12,7 @@ const ENABLED_KEY = 'blobbaSoundEffectsEnabled'
 const VOLUME_KEY = 'blobbaSoundEffectsVolume'
 let context: AudioContext | null = null
 let noiseBuffer: AudioBuffer | null = null
+let wrongSoundBufferPromise: Promise<AudioBuffer> | null = null
 let unlocked = false
 let unlockPromise: Promise<boolean> | null = null
 let mediaChannelAudio: HTMLAudioElement | null = null
@@ -60,6 +61,41 @@ function playCorrectSound() {
   void audio.play().catch((error) => {
     if (import.meta.env.DEV) console.warn('[Audio] Richtig-Sound konnte nicht abgespielt werden.', error)
   })
+}
+
+function loadWrongSoundBuffer(ctx: AudioContext) {
+  wrongSoundBufferPromise ??= fetch(correctSoundUrl)
+    .then((response) => {
+      if (!response.ok) throw new Error(`Audio konnte nicht geladen werden (${response.status}).`)
+      return response.arrayBuffer()
+    })
+    .then((data) => ctx.decodeAudioData(data))
+    .then((original) => {
+      const reversed = ctx.createBuffer(original.numberOfChannels, original.length, original.sampleRate)
+      for (let channel = 0; channel < original.numberOfChannels; channel += 1) {
+        const source = original.getChannelData(channel)
+        const target = reversed.getChannelData(channel)
+        for (let index = 0; index < source.length; index += 1) target[index] = source[source.length - 1 - index]!
+      }
+      return reversed
+    })
+  return wrongSoundBufferPromise
+}
+
+async function playWrongSound() {
+  try {
+    const ctx = audioContext()
+    const source = ctx.createBufferSource()
+    const gain = ctx.createGain()
+    source.buffer = await loadWrongSoundBuffer(ctx)
+    gain.gain.value = readVolume()
+    source.connect(gain).connect(ctx.destination)
+    activeWebAudioSources.add(source)
+    source.addEventListener('ended', () => activeWebAudioSources.delete(source), { once: true })
+    source.start()
+  } catch (error) {
+    if (import.meta.env.DEV) console.warn('[Audio] Falsch-Sound konnte nicht abgespielt werden.', error)
+  }
 }
 
 function playBlobbenCardDraw() {
@@ -231,7 +267,7 @@ function renderSound(name: SoundName) {
     case 'blobben-card-draw': break
     case 'card-flip': n(.045, .07, 2600); t(620, .045, .045, .03, 390, 'triangle'); break
     case 'correct': break
-    case 'wrong': t(330, .24, .07, 0, 310, 'triangle'); t(247, .31, .075, .13, 220, 'sine'); t(123, .2, .018, .135, 110, 'sine'); break
+    case 'wrong': break
     case 'success': t(440, .1, .08); t(660, .11, .1, .08); t(880, .2, .11, .17); break
     case 'player-change': t(360, .08, .07); t(540, .1, .08, .07); break
     case 'notification': t(720, .08, .08); t(920, .1, .07, .09); break
@@ -258,6 +294,11 @@ export function playSound(name: SoundName) {
   }
   if (name === 'correct') {
     playCorrectSound()
+    if (!unlocked || context?.state !== 'running') void unlockAudio()
+    return
+  }
+  if (name === 'wrong') {
+    void playWrongSound()
     if (!unlocked || context?.state !== 'running') void unlockAudio()
     return
   }
