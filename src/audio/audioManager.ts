@@ -1,5 +1,6 @@
 import cardDrawUrl from '../assets/audio/card-draw.mp3'
 import correctSoundUrl from '../assets/audio/richtig-sound.mp3'
+import wrongSoundUrl from '../assets/audio/falsch-sound.wav'
 import blobbenCardDrawUrl from '../assets/audio/blobben-card-draw.mp3'
 
 export type SoundName =
@@ -30,6 +31,13 @@ const correctSoundPool = Array.from({ length: 3 }, () => {
   return audio
 })
 let correctSoundPoolIndex = 0
+const wrongSoundPool = Array.from({ length: 3 }, () => {
+  const audio = new Audio(wrongSoundUrl)
+  audio.preload = 'auto'
+  audio.setAttribute('playsinline', '')
+  return audio
+})
+let wrongSoundPoolIndex = 0
 const blobbenCardDrawPool = Array.from({ length: 3 }, () => {
   const audio = new Audio(blobbenCardDrawUrl)
   audio.preload = 'auto'
@@ -62,12 +70,26 @@ function playCorrectSound() {
   })
 }
 
+function playWrongSound() {
+  const audio = wrongSoundPool[wrongSoundPoolIndex]!
+  wrongSoundPoolIndex = (wrongSoundPoolIndex + 1) % wrongSoundPool.length
+  audio.pause()
+  audio.currentTime = 0
+  audio.muted = false
+  audio.playbackRate = 0.276
+  audio.preservesPitch = true
+  audio.volume = Math.min(1, readVolume())
+  void audio.play().catch((error) => {
+    if (import.meta.env.DEV) console.warn('[Audio] Falsch-Sound konnte nicht abgespielt werden.', error)
+  })
+}
+
 function playBlobbenCardDraw() {
   activeWebAudioSources.forEach((source) => {
     try { source.stop() } catch { /* Source has already ended. */ }
   })
   activeWebAudioSources.clear()
-  ;[...cardDrawPool, ...correctSoundPool].forEach((entry) => {
+  ;[...cardDrawPool, ...correctSoundPool, ...wrongSoundPool].forEach((entry) => {
     entry.pause()
     entry.currentTime = 0
   })
@@ -231,7 +253,7 @@ function renderSound(name: SoundName) {
     case 'blobben-card-draw': break
     case 'card-flip': n(.045, .07, 2600); t(620, .045, .045, .03, 390, 'triangle'); break
     case 'correct': break
-    case 'wrong': t(390, .18, .2, 0, 350, 'square'); t(245, .27, .2, .21, 220, 'square'); break
+    case 'wrong': break
     case 'success': t(440, .1, .08); t(660, .11, .1, .08); t(880, .2, .11, .17); break
     case 'player-change': t(360, .08, .07); t(540, .1, .08, .07); break
     case 'notification': t(720, .08, .08); t(920, .1, .07, .09); break
@@ -258,6 +280,11 @@ export function playSound(name: SoundName) {
   }
   if (name === 'correct') {
     playCorrectSound()
+    if (!unlocked || context?.state !== 'running') void unlockAudio()
+    return
+  }
+  if (name === 'wrong') {
+    playWrongSound()
     if (!unlocked || context?.state !== 'running') void unlockAudio()
     return
   }
