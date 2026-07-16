@@ -76,7 +76,7 @@ function playWrongSound() {
   audio.pause()
   audio.currentTime = 0
   audio.muted = false
-  audio.playbackRate = 0.82
+  audio.playbackRate = 0.55
   audio.preservesPitch = false
   audio.volume = Math.min(1, readVolume())
   void audio.play().catch((error) => {
