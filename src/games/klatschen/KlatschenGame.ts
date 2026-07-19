@@ -545,19 +545,39 @@ function fitCurrentPlayerDisplay() {
 
 function positionMiddleLayout() {
   const screen = root?.querySelector<HTMLElement>('.klatschen-play-screen')
+  const circle = screen?.querySelector<HTMLElement>('.klatschen-card-circle')
   const turn = screen?.querySelector<HTMLElement>('.klatschen-turn')
   const avatar = turn?.querySelector<HTMLElement>(':scope > .klatschen-avatar')
   const name = turn?.querySelector<HTMLElement>(':scope > strong')
   const drawButton = screen?.querySelector<HTMLElement>('.klatschen-draw-button')
+  const heldCards = screen?.querySelector<HTMLElement>('.klatschen-held-cards')
   const slots = screen?.querySelectorAll<HTMLElement>('.klatschen-circle-slot')
-  if (!screen || !turn || !avatar || !name || !drawButton || !slots?.length) return
+  if (!screen || !circle || !turn || !avatar || !name || !drawButton || !slots?.length) return
 
+  circle.style.removeProperty('top')
   avatar.style.removeProperty('width')
   avatar.style.removeProperty('height')
   const screenRect = screen.getBoundingClientRect()
-  const slotRects = [...slots].map((slot) => slot.getBoundingClientRect())
-  const circleTop = Math.min(...slotRects.map((rect) => rect.top))
-  const circleBottom = Math.max(...slotRects.map((rect) => rect.bottom))
+  let slotRects = [...slots].map((slot) => slot.getBoundingClientRect())
+  let circleTop = Math.min(...slotRects.map((rect) => rect.top))
+  let circleBottom = Math.max(...slotRects.map((rect) => rect.bottom))
+
+  const buttonHeight = drawButton.getBoundingClientRect().height
+  const freeBottomTop = Math.min(screenRect.bottom, circleBottom)
+  const buttonTop = ((freeBottomTop + screenRect.bottom) / 2) - screenRect.top - (buttonHeight / 2) - (buttonHeight * .4)
+  drawButton.style.top = `${buttonTop}px`
+
+  const effectCardsBottom = heldCards?.getBoundingClientRect().bottom ?? screenRect.top
+  const circleHeight = circleBottom - circleTop
+  const drawButtonTop = screenRect.top + buttonTop
+  const centeredCircleTop = effectCardsBottom + ((drawButtonTop - effectCardsBottom - circleHeight) / 2)
+  const circleShift = centeredCircleTop - circleTop
+  const currentCircleCenter = circle.getBoundingClientRect().top - screenRect.top
+  circle.style.top = `${currentCircleCenter + circleShift}px`
+
+  slotRects = [...slots].map((slot) => slot.getBoundingClientRect())
+  circleTop = Math.min(...slotRects.map((rect) => rect.top))
+  circleBottom = Math.max(...slotRects.map((rect) => rect.bottom))
 
   const turnStyle = window.getComputedStyle(turn)
   const turnGap = Number.parseFloat(turnStyle.rowGap || turnStyle.gap) || 0
@@ -575,10 +595,6 @@ function positionMiddleLayout() {
   const turnTop = circleCenter - (previousTurnHeight / 2)
   turn.style.top = `${turnTop}px`
 
-  const freeBottomTop = Math.min(screenRect.bottom, circleBottom)
-  const buttonHeight = drawButton.getBoundingClientRect().height
-  const buttonTop = ((freeBottomTop + screenRect.bottom) / 2) - screenRect.top - (buttonHeight / 2) - (buttonHeight * .4)
-  drawButton.style.top = `${buttonTop}px`
   positionHeldCards(screen, circleTop)
 }
 
