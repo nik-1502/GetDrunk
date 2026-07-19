@@ -73,6 +73,7 @@
 .klatschen-player-card-person strong { overflow: hidden; color: #dda15e; text-overflow: ellipsis; white-space: nowrap; }
 .klatschen-player-card-list { display: flex; min-width: 0; align-items: center; flex-direction: row; flex-wrap: wrap; gap: 8px; font-size: .85rem; font-weight: 800; }
 .klatschen-player-card-symbol { position: relative; display: inline-grid; min-width: 34px; height: 34px; place-items: center; font-size: 1.55rem; line-height: 1; }
+.klatschen-player-card-symbol .klatschen-effect-icon { width: 34px; height: 34px; }
 .klatschen-player-card-symbol b { position: absolute; top: -3px; right: -3px; display: grid; min-width: 16px; height: 16px; padding-inline: 3px; border: 1px solid rgba(255,255,255,.75); border-radius: 999px; box-sizing: border-box; place-items: center; color: #fff; background: #b90069; box-shadow: 0 2px 5px rgba(0,0,0,.32); font-size: .62rem; line-height: 1; }
 .klatschen-player-card-list .is-empty { color: rgba(255,255,255,.58); font-weight: 600; }
 .klatschen-players-dialog > .game-button { width: min(220px,100%); min-height: 42px; margin-inline: auto; }
@@ -85,6 +86,8 @@
 .klatschen-drawn-front { display: flex; padding: clamp(16px, 3vw, 26px); box-sizing: border-box; border: 4px solid var(--blobba-yellow); flex-direction: column; align-items: center; justify-content: space-between; color: #271d35; background: linear-gradient(145deg,#fff,#efe9f6); box-shadow: 0 22px 55px rgba(0,0,0,.45), inset 0 0 0 2px rgba(255,255,255,.7); text-align: center; -webkit-transform: rotateY(180deg); transform: rotateY(180deg); overflow: hidden; }
 .klatschen-drawn-front h2 { margin: 0; color: #6d45c4; font-size: clamp(1.2rem, 3.5vw, 1.8rem); }
 .klatschen-card-symbol { font-size: clamp(2.4rem, 9vw, 4.5rem); line-height: 1; }
+.klatschen-card-symbol .klatschen-effect-icon { width: clamp(64px,14vw,92px); height: clamp(64px,14vw,92px); }
+.klatschen-dialog-effect-icon { width: clamp(64px,14vw,88px); height: clamp(64px,14vw,88px); }
 .klatschen-drawn-front p { margin: 0; font-size: clamp(.88rem, 2.4vw, 1.1rem); font-weight: 700; line-height: 1.25; }
 .klatschen-drawn-front small { color: #6d45c4; font-size: clamp(.7rem,1.8vw,.9rem); font-weight: 800; line-height: 1.15; }
 .klatschen-amount { color: #b92e4b; font-size: clamp(1.12rem, 3vw, 1.5rem); }

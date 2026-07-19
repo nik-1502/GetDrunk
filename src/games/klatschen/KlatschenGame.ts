@@ -140,17 +140,23 @@ const effectIcons: Record<EffectIconName, string> = {
   'question-master': questionMasterEffectIconUrl,
 }
 
-function effectIconMarkup(cardId: string) {
-  const name: EffectIconName = cardId.startsWith('thumb-clapper')
-    ? 'thumb'
-    : cardId.startsWith('nose-clapper')
-      ? 'nose'
-      : cardId.startsWith('double-clap')
-        ? 'double'
-        : cardId.startsWith('question-rule')
-          ? 'question-master'
-          : 'partner'
-  return `<img class="klatschen-effect-icon" src="${effectIcons[name]}" alt="" aria-hidden="true" draggable="false">`
+function effectIconName(cardId: string): EffectIconName | null {
+  if (cardId.startsWith('thumb-clapper') || cardId === 'duel-thumb') return 'thumb'
+  if (cardId.startsWith('nose-clapper')) return 'nose'
+  if (cardId.startsWith('double-clap')) return 'double'
+  if (cardId.startsWith('question-rule')) return 'question-master'
+  if (cardId === 'clap-partner' || cardId === 'partner-status') return 'partner'
+  return null
+}
+
+function effectIconMarkup(cardId: string, extraClass = '') {
+  const name = effectIconName(cardId)
+  if (!name) return ''
+  return `<img class="klatschen-effect-icon${extraClass ? ` ${extraClass}` : ''}" src="${effectIcons[name]}" alt="" aria-hidden="true" draggable="false">`
+}
+
+function cardSymbolMarkup(card: KlatschenCard, extraClass = '') {
+  return effectIconName(card.id) ? effectIconMarkup(card.id, extraClass) : escapeHtml(card.symbol)
 }
 
 function effectCardPriority(cardId: string) {
@@ -201,12 +207,12 @@ function heldCardDialogMarkup() {
     const partners = owner?.partnerIds.map((id) => state.players.find((player) => player.id === id)).filter((player): player is KlatschenPlayer => Boolean(player)) ?? []
     if (!owner || !partners.length) return ''
     const heading = partners.length === 1 ? 'Dein Blobb-Partner:' : 'Deine Blobb-Partner:'
-    return `<div class="klatschen-held-dialog-backdrop" data-klatschen-action="cancel-held"><article class="klatschen-held-dialog klatschen-partner-dialog" role="dialog" aria-modal="true" aria-labelledby="partner-dialog-title"><span aria-hidden="true">🤝</span><h2 id="partner-dialog-title">${heading}</h2><div class="klatschen-partner-dialog-list">${partners.map((partner) => `<div>${avatarMarkup(partner)}<strong class="player-name-color" ${playerNameColor(partner)}>${escapeHtml(partner.name)}</strong></div>`).join('')}</div><button class="game-button primary" data-klatschen-action="cancel-held">Schließen</button></article></div>`
+    return `<div class="klatschen-held-dialog-backdrop" data-klatschen-action="cancel-held"><article class="klatschen-held-dialog klatschen-partner-dialog" role="dialog" aria-modal="true" aria-labelledby="partner-dialog-title"><span aria-hidden="true">${effectIconMarkup('clap-partner', 'klatschen-dialog-effect-icon')}</span><h2 id="partner-dialog-title">${heading}</h2><div class="klatschen-partner-dialog-list">${partners.map((partner) => `<div>${avatarMarkup(partner)}<strong class="player-name-color" ${playerNameColor(partner)}>${escapeHtml(partner.name)}</strong></div>`).join('')}</div><button class="game-button primary" data-klatschen-action="cancel-held">Schließen</button></article></div>`
   }
   const cardId = state.openedHeldCardId === 'partner-status' ? 'clap-partner' : state.openedHeldCardId
   const card = cardId ? klatschenCardMap.get(cardId) : undefined
   if (!card) return ''
-  return `<div class="klatschen-held-dialog-backdrop" data-klatschen-action="cancel-held"><article class="klatschen-held-dialog" role="dialog" aria-modal="true" aria-labelledby="held-card-title"><h2 id="held-card-title">Blobb-Karte entfernen?</h2><span>${card.symbol}</span><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.description)}</p><div><button class="game-button klatschen-cancel-remove" data-klatschen-action="cancel-held">Nein</button><button class="game-button primary" data-klatschen-action="remove-held">Ja</button></div></article></div>`
+  return `<div class="klatschen-held-dialog-backdrop" data-klatschen-action="cancel-held"><article class="klatschen-held-dialog" role="dialog" aria-modal="true" aria-labelledby="held-card-title"><h2 id="held-card-title">Blobb-Karte entfernen?</h2><span>${cardSymbolMarkup(card, 'klatschen-dialog-effect-icon')}</span><h3>${escapeHtml(card.title)}</h3><p>${escapeHtml(card.description)}</p><div><button class="game-button klatschen-cancel-remove" data-klatschen-action="cancel-held">Nein</button><button class="game-button primary" data-klatschen-action="remove-held">Ja</button></div></article></div>`
 }
 
 function playersButtonMarkup() {
@@ -224,9 +230,9 @@ function playersDialogMarkup() {
       else result.set(card.title, { card, count: 1 })
       return result
     }, new Map())
-    const cards = [...cardCounts.values()].map(({ card, count }) => `<span class="klatschen-player-card-symbol" aria-label="${escapeHtml(card.title)}${count > 1 ? `, ${count} Karten` : ''}"><span aria-hidden="true">${card.symbol}</span>${count > 1 ? `<b aria-hidden="true">${count}</b>` : ''}</span>`)
+    const cards = [...cardCounts.values()].map(({ card, count }) => `<span class="klatschen-player-card-symbol" aria-label="${escapeHtml(card.title)}${count > 1 ? `, ${count} Karten` : ''}"><span aria-hidden="true">${cardSymbolMarkup(card)}</span>${count > 1 ? `<b aria-hidden="true">${count}</b>` : ''}</span>`)
     const partners = player.partnerIds.map((id) => state.players.find((candidate) => candidate.id === id)).filter((candidate): candidate is KlatschenPlayer => Boolean(candidate))
-    if (partners.length) cards.push(`<span class="klatschen-player-card-symbol" aria-label="${partners.length} Blobb-Partner"><span aria-hidden="true">🤝</span>${partners.length > 1 ? `<b aria-hidden="true">${partners.length}</b>` : ''}</span>`)
+    if (partners.length) cards.push(`<span class="klatschen-player-card-symbol" aria-label="${partners.length} Blobb-Partner"><span aria-hidden="true">${effectIconMarkup('clap-partner')}</span>${partners.length > 1 ? `<b aria-hidden="true">${partners.length}</b>` : ''}</span>`)
     return `<div class="klatschen-player-card-row"><div class="klatschen-player-card-person">${avatarMarkup(player)}<strong class="player-name-color" ${playerNameColor(player)}>${escapeHtml(player.name)}</strong></div><div class="klatschen-player-card-list">${cards.length ? cards.join('') : '<span class="is-empty">Keine Karte</span>'}</div></div>`
   }).join('')
   return `<div class="klatschen-players-backdrop" data-klatschen-action="close-players"><article class="klatschen-players-dialog" role="dialog" aria-modal="true" aria-labelledby="klatschen-players-title"><h2 id="klatschen-players-title">Mitspieler</h2><div class="klatschen-player-card-table">${rows}</div><button type="button" class="game-button primary" data-klatschen-action="close-players">Schließen</button></article></div>`
@@ -243,7 +249,7 @@ function renderTurn() {
 function drawnCardMarkup(card: KlatschenCard) {
   const angle = ((state.drawnSlot ?? 0) / state.deck.length) * 360
   const settled = state.drawIndex <= lastAnimatedDrawIndex
-  return `<article class="klatschen-drawn-card" style="--draw-angle:${angle}deg;--draw-counter-angle:${-angle}deg"><div class="klatschen-drawn-inner${settled ? ' is-settled' : ''}"><div class="klatschen-drawn-back" aria-hidden="true"></div><div class="klatschen-drawn-front"><h2>${escapeHtml(card.title)}</h2><span class="klatschen-card-symbol" aria-hidden="true">${card.symbol}</span><p>${escapeHtml(card.description)}</p>${card.suggestedRule ? `<small>Vorschlag: ${escapeHtml(card.suggestedRule)}</small>` : ''}${card.amount ? `<strong class="klatschen-amount">${card.amount} Schluck${card.amount === 1 ? '' : 'e'}</strong>` : ''}</div></div></article>`
+  return `<article class="klatschen-drawn-card" style="--draw-angle:${angle}deg;--draw-counter-angle:${-angle}deg"><div class="klatschen-drawn-inner${settled ? ' is-settled' : ''}"><div class="klatschen-drawn-back" aria-hidden="true"></div><div class="klatschen-drawn-front"><h2>${escapeHtml(card.title)}</h2><span class="klatschen-card-symbol" aria-hidden="true">${cardSymbolMarkup(card)}</span><p>${escapeHtml(card.description)}</p>${card.suggestedRule ? `<small>Vorschlag: ${escapeHtml(card.suggestedRule)}</small>` : ''}${card.amount ? `<strong class="klatschen-amount">${card.amount} Schluck${card.amount === 1 ? '' : 'e'}</strong>` : ''}</div></div></article>`
 }
 
 function needsTarget(card: KlatschenCard) {
