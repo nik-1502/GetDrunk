@@ -57,7 +57,7 @@ function escapeHtml(value: string) {
 
 function createState(setups: KlatschenPlayerSetup[]): KlatschenGameState {
   const players = setups.map((player, index) => ({ ...player, id: player.id ?? `${index}-${player.name}`, drinks: 0, heldCards: [], partnerIds: [] }))
-  const partnerCardCount = Math.floor(players.length / 2)
+  const partnerCardCount = Math.max(0, players.length - 1)
   const deck = klatschenCards.filter((card) => card.id !== 'clap-partner').map((card) => card.id)
   deck.push(...Array.from({ length: partnerCardCount }, () => 'clap-partner'))
   return {
@@ -211,7 +211,14 @@ function targetMarkup(card: KlatschenCard) {
 }
 
 function renderPartnerTargetScreen() {
-  return `<section class="klatschen-partner-target-screen"><p class="eyebrow">Blobb-Partner</p><h2>Wer soll dein Blobb-Partner sein?</h2><div class="klatschen-partner-player-list" aria-label="Partner auswählen">${state.players.map((player, index) => `<button class="game-button${index === state.currentPlayerIndex ? ' is-self' : ''}" data-klatschen-target="${index}" ${index === state.currentPlayerIndex ? 'disabled aria-label="Du kannst dich nicht selbst wählen"' : ''}>${avatarMarkup(player)}<span>${escapeHtml(player.name)}</span></button>`).join('')}</div></section>`
+  const owner = currentPlayer()
+  return `<section class="klatschen-partner-target-screen"><p class="eyebrow">Blobb-Partner</p><h2>Wer soll dein Blobb-Partner sein?</h2><div class="klatschen-partner-player-list" aria-label="Partner auswählen">${state.players.map((player, index) => {
+    const isSelf = index === state.currentPlayerIndex
+    const isExistingPartner = owner.partnerIds.includes(player.id)
+    const unavailable = isSelf || isExistingPartner
+    const unavailableLabel = isSelf ? 'Du kannst dich nicht selbst wählen' : `${player.name} ist bereits dein Blobb-Partner`
+    return `<button class="game-button${unavailable ? ' is-unavailable' : ''}" data-klatschen-target="${index}" ${unavailable ? `disabled aria-label="${escapeHtml(unavailableLabel)}"` : ''}>${avatarMarkup(player)}<span>${escapeHtml(player.name)}</span></button>`
+  }).join('')}</div></section>`
 }
 
 function renderCard() {
@@ -325,6 +332,7 @@ function selectTarget(index: number) {
   const card = state.currentCardId ? klatschenCardMap.get(state.currentCardId) : undefined
   if (!card || !needsTarget(card)) return
   if (card.id === 'clap-partner' && index === state.currentPlayerIndex) return
+  if (currentPlayer().partnerIds.includes(state.players[index]!.id)) return
   state.selectedTargetIndex = index
   const owner = currentPlayer()
   const partner = state.players[index]!

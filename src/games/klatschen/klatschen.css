@@ -94,7 +94,7 @@
 .klatschen-partner-target-screen h2 { margin: 0 0 clamp(18px,4dvh,32px); color: #fff; font-size: clamp(1.35rem,4vw,2rem); }
 .klatschen-partner-player-list { display: grid; width: min(440px,100%); gap: 10px; }
 .klatschen-partner-player-list .game-button { display: flex; width: 100%; min-height: 50px; align-items: center; justify-content: flex-start; gap: 12px; text-align: left; }
-.klatschen-partner-player-list .game-button.is-self { border-color: rgba(255,255,255,.08); color: rgba(255,255,255,.34); background: rgba(8,6,14,.82); box-shadow: none; opacity: 1; filter: saturate(.25) brightness(.58); }
+.klatschen-partner-player-list .game-button.is-unavailable { border-color: rgba(255,255,255,.08); color: rgba(255,255,255,.34); background: rgba(8,6,14,.82); box-shadow: none; opacity: 1; filter: saturate(.25) brightness(.58); }
 .klatschen-partner-player-list .klatschen-avatar { width: 34px; height: 34px; flex: 0 0 34px; }
 .klatschen-partner-player-list span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .klatschen-targets { display: flex; width: min(620px,100%); max-height: clamp(86px, 13vh, 112px); margin-inline: auto; padding: 4px; gap: 7px; overflow-x: auto; }
