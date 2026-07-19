@@ -84,6 +84,7 @@
 .klatschen-drawn-back,
 .klatschen-drawn-front { position: absolute; inset: 0; border-radius: clamp(15px, 3vw, 24px); -webkit-backface-visibility: hidden; backface-visibility: hidden; }
 .klatschen-drawn-front { display: flex; padding: clamp(16px, 3vw, 26px); box-sizing: border-box; border: 4px solid var(--blobba-yellow); flex-direction: column; align-items: center; justify-content: space-between; color: #271d35; background: linear-gradient(145deg,#fff,#efe9f6); box-shadow: 0 22px 55px rgba(0,0,0,.45), inset 0 0 0 2px rgba(255,255,255,.7); text-align: center; -webkit-transform: rotateY(180deg); transform: rotateY(180deg); overflow: hidden; }
+.klatschen-drawn-card.is-effect-card .klatschen-drawn-front { border-color: #ff0084; background: linear-gradient(145deg,#ffe0f0,#ffb8dc); }
 .klatschen-drawn-front h2 { margin: 0; color: #6d45c4; font-size: clamp(1.2rem, 3.5vw, 1.8rem); }
 .klatschen-card-symbol { font-size: clamp(2.4rem, 9vw, 4.5rem); line-height: 1; }
 .klatschen-card-symbol .klatschen-effect-icon { width: clamp(64px,14vw,92px); height: clamp(64px,14vw,92px); }
