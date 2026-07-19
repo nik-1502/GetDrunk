@@ -566,7 +566,10 @@ function positionMiddleLayout() {
   const buttonTop = ((freeBottomTop + screenRect.bottom) / 2) - screenRect.top - (buttonHeight / 2) - (buttonHeight * .4)
   drawButton.style.top = `${buttonTop}px`
 
-  const effectCardsBottom = heldCards?.getBoundingClientRect().bottom ?? screenRect.top
+  const effectCards = heldCards?.querySelectorAll<HTMLElement>('.klatschen-held-preview')
+  const effectCardsBottom = effectCards?.length
+    ? Math.max(...[...effectCards].map((card) => card.getBoundingClientRect().bottom))
+    : heldCards?.getBoundingClientRect().bottom ?? screenRect.top
   const circleHeight = circleBottom - circleTop
   const drawButtonTop = screenRect.top + buttonTop
   const centeredCircleTop = effectCardsBottom + ((drawButtonTop - effectCardsBottom - circleHeight) / 2)
@@ -613,7 +616,10 @@ function positionNextButton() {
   const buttonTop = ((freeBottomTop + screenRect.bottom) / 2) - screenRect.top - (buttonHeight / 2) - (buttonHeight * .4)
   nextButton.style.top = `${buttonTop}px`
 
-  const availableTop = heldCards.getBoundingClientRect().bottom
+  const effectCards = heldCards.querySelectorAll<HTMLElement>('.klatschen-held-preview')
+  const availableTop = effectCards.length
+    ? Math.max(...[...effectCards].map((card) => card.getBoundingClientRect().bottom))
+    : heldCards.getBoundingClientRect().bottom
   const availableBottom = screenRect.top + buttonTop
   const circleHeight = circleBottom - circleTop
   const centeredCircleTop = availableTop + ((availableBottom - availableTop - circleHeight) / 2)
