@@ -142,7 +142,7 @@ function heldCardsMarkup() {
     const pairKey = [player.id, partner.id].sort().join('|')
     if (renderedPairs.has(pairKey)) return
     renderedPairs.add(pairKey)
-    cards.push(`<button type="button" class="klatschen-held-preview" data-klatschen-held="partner-status" data-klatschen-owner="${escapeHtml(player.id)}"><span>🤝</span><strong>Blobb-Partner</strong></button>`)
+    cards.push(`<button type="button" class="klatschen-held-preview" data-klatschen-held="partner-status" data-klatschen-owner="${escapeHtml(player.id)}" aria-label="Blobb-Partner: ${escapeHtml(partner.name)}"><span>🤝</span><strong>${escapeHtml(partner.name)}</strong></button>`)
   })
   if (!cards.length) return ''
   return `<section class="klatschen-held-cards" aria-label="Aktive Blobb-Karten und Zustände"><div>${cards.join('')}</div></section>`
@@ -192,20 +192,22 @@ function drawnCardMarkup(card: KlatschenCard) {
 }
 
 function needsTarget(card: KlatschenCard) {
-  void card
-  return false
+  return card.id === 'clap-partner'
 }
 
 function targetMarkup(card: KlatschenCard) {
   if (!needsTarget(card)) return ''
-  return `<div class="klatschen-targets" aria-label="Spieler auswählen">${state.players.map((player, index) => `<button class="game-button klatschen-target ${state.selectedTargetIndex === index ? 'is-selected' : ''}" data-klatschen-target="${index}" ${card.id === 'clap-partner' && index === state.currentPlayerIndex ? 'disabled' : ''}>${avatarMarkup(player)}<span>${escapeHtml(player.name)}</span></button>`).join('')}</div>`
+  if (state.selectedTargetIndex !== -1) {
+    return '<button class="game-button primary klatschen-partner-select-button" data-klatschen-action="choose-partner">Partner wählen</button>'
+  }
+  return `<div class="klatschen-partner-picker"><p>Wer soll dein Blobb-Partner sein?</p><div class="klatschen-targets" aria-label="Partner auswählen">${state.players.map((player, index) => `<button class="game-button klatschen-target" data-klatschen-target="${index}" ${index === state.currentPlayerIndex ? 'disabled' : ''}>${avatarMarkup(player)}<span>${escapeHtml(player.name)}</span></button>`).join('')}</div></div>`
 }
 
 function renderCard() {
   const card = state.currentCardId ? klatschenCardMap.get(state.currentCardId) : undefined
   if (!card) return renderTurn()
-  const actionPending = needsTarget(card) && state.selectedTargetIndex === null
-  return `<section class="klatschen-card-screen">${circleMarkup()}${drawnCardMarkup(card)}${playersButtonMarkup()}${heldCardsMarkup()}${heldCardDialogMarkup()}${playersDialogMarkup()}<div class="klatschen-card-actions">${targetMarkup(card)}</div><button class="game-button primary klatschen-next-button" data-klatschen-action="next" ${actionPending ? 'disabled' : ''}>Weiter</button></section>`
+  const nextButton = needsTarget(card) ? '' : '<button class="game-button primary klatschen-next-button" data-klatschen-action="next">Weiter</button>'
+  return `<section class="klatschen-card-screen">${circleMarkup()}${drawnCardMarkup(card)}${playersButtonMarkup()}${heldCardsMarkup()}${heldCardDialogMarkup()}${playersDialogMarkup()}<div class="klatschen-card-actions">${targetMarkup(card)}</div>${nextButton}</section>`
 }
 
 function renderFinished() {
@@ -272,7 +274,7 @@ function drawCard() {
 }
 
 function selectTarget(index: number) {
-  if (!canControl() || state.phase !== 'card' || state.selectedTargetIndex !== null || !state.players[index]) return
+  if (!canControl() || state.phase !== 'card' || state.selectedTargetIndex !== -1 || !state.players[index]) return
   const card = state.currentCardId ? klatschenCardMap.get(state.currentCardId) : undefined
   if (!card || !needsTarget(card)) return
   if (card.id === 'clap-partner' && index === state.currentPlayerIndex) return
@@ -284,8 +286,7 @@ function selectTarget(index: number) {
   owner.partnerPlayerId = partner.id
   partner.partnerPlayerId = owner.id
   owner.heldCards.push('clap-partner')
-  render()
-  publish()
+  nextTurn()
 }
 
 function nextTurn() {
@@ -389,6 +390,10 @@ function handleClick(event: Event) {
   if (action === 'start') startGameWithDeal()
   if (action === 'draw') drawCard()
   if (action === 'next') nextTurn()
+  if (action === 'choose-partner' && canControl() && state.phase === 'card' && state.currentCardId === 'clap-partner') {
+    state.selectedTargetIndex = -1
+    render(); publish()
+  }
   if (action === 'cancel-held') { state.openedHeldCardId = null; state.openedHeldCardOwnerId = null; render(); publish() }
   if (action === 'remove-held' && canControl() && state.openedHeldCardId) {
     const owner = state.players.find((player) => player.id === state.openedHeldCardOwnerId)

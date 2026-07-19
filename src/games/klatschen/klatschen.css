@@ -82,6 +82,9 @@
 .klatschen-drawn-front small { color: #6d45c4; font-size: clamp(.7rem,1.8vw,.9rem); font-weight: 800; line-height: 1.15; }
 .klatschen-amount { color: #b92e4b; font-size: clamp(1.12rem, 3vw, 1.5rem); }
 .klatschen-card-actions { position: absolute; left: 0; right: 0; bottom: clamp(8px, 1.6vh, 16px); z-index: 7; display: grid; width: auto; padding-inline: 10px; gap: 8px; animation: klatschen-actions-in .35s 750ms both; }
+.klatschen-partner-select-button { width: min(240px,100%); margin-inline: auto; }
+.klatschen-partner-picker { display: grid; width: min(620px,100%); margin-inline: auto; gap: 5px; }
+.klatschen-partner-picker > p { margin: 0; color: #fff; font-size: clamp(.8rem,2vw,.95rem); font-weight: 850; text-align: center; }
 .klatschen-targets { display: flex; width: min(620px,100%); max-height: clamp(86px, 13vh, 112px); margin-inline: auto; padding: 4px; gap: 7px; overflow-x: auto; }
 .klatschen-target { display: flex; min-width: 145px; min-height: 48px; padding: 7px 10px; align-items: center; justify-content: flex-start; gap: 8px; }
 .klatschen-target.is-selected { outline: 3px solid #dda15e; background: #584170; }
