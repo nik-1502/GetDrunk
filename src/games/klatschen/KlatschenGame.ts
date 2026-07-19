@@ -187,7 +187,6 @@ function heldCardsMarkup() {
     const partnerNames = partners.map((partner) => partner.name).join(', ')
     cards.push({ priority: effectCardPriority('partner-status'), markup: `<button type="button" class="klatschen-held-preview" data-klatschen-held="partner-status" data-klatschen-owner="${escapeHtml(player.id)}" aria-label="Blobb-Partner: ${escapeHtml(partnerNames)}"><b class="klatschen-held-count" aria-hidden="true">${partners.length}</b>${effectIconMarkup('clap-partner')}</button>` })
   })
-  if (!cards.length) return ''
   cards.sort((a, b) => a.priority - b.priority)
   return `<section class="klatschen-held-cards" aria-label="Aktive Blobb-Karten und Zustände"><div>${cards.map((card) => card.markup).join('')}</div></section>`
 }
@@ -595,29 +594,32 @@ function positionMiddleLayout() {
   const turnTop = circleCenter - (previousTurnHeight / 2)
   turn.style.top = `${turnTop}px`
 
-  positionHeldCards(screen, circleTop)
-}
-
-function positionHeldCards(screen: HTMLElement, circleTop: number) {
-  const heldCards = screen.querySelector<HTMLElement>('.klatschen-held-cards')
-  if (!heldCards) return
-  const screenTop = screen.getBoundingClientRect().top
-  heldCards.style.maxHeight = `${Math.max(0, circleTop - screenTop - 16)}px`
 }
 
 function positionNextButton() {
   const screen = root?.querySelector<HTMLElement>('.klatschen-card-screen')
   const nextButton = root?.querySelector<HTMLElement>('.klatschen-next-button')
+  const circle = screen?.querySelector<HTMLElement>('.klatschen-card-circle')
+  const heldCards = screen?.querySelector<HTMLElement>('.klatschen-held-cards')
   const slots = screen?.querySelectorAll<HTMLElement>('.klatschen-circle-slot')
-  if (!screen || !nextButton || !slots?.length) return
+  if (!screen || !nextButton || !circle || !heldCards || !slots?.length) return
+  circle.style.removeProperty('top')
   const screenRect = screen.getBoundingClientRect()
-  const circleBottom = Math.max(...[...slots].map((slot) => slot.getBoundingClientRect().bottom))
-  const circleTop = Math.min(...[...slots].map((slot) => slot.getBoundingClientRect().top))
+  const slotRects = [...slots].map((slot) => slot.getBoundingClientRect())
+  const circleBottom = Math.max(...slotRects.map((rect) => rect.bottom))
+  const circleTop = Math.min(...slotRects.map((rect) => rect.top))
   const freeBottomTop = Math.min(screenRect.bottom, circleBottom)
   const buttonHeight = nextButton.getBoundingClientRect().height
   const buttonTop = ((freeBottomTop + screenRect.bottom) / 2) - screenRect.top - (buttonHeight / 2) - (buttonHeight * .4)
   nextButton.style.top = `${buttonTop}px`
-  positionHeldCards(screen, circleTop)
+
+  const availableTop = heldCards.getBoundingClientRect().bottom
+  const availableBottom = screenRect.top + buttonTop
+  const circleHeight = circleBottom - circleTop
+  const centeredCircleTop = availableTop + ((availableBottom - availableTop - circleHeight) / 2)
+  const circleShift = centeredCircleTop - circleTop
+  const currentCircleCenter = circle.getBoundingClientRect().top - screenRect.top
+  circle.style.top = `${currentCircleCenter + circleShift}px`
 }
 
 function positionPlayersButton() {
