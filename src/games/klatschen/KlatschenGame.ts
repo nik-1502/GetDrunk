@@ -3,6 +3,11 @@ import { defaultProfileIconMarkup } from '../../profiles.ts'
 import { getSoundSettings, playSound } from '../../audio/audioManager.ts'
 import { klatschenCardMap, klatschenCards, type KlatschenCard } from './klatschenCards.ts'
 import blobbenCardDealUrl from '../../assets/audio/blobben-card-deal.mp3'
+import thumbEffectIconUrl from '../../assets/smileys/processed/thumb.png'
+import noseEffectIconUrl from '../../assets/smileys/processed/nose.png'
+import doubleEffectIconUrl from '../../assets/smileys/processed/double.png'
+import partnerEffectIconUrl from '../../assets/smileys/processed/partner.png'
+import questionMasterEffectIconUrl from '../../assets/smileys/processed/question-master.png'
 
 export type KlatschenPlayerSetup = { id?: string; name: string; avatar: string; avatarColor: string }
 export type KlatschenPlayer = KlatschenPlayerSetup & { id: string; drinks: number; heldCards: string[]; partnerIds: string[] }
@@ -127,11 +132,11 @@ function heldCardLabel(card: KlatschenCard) {
 type EffectIconName = 'thumb' | 'nose' | 'double' | 'partner' | 'question-master'
 
 const effectIcons: Record<EffectIconName, string> = {
-  thumb: '<path d="M11 27V13h4l3-8c.7-1.8 3.5-1.3 3.5.7V13h4.8c2 0 3.2 1.8 2.6 3.7l-2.3 7.5A4 4 0 0 1 22.8 27H11Z"/><path class="effect-icon-highlight" d="M15 15h10.5M15 19h9.2"/><rect x="4" y="13" width="7" height="14" rx="3"/>',
-  nose: '<path d="M17.5 4.5c-1 5.2-3.7 9.3-5 13.2-1.1 3.4.5 6.8 4.2 7.2 2.1.2 3.4-.8 4.5-2.1 1.1 1.4 2.5 2.3 4.5 1.8 2.8-.7 3.7-4.1 1.8-6.1"/><path class="effect-icon-highlight" d="M16.2 21.2c1.5 1 3.3.7 5-.7 1.4 1.2 3 1.5 4.4.5"/>',
-  double: '<path d="M7 27V13.5a3 3 0 0 1 6 0v3-11a3 3 0 0 1 6 0v10-8a3 3 0 0 1 6 0v10.8c0 5.2-3.7 8.7-9 8.7H7Z"/><path class="effect-icon-highlight" d="M13 16.5V21M19 15.5V21"/>',
-  partner: '<path d="m4 15 6-6 6 4 6-4 6 6-8.5 10H12L4 15Z"/><path class="effect-icon-highlight" d="m10 15 4 4c1 1 2.4 1 3.4 0l4.6-4M7.5 18l4 4M24.5 18l-4 4"/>',
-  'question-master': '<path d="M6 6.5h20v15H17l-6 5v-5H6v-15Z"/><path class="effect-icon-highlight" d="M12 12c.5-2 2.2-3.2 4.5-3.2 2.6 0 4.5 1.4 4.5 3.6 0 3-3.7 3-3.7 5.1M17.3 20h.01"/>',
+  thumb: thumbEffectIconUrl,
+  nose: noseEffectIconUrl,
+  double: doubleEffectIconUrl,
+  partner: partnerEffectIconUrl,
+  'question-master': questionMasterEffectIconUrl,
 }
 
 function effectIconMarkup(cardId: string) {
@@ -144,7 +149,7 @@ function effectIconMarkup(cardId: string) {
         : cardId.startsWith('question-rule')
           ? 'question-master'
           : 'partner'
-  return `<svg class="klatschen-effect-icon" viewBox="0 0 32 32" aria-hidden="true" focusable="false">${effectIcons[name]}</svg>`
+  return `<img class="klatschen-effect-icon" src="${effectIcons[name]}" alt="" aria-hidden="true" draggable="false">`
 }
 
 function heldCardsMarkup() {
