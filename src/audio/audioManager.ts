@@ -9,6 +9,8 @@ export type SoundName =
   | 'success' | 'player-change' | 'notification' | 'favorite-on'
   | 'favorite-off' | 'collect-card' | 'remove-card' | 'game-finish'
 
+export type ActionSoundCategory = 'back' | 'continue' | 'select' | 'add-player' | 'remove-player' | 'start-game'
+
 const ENABLED_KEY = 'blobbaSoundEffectsEnabled'
 const VOLUME_KEY = 'blobbaSoundEffectsVolume'
 let context: AudioContext | null = null
@@ -16,6 +18,9 @@ let noiseBuffer: AudioBuffer | null = null
 let unlocked = false
 let unlockPromise: Promise<boolean> | null = null
 let mediaChannelAudio: HTMLAudioElement | null = null
+let clickDispatchActive = false
+let soundPlayedForClick = false
+let lastActionSoundAt = 0
 const activeWebAudioSources = new Set<AudioScheduledSourceNode>()
 const cardDrawPool = Array.from({ length: 3 }, () => {
   const audio = new Audio(cardDrawUrl)
@@ -287,6 +292,7 @@ function renderSound(name: SoundName) {
 
 export function playSound(name: SoundName) {
   if (!readEnabled()) return
+  if (clickDispatchActive) soundPlayedForClick = true
   ensureMediaChannel()
   if (name === 'card-draw') {
     playCardDraw()
@@ -318,6 +324,49 @@ export function playSound(name: SoundName) {
   renderSound(name)
   if (!unlocked || context?.state !== 'running') void unlockAudio()
 }
+
+const actionSoundMap: Record<ActionSoundCategory, SoundName> = {
+  back: 'ui-back',
+  continue: 'ui-confirm',
+  select: 'ui-click',
+  'add-player': 'ui-confirm',
+  'remove-player': 'ui-delete',
+  'start-game': 'game-start',
+}
+
+export function playActionSound(category: ActionSoundCategory) {
+  if (clickDispatchActive) soundPlayedForClick = true
+  const now = performance.now()
+  if (now - lastActionSoundAt < 55) return
+  lastActionSoundAt = now
+  playSound(actionSoundMap[category])
+}
+
+function inferButtonSound(button: HTMLButtonElement | HTMLAnchorElement): ActionSoundCategory {
+  const data = button instanceof HTMLButtonElement ? button.dataset : button.dataset
+  const action = [data.action, data.klatschenAction, ...Object.keys(data), button.textContent, button.getAttribute('aria-label')]
+    .filter(Boolean).join(' ').toLocaleLowerCase('de')
+  if (/spieler.*hinzuf|add.player/.test(action)) return 'add-player'
+  if (/spieler.*entfern|remove.player|löschen/.test(action)) return 'remove-player'
+  if (/abbrechen|schließen|zurück|beenden|neustart|neu starten|erneut spielen|logout|\bnein\b|cancel|close|back|exit|restart|keep-pyramid/.test(action)) return 'back'
+  if (/spiel starten|start-game/.test(action)) return 'start-game'
+  if (/\bja\b|weiter|bestät|fertig|speichern|erstellen|beitreten|starten|nächste|karte ziehen|karte aufdecken|kopieren|einladen|login|registrieren/.test(action)) return 'continue'
+  return 'select'
+}
+
+document.addEventListener('click', () => {
+  clickDispatchActive = true
+  soundPlayedForClick = false
+}, { capture: true })
+
+document.addEventListener('click', (event) => {
+  const control = (event.target as HTMLElement | null)?.closest<HTMLButtonElement | HTMLAnchorElement>('button, a.game-button')
+  if (control && !soundPlayedForClick && !(control instanceof HTMLButtonElement && control.disabled)) {
+    playActionSound(inferButtonSound(control))
+  }
+  clickDispatchActive = false
+  soundPlayedForClick = false
+})
 
 const unlock = () => { void unlockAudio() }
 document.addEventListener('pointerdown', unlock, { once: true, passive: true, capture: true })

@@ -2,7 +2,7 @@ import './style.css'
 import { applyBusfahrerState, getBusfahrerState, mountBusfahrer, type BusfahrerGameState } from './busfahrer.ts'
 import { applyKlatschenState, getKlatschenState, mountKlatschen, type KlatschenGameState } from './games/klatschen/KlatschenGame.ts'
 import { avatarColor, avatarOptions, avatarSource, avatarVisualMarkup } from './profiles.ts'
-import { getSoundSettings, playSound, setSoundEffectsEnabled, setSoundEffectsVolume } from './audio/audioManager.ts'
+import { getSoundSettings, playActionSound, playSound, setSoundEffectsEnabled, setSoundEffectsVolume } from './audio/audioManager.ts'
 import {
   createOnlineGroup,
   fetchGroupSnapshot,
@@ -521,7 +521,7 @@ function renderHome() {
   app.querySelector<HTMLButtonElement>('.home-user-button')!.addEventListener('click', () => { playSound('ui-click'); window.location.hash = 'profile' })
   app.querySelector<HTMLButtonElement>('.home-settings-button')!.addEventListener('click', () => { playSound('ui-click'); window.location.hash = 'settings' })
   app.querySelector<HTMLButtonElement>('.blobfahrer-home-button')!.addEventListener('click', () => {
-    playSound('ui-click')
+    playActionSound('select')
     activeGame = 'busfahrer'
     setupMode = 'offline'
     activeOnlineModal = null
@@ -835,7 +835,7 @@ function bindOfflineSetup() {
   })
   app.querySelectorAll<HTMLButtonElement>('[data-remove-player]').forEach((button) => button.addEventListener('click', () => {
     if (players.length === 1) return
-    playSound('ui-delete')
+    playActionSound('remove-player')
     if (editingPlayerId === button.dataset.removePlayer) editingPlayerId = null
     players = players.filter((player) => player.id !== button.dataset.removePlayer)
     renderModeMenu()
@@ -854,7 +854,7 @@ function bindOfflineSetup() {
   app.querySelectorAll<HTMLButtonElement>('[data-player-avatar-id]').forEach((button) => button.addEventListener('click', () => {
     const avatarId = button.dataset.playerAvatarId
     if (!avatarId || !avatarEditorPlayerId || button.disabled) return
-    playSound('ui-confirm')
+    playActionSound('select')
     players = players.map((player) => player.id === avatarEditorPlayerId
       ? { ...player, avatarId, avatar: avatarSource(avatarId), avatarColor: avatarColor(avatarId) }
       : player)
@@ -863,7 +863,7 @@ function bindOfflineSetup() {
   }))
   app.querySelector<HTMLButtonElement>('[data-add-player]')!.addEventListener('click', () => {
     if (players.length >= MAX_PLAYERS) return
-    playSound('ui-confirm')
+    playActionSound('add-player')
     const player = createLocalPlayer(players.length + 1)
     players.push(player)
     editingPlayerId = player.id

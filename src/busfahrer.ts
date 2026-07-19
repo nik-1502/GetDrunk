@@ -1,6 +1,6 @@
 import './busfahrer.css'
 import { defaultProfileIconMarkup } from './profiles.ts'
-import { playSound } from './audio/audioManager.ts'
+import { playActionSound, playSound } from './audio/audioManager.ts'
 
 type CardColor = 'red' | 'blue'
 type SuitId = 'heart' | 'diamond' | 'star' | 'moon'
@@ -350,7 +350,6 @@ function usePyramidCard() {
   if (!pyramidDecision || pyramidDecision.step !== 'offer') return
   const cardIndex = hand.findIndex((card) => card.id === pyramidDecision!.cardId)
   if (cardIndex >= 0) {
-    playSound('remove-card')
     hand.splice(cardIndex, 1)
     questionResults.splice(cardIndex, 1)
     syncCurrentPlayerCards()
@@ -554,8 +553,8 @@ function handleClick(event: Event) {
   if (button.dataset.busChoice) answerBus(button.dataset.busChoice)
   if (button.dataset.pyramidTarget) assignPyramidDrinks(Number(button.dataset.pyramidTarget))
   if (button.dataset.action === 'reveal-pyramid') revealPyramid()
-  if (button.dataset.action === 'use-pyramid-card') usePyramidCard()
-  if (button.dataset.action === 'keep-pyramid-card') keepPyramidCard()
+  if (button.dataset.action === 'use-pyramid-card') { playActionSound('continue'); usePyramidCard() }
+  if (button.dataset.action === 'keep-pyramid-card') { playActionSound('back'); keepPyramidCard() }
   if (button.dataset.action === 'finish-player-pyramid') finishPlayerPyramid()
   if (button.dataset.action === 'start-player-round') {
     playSound('player-change')
