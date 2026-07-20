@@ -50,6 +50,15 @@ const HOME_GAMES = [
   },
 ] as const
 
+const HOME_UPCOMING_GAMES = [
+  { id: 'wer-wuerde-eher', title: 'WER WÜRDE EHER', accent: 'sky', categories: ['Lustig', 'Denkspiele'], searchTerms: ['wer wurde eher', 'wer würde eher', 'freunde'] },
+  { id: 'ich-hab-noch-nie', title: 'ICH HAB NOCH NIE', accent: 'pink', categories: ['Klassiker', 'Lustig'], searchTerms: ['ich hab noch nie', 'klassiker'] },
+  { id: 'wahrheit-oder-pflicht', title: 'WAHRHEIT ODER PFLICHT', accent: 'yellow', categories: ['Klassiker', 'Teamspiele'], searchTerms: ['wahrheit oder pflicht', 'wahrheit', 'pflicht'] },
+  { id: 'challenge-runde', title: 'CHALLENGE-RUNDE', accent: 'violet', categories: ['Wettkampf', 'Teamspiele'], searchTerms: ['challenge runde', 'challenge', 'wettkampf'] },
+] as const
+
+const HOME_FILTER_GAMES = [...HOME_GAMES, ...HOME_UPCOMING_GAMES]
+
 let homeSearchQuery = ''
 let favoritesOnly = false
 let selectedHomeCategory: HomeGameCategory = 'Alle'
@@ -411,6 +420,8 @@ function renderPage() {
   const inviteFromRoute = new URLSearchParams(routeQuery).get('invite')
   if (inviteFromRoute) pendingInviteCode = inviteFromRoute
   const usesDarkTheme = routeBase.startsWith('#busfahrer') || routeBase.startsWith('#klatschen') || routeBase === '#profile'
+  const themeColor = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')
+  if (themeColor) themeColor.content = routeBase === '' || routeBase === '#' ? '#DFF5FF' : '#120012'
   document.documentElement.classList.toggle('busfahrer-active', usesDarkTheme)
   document.body.classList.toggle('busfahrer-active', usesDarkTheme)
 
@@ -514,6 +525,13 @@ function renderHome() {
           <span class="busfahrer-button-label">BLOBBEN</span>
         </button>
         ${favoriteHeartMarkup('blobben')}
+      </div>
+      <div class="games-water-section" aria-label="Kommende Spiele">
+        ${HOME_UPCOMING_GAMES.map((game) => `<article class="game-tile-wrap upcoming-game-tile upcoming-game-tile--${game.accent}" data-home-game="${game.id}" aria-disabled="true">
+          <div class="upcoming-game-art" aria-hidden="true"><span></span><span></span><span></span></div>
+          <span class="upcoming-game-badge">Demnächst</span>
+          <h3>${game.title}</h3>
+        </article>`).join('')}
       </div>
         <p class="game-filter-empty" role="status" hidden></p>
       </section>
@@ -623,11 +641,12 @@ function favoriteHeartMarkup(gameId: string) {
 function updateHomeFilters() {
   const normalizedQuery = normalizeGameSearch(homeSearchQuery)
   let visibleCount = 0
-  HOME_GAMES.forEach((game) => {
+  HOME_FILTER_GAMES.forEach((game) => {
     const searchableTerms = game.searchTerms.map(normalizeGameSearch)
     const matchesSearch = !normalizedQuery || searchableTerms.some((term) => term.includes(normalizedQuery))
     const matchesCategory = selectedHomeCategory === 'Alle' || (game.categories as readonly string[]).includes(selectedHomeCategory)
-    const visible = matchesSearch && matchesCategory && (!favoritesOnly || favoriteGameIds.has(game.id))
+    const isAvailable = HOME_GAMES.some((availableGame) => availableGame.id === game.id)
+    const visible = matchesSearch && matchesCategory && (!favoritesOnly || (isAvailable && favoriteGameIds.has(game.id)))
     const tile = app.querySelector<HTMLElement>(`[data-home-game="${game.id}"]`)
     if (tile) tile.hidden = !visible
     if (visible) visibleCount += 1
