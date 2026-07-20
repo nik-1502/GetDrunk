@@ -230,8 +230,8 @@ body {
   display: block;
   width: min(
     100%,
-    56vw,
-    560px,
+    53vw,
+    530px,
     calc(100vw - clamp(16px, 4vw, 40px) - clamp(16px, 4vw, 40px) - clamp(50px, 7vw, 58px) - clamp(50px, 7vw, 58px) - 24px)
   );
   height: auto;
@@ -852,7 +852,7 @@ html.is-standalone #app > .setup-page > .setup-shell {
 /* Freundlicher, natürlicher Startseitenhintergrund ohne Neonwirkung */
 .home-page,
 html.is-standalone #app > .home-page {
-  --home-sun-size: clamp(280px, 62vw, 610px);
+  --home-sun-size: clamp(305px, 68vw, 670px);
   background: #9ddcf7;
   background-attachment: local;
 }
