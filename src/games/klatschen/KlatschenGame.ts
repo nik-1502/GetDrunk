@@ -47,6 +47,7 @@ let playersDialogOpen = false
 type PartnerGroupIdentity = { id: string; creationIndex: number }
 const partnerGroupIdentityByPlayer = new Map<string, PartnerGroupIdentity>()
 let nextPartnerGroupIndex = 0
+const partnerGroupColorCount = 9
 const dealAudio = new Audio(blobbenCardDealUrl)
 dealAudio.preload = 'auto'
 dealAudio.setAttribute('playsinline', '')
@@ -82,7 +83,7 @@ function partnerGroupDisplay(player: KlatschenPlayer) {
     nextPartnerGroupIndex += 1
   }
   members.forEach((id) => partnerGroupIdentityByPlayer.set(id, group))
-  return { size: members.length, colorIndex: group.creationIndex % 5 }
+  return { size: members.length, colorIndex: group.creationIndex % partnerGroupColorCount }
 }
 
 function createState(setups: KlatschenPlayerSetup[]): KlatschenGameState {

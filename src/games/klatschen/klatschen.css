@@ -71,7 +71,7 @@
 .klatschen-partner-dialog-list strong { min-width: 0; overflow: hidden; font-size: clamp(1.08rem,3.2vw,1.28rem); text-overflow: ellipsis; white-space: nowrap; }
 .klatschen-partner-dialog > .game-button { width: min(220px,100%); min-height: 44px; }
 .klatschen-players-backdrop { position: absolute; inset: 0; z-index: 21; display: grid; padding: 12px; place-items: center; background: rgba(4,2,10,.72); backdrop-filter: blur(5px); }
-.klatschen-players-dialog { --partner-group-green: #267a00; --partner-group-blue: #06449a; --partner-group-orange: #a94700; --partner-group-yellow: #a97800; --partner-group-red: #a8002d; display: flex; width: min(560px,100%); max-height: 100%; padding: clamp(16px,4vw,28px); border: 2px solid rgba(255,255,255,.25); border-radius: 22px; box-sizing: border-box; flex-direction: column; gap: 14px; color: #fff; background: linear-gradient(145deg,#49346c,#251d33); box-shadow: 0 24px 70px rgba(0,0,0,.55); overflow: hidden; }
+.klatschen-players-dialog { --partner-group-green: #267a00; --partner-group-orange: #d56a00; --partner-group-yellow: #c99b00; --partner-group-red: #c6283d; --partner-group-purple: #7b3fc6; --partner-group-pink: #c72c85; --partner-group-turquoise: #008f91; --partner-group-brown: #8a5428; --partner-group-lime: #6cae00; display: flex; width: min(560px,100%); max-height: 100%; padding: clamp(16px,4vw,28px); border: 2px solid rgba(255,255,255,.25); border-radius: 22px; box-sizing: border-box; flex-direction: column; gap: 14px; color: #fff; background: linear-gradient(145deg,#49346c,#251d33); box-shadow: 0 24px 70px rgba(0,0,0,.55); overflow: hidden; }
 .klatschen-players-dialog h2 { margin: 0; text-align: center; }
 .klatschen-player-card-table { display: flex; padding: 2px; flex-direction: column; gap: 12px; overflow: auto; }
 .klatschen-player-card-row { display: flex; width: 100%; min-width: 0; padding: 12px; border: 1px solid rgba(255,255,255,.2); border-radius: 14px; box-sizing: border-box; align-items: center; gap: clamp(6px,1.5vw,10px); background: rgba(255,255,255,.055); }
@@ -84,14 +84,22 @@
 .klatschen-player-card-list .klatschen-held-count { top: 2px; right: 3px; font-size: clamp(.68rem,2.5vw,.86rem); }
 .klatschen-player-card-list .effect-partner.partner-group-0 .klatschen-held-preview { border-color: var(--partner-group-green); }
 .klatschen-player-card-list .effect-partner.partner-group-0 .klatschen-held-count { color: var(--partner-group-green); }
-.klatschen-player-card-list .effect-partner.partner-group-1 .klatschen-held-preview { border-color: var(--partner-group-blue); }
-.klatschen-player-card-list .effect-partner.partner-group-1 .klatschen-held-count { color: var(--partner-group-blue); }
-.klatschen-player-card-list .effect-partner.partner-group-2 .klatschen-held-preview { border-color: var(--partner-group-orange); }
-.klatschen-player-card-list .effect-partner.partner-group-2 .klatschen-held-count { color: var(--partner-group-orange); }
-.klatschen-player-card-list .effect-partner.partner-group-3 .klatschen-held-preview { border-color: var(--partner-group-yellow); }
-.klatschen-player-card-list .effect-partner.partner-group-3 .klatschen-held-count { color: var(--partner-group-yellow); }
-.klatschen-player-card-list .effect-partner.partner-group-4 .klatschen-held-preview { border-color: var(--partner-group-red); }
-.klatschen-player-card-list .effect-partner.partner-group-4 .klatschen-held-count { color: var(--partner-group-red); }
+.klatschen-player-card-list .effect-partner.partner-group-1 .klatschen-held-preview { border-color: var(--partner-group-orange); }
+.klatschen-player-card-list .effect-partner.partner-group-1 .klatschen-held-count { color: var(--partner-group-orange); }
+.klatschen-player-card-list .effect-partner.partner-group-2 .klatschen-held-preview { border-color: var(--partner-group-yellow); }
+.klatschen-player-card-list .effect-partner.partner-group-2 .klatschen-held-count { color: var(--partner-group-yellow); }
+.klatschen-player-card-list .effect-partner.partner-group-3 .klatschen-held-preview { border-color: var(--partner-group-red); }
+.klatschen-player-card-list .effect-partner.partner-group-3 .klatschen-held-count { color: var(--partner-group-red); }
+.klatschen-player-card-list .effect-partner.partner-group-4 .klatschen-held-preview { border-color: var(--partner-group-purple); }
+.klatschen-player-card-list .effect-partner.partner-group-4 .klatschen-held-count { color: var(--partner-group-purple); }
+.klatschen-player-card-list .effect-partner.partner-group-5 .klatschen-held-preview { border-color: var(--partner-group-pink); }
+.klatschen-player-card-list .effect-partner.partner-group-5 .klatschen-held-count { color: var(--partner-group-pink); }
+.klatschen-player-card-list .effect-partner.partner-group-6 .klatschen-held-preview { border-color: var(--partner-group-turquoise); }
+.klatschen-player-card-list .effect-partner.partner-group-6 .klatschen-held-count { color: var(--partner-group-turquoise); }
+.klatschen-player-card-list .effect-partner.partner-group-7 .klatschen-held-preview { border-color: var(--partner-group-brown); }
+.klatschen-player-card-list .effect-partner.partner-group-7 .klatschen-held-count { color: var(--partner-group-brown); }
+.klatschen-player-card-list .effect-partner.partner-group-8 .klatschen-held-preview { border-color: var(--partner-group-lime); }
+.klatschen-player-card-list .effect-partner.partner-group-8 .klatschen-held-count { color: var(--partner-group-lime); }
 .klatschen-players-dialog > .game-button { width: min(220px,100%); min-height: 42px; margin-inline: auto; }
 
 .klatschen-drawn-card { --draw-radius: clamp(118px, min(29vw, 27dvh), 255px); position: absolute; left: 50%; top: 43%; z-index: 5; width: clamp(190px, min(50vw, 31dvh), 310px); aspect-ratio: 5 / 7; perspective: 1200px; transform: translate(-50%,-50%); }
