@@ -853,10 +853,10 @@ html.is-standalone #app > .setup-page > .setup-shell {
 .home-page,
 html.is-standalone #app > .home-page {
   background:
-    radial-gradient(ellipse 58% 36% at 18% 12%, rgba(255, 226, 235, .76) 0%, rgba(255, 238, 243, .42) 42%, transparent 74%),
-    radial-gradient(ellipse 54% 38% at 84% 24%, rgba(204, 231, 246, .80) 0%, rgba(222, 241, 250, .42) 46%, transparent 76%),
-    radial-gradient(ellipse 68% 42% at 50% 76%, rgba(212, 205, 237, .58) 0%, rgba(232, 226, 246, .30) 48%, transparent 78%),
-    linear-gradient(155deg, #f9f4ed 0%, #f6edf2 24%, #e8f2f7 52%, #dcecf4 74%, #e6e0f0 100%);
+    radial-gradient(ellipse 52% 32% at 14% 12%, rgba(255, 190, 221, .34) 0%, rgba(255, 215, 234, .16) 44%, transparent 72%),
+    radial-gradient(ellipse 56% 38% at 88% 24%, rgba(111, 184, 238, .45) 0%, rgba(159, 211, 245, .20) 48%, transparent 76%),
+    radial-gradient(ellipse 66% 40% at 50% 78%, rgba(157, 139, 224, .24) 0%, rgba(188, 178, 235, .12) 48%, transparent 78%),
+    linear-gradient(160deg, #dff5ff 0%, #c9edff 28%, #b7e4fb 56%, #9fd9f4 78%, #acd8ef 100%);
   background-attachment: local;
 }
 
