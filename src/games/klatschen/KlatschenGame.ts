@@ -169,7 +169,7 @@ function effectCardPriority(cardId: string) {
 }
 
 function heldCardsMarkup() {
-  const cards: Array<{ priority: number; markup: string }> = []
+  const cards: Array<string | null> = Array(5).fill(null)
   const visiblePlayers = [currentPlayer()]
   visiblePlayers.forEach((player) => {
     const stacks = player.heldCards.reduce<Array<{ card: KlatschenCard; count: number }>>((result, cardId) => {
@@ -181,7 +181,8 @@ function heldCardsMarkup() {
       return result
     }, [])
     stacks.forEach(({ card, count }) => {
-      cards.push({ priority: effectCardPriority(card.id), markup: `<button type="button" class="klatschen-held-preview" data-klatschen-held="${escapeHtml(card.id)}" data-klatschen-owner="${escapeHtml(player.id)}" aria-label="${escapeHtml(heldCardLabel(card))}${count > 1 ? `, ${count} Karten` : ''}">${count > 1 ? `<b class="klatschen-held-count" aria-hidden="true">${count}</b>` : ''}${effectIconMarkup(card.id)}</button>` })
+      const slot = effectCardPriority(card.id)
+      if (slot < cards.length) cards[slot] = `<button type="button" class="klatschen-held-preview" data-klatschen-held="${escapeHtml(card.id)}" data-klatschen-owner="${escapeHtml(player.id)}" aria-label="${escapeHtml(heldCardLabel(card))}${count > 1 ? `, ${count} Karten` : ''}">${count > 1 ? `<b class="klatschen-held-count" aria-hidden="true">${count}</b>` : ''}${effectIconMarkup(card.id)}</button>`
     })
   })
   const renderedPairs = new Set<string>()
@@ -192,12 +193,10 @@ function heldCardsMarkup() {
     if (renderedPairs.has(groupKey)) return
     renderedPairs.add(groupKey)
     const partnerNames = partners.map((partner) => partner.name).join(', ')
-    cards.push({ priority: effectCardPriority('partner-status'), markup: `<button type="button" class="klatschen-held-preview" data-klatschen-held="partner-status" data-klatschen-owner="${escapeHtml(player.id)}" aria-label="Blobb-Partner: ${escapeHtml(partnerNames)}"><b class="klatschen-held-count" aria-hidden="true">${partners.length}</b>${effectIconMarkup('clap-partner')}</button>` })
+    cards[effectCardPriority('partner-status')] = `<button type="button" class="klatschen-held-preview" data-klatschen-held="partner-status" data-klatschen-owner="${escapeHtml(player.id)}" aria-label="Blobb-Partner: ${escapeHtml(partnerNames)}"><b class="klatschen-held-count" aria-hidden="true">${partners.length}</b>${effectIconMarkup('clap-partner')}</button>`
   })
-  cards.sort((a, b) => a.priority - b.priority)
-  const content = cards.length
-    ? cards.map((card) => card.markup).join('')
-    : '<span class="klatschen-held-placeholder" aria-hidden="true"></span>'
+  const slotCardIds = ['nose-clapper-1', 'thumb-clapper-1', 'double-clap', 'clap-partner', 'question-rule']
+  const content = cards.map((card, index) => `<div class="klatschen-effect-slot${card ? ' is-filled' : ''}">${card ?? `<span class="klatschen-effect-placeholder" aria-hidden="true">${effectIconMarkup(slotCardIds[index]!)}</span>`}</div>`).join('')
   return `<section class="klatschen-held-cards" aria-label="Aktive Blobb-Karten und Zustände"><div>${content}</div></section>`
 }
 
@@ -578,7 +577,7 @@ function positionMiddleLayout() {
   const buttonTop = ((freeBottomTop + screenRect.bottom) / 2) - screenRect.top - (buttonHeight / 2) - (buttonHeight * .4)
   drawButton.style.top = `${buttonTop}px`
 
-  const effectCards = heldCards?.querySelectorAll<HTMLElement>('.klatschen-held-preview, .klatschen-held-placeholder')
+  const effectCards = heldCards?.querySelectorAll<HTMLElement>('.klatschen-effect-slot')
   const effectCardsBottom = effectCards?.length
     ? Math.max(...[...effectCards].map((card) => card.getBoundingClientRect().bottom))
     : heldCards?.getBoundingClientRect().bottom ?? screenRect.top
@@ -629,7 +628,7 @@ function positionNextButton() {
   const buttonTop = ((freeBottomTop + screenRect.bottom) / 2) - screenRect.top - (buttonHeight / 2) - (buttonHeight * .4)
   nextButton.style.top = `${buttonTop}px`
 
-  const effectCards = heldCards.querySelectorAll<HTMLElement>('.klatschen-held-preview, .klatschen-held-placeholder')
+  const effectCards = heldCards.querySelectorAll<HTMLElement>('.klatschen-effect-slot')
   const availableTop = effectCards.length
     ? Math.max(...[...effectCards].map((card) => card.getBoundingClientRect().bottom))
     : heldCards.getBoundingClientRect().bottom
