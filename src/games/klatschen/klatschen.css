@@ -1,9 +1,11 @@
 .klatschen-shell { --blobba-yellow: #dda15e; padding-bottom: clamp(8px, 2vh, 20px); }
+.klatschen-shell.is-finished { --blobben-end-frame-height: clamp(270px,36dvh,310px); --blobben-end-title-gap: clamp(10px,1.8dvh,18px); }
 .klatschen-global-rule { width: fit-content; max-width: 100%; margin: clamp(6px, 1.3vh, 12px) auto; padding: 5px 14px; border: 1px solid rgba(255,255,255,.12); border-radius: 999px; color: #e5ddf2; background: rgba(20,14,30,.42); font-size: clamp(.72rem, 2vw, .86rem); font-weight: 700; text-align: center; }
 .klatschen-stage { position: relative; flex: 1 1 auto; min-height: 0; overflow: hidden; }
 .klatschen-rule-screen,
 .klatschen-summary { display: flex; width: min(760px, 100%); height: 100%; margin: auto; padding: clamp(18px, 4vw, 42px); border: 1px solid rgba(255,255,255,.1); border-radius: 24px; flex-direction: column; align-items: center; justify-content: center; gap: clamp(16px, 3vh, 28px); color: #f8f5ff; background: rgba(31,25,44,.88); box-shadow: 0 24px 70px rgba(0,0,0,.28); text-align: center; }
-.klatschen-shell.is-finished .klatschen-summary { position: fixed; top: 50dvh; left: 50%; width: min(620px,calc(100vw - 2 * clamp(8px,3vw,36px))); height: clamp(336px,44dvh,376px); min-height: clamp(336px,44dvh,376px); margin: 0; padding: clamp(18px,4vw,36px); background: rgba(31,25,44,.9); transform: translate(-50%,-50%); }
+.klatschen-shell.is-finished .setup-title { position: fixed; top: calc(50dvh - var(--blobben-end-frame-height) / 2 - var(--blobben-end-title-gap)); left: 50%; transform: translate(-50%,-100%); }
+.klatschen-shell.is-finished .klatschen-summary { position: fixed; top: 50dvh; left: 50%; width: min(620px,calc(100vw - 2 * clamp(8px,3vw,36px))); height: var(--blobben-end-frame-height); min-height: var(--blobben-end-frame-height); margin: 0; padding: clamp(18px,4vw,36px); background: rgba(31,25,44,.9); transform: translate(-50%,-50%); }
 .klatschen-rule-screen h2 { max-width: 650px; margin: 0; font-size: clamp(1.5rem, 4.6vw, 2.7rem); }
 .klatschen-rule-screen > p:not(.eyebrow) { max-width: 620px; margin: 0; color: #d8d0e4; font-size: clamp(1.08rem, 3vw, 1.35rem); }
 .klatschen-rule-screen > p strong { color: var(--blobba-yellow); }
@@ -142,8 +144,9 @@
 .klatschen-summary-actions { display: grid; width: min(520px,100%); grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
 .klatschen-summary-actions .game-button { display: flex; width: 100%; height: 100%; min-width: 0; grid-column: auto; align-items: center; justify-content: center; }
 .klatschen-shell.is-finished .klatschen-summary-content { width: 100%; height: 100%; gap: 0; }
-.klatschen-shell.is-finished .klatschen-summary-message { width: min(520px,100%); margin-top: clamp(8px,2.2dvh,20px); gap: clamp(12px,1.8dvh,18px); }
+.klatschen-shell.is-finished .klatschen-summary-message { width: min(520px,100%); margin-top: clamp(4px,1dvh,10px); }
 .klatschen-shell.is-finished .klatschen-summary-message h2 { font-size: clamp(2.35rem,7vw,4.2rem); line-height: 1; }
+.klatschen-shell.is-finished .klatschen-summary-message p { position: absolute; top: 50%; left: 50%; margin: 0; transform: translate(-50%,-50%); }
 .klatschen-shell.is-finished .klatschen-summary-actions { margin-top: auto; margin-bottom: max(0px,calc((100% - 520px) / 2)); }
 
 @keyframes klatschen-draw {
