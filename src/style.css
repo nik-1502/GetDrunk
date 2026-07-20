@@ -239,7 +239,7 @@ body {
   grid-row: 1;
   justify-self: center;
   object-fit: contain;
-  transform: translateX(4px);
+  transform: translateX(0);
 }
 
 .busfahrer-button {
