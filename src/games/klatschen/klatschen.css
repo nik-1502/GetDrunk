@@ -74,13 +74,14 @@
 .klatschen-players-dialog { display: flex; width: min(560px,100%); max-height: 100%; padding: clamp(16px,4vw,28px); border: 2px solid rgba(255,255,255,.25); border-radius: 22px; box-sizing: border-box; flex-direction: column; gap: 14px; color: #fff; background: linear-gradient(145deg,#49346c,#251d33); box-shadow: 0 24px 70px rgba(0,0,0,.55); overflow: hidden; }
 .klatschen-players-dialog h2 { margin: 0; text-align: center; }
 .klatschen-player-card-table { display: flex; padding: 2px; flex-direction: column; gap: 12px; overflow: auto; }
-.klatschen-player-card-row { display: flex; width: 100%; padding: 12px; border: 1px solid rgba(255,255,255,.2); border-radius: 14px; box-sizing: border-box; flex-direction: column; gap: 10px; background: rgba(255,255,255,.055); }
-.klatschen-player-card-person { display: flex; min-width: 0; align-items: center; gap: 8px; }
-.klatschen-player-card-person .klatschen-avatar { width: 34px; height: 34px; flex: 0 0 34px; }
-.klatschen-player-card-person strong { overflow: hidden; color: #dda15e; font-size: clamp(1.12rem,3.8vw,1.4rem); line-height: 1.15; text-overflow: ellipsis; white-space: nowrap; }
-.klatschen-player-card-list { display: grid; width: 100%; min-width: 0; grid-template-columns: repeat(5,minmax(0,1fr)); gap: clamp(4px,1.2vw,8px); }
-.klatschen-player-card-list .klatschen-effect-slot { width: 100%; min-height: clamp(40px,10vw,52px); }
-.klatschen-player-card-list .klatschen-effect-icon { width: clamp(28px,7vw,40px); height: clamp(28px,7vw,40px); }
+.klatschen-player-card-row { display: flex; width: 100%; min-width: 0; padding: 12px; border: 1px solid rgba(255,255,255,.2); border-radius: 14px; box-sizing: border-box; align-items: center; gap: clamp(6px,1.5vw,10px); background: rgba(255,255,255,.055); }
+.klatschen-player-card-person { display: flex; min-width: 0; flex: 0 1 auto; align-items: center; gap: 8px; }
+.klatschen-player-card-person .klatschen-avatar { width: clamp(30px,8vw,34px); height: clamp(30px,8vw,34px); flex: 0 0 clamp(30px,8vw,34px); }
+.klatschen-player-card-person strong { min-width: 0; overflow: hidden; color: #dda15e; font-size: clamp(1.12rem,3.8vw,1.4rem); line-height: 1.15; text-overflow: ellipsis; white-space: nowrap; }
+.klatschen-player-card-list { display: flex; min-width: 0; margin-left: auto; align-items: center; flex: 0 1 auto; flex-wrap: nowrap; justify-content: flex-start; gap: clamp(2px,.9vw,6px); }
+.klatschen-player-card-list .klatschen-effect-slot { width: clamp(28px,7vw,40px); height: clamp(28px,7vw,40px); min-height: 0; flex: 0 1 clamp(28px,7vw,40px); }
+.klatschen-player-card-list .klatschen-effect-icon { width: clamp(22px,5.8vw,34px); height: clamp(22px,5.8vw,34px); }
+.klatschen-player-card-list .klatschen-held-count { top: 2px; right: 3px; font-size: clamp(.68rem,2.5vw,.86rem); }
 .klatschen-players-dialog > .game-button { width: min(220px,100%); min-height: 42px; margin-inline: auto; }
 
 .klatschen-drawn-card { --draw-radius: clamp(118px, min(29vw, 27dvh), 255px); position: absolute; left: 50%; top: 43%; z-index: 5; width: clamp(190px, min(50vw, 31dvh), 310px); aspect-ratio: 5 / 7; perspective: 1200px; transform: translate(-50%,-50%); }
