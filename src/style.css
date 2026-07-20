@@ -848,3 +848,31 @@ html.is-standalone #app > .setup-page > .setup-shell {
   .home-page .favorite-heart-button:active,
   .home-page .home-profile-button:active { transform: none; translate: none; }
 }
+
+/* Freundlicher, natürlicher Startseitenhintergrund ohne Neonwirkung */
+.home-page,
+html.is-standalone #app > .home-page {
+  background:
+    radial-gradient(ellipse 58% 36% at 18% 12%, rgba(255, 226, 235, .76) 0%, rgba(255, 238, 243, .42) 42%, transparent 74%),
+    radial-gradient(ellipse 54% 38% at 84% 24%, rgba(204, 231, 246, .80) 0%, rgba(222, 241, 250, .42) 46%, transparent 76%),
+    radial-gradient(ellipse 68% 42% at 50% 76%, rgba(212, 205, 237, .58) 0%, rgba(232, 226, 246, .30) 48%, transparent 78%),
+    linear-gradient(155deg, #f9f4ed 0%, #f6edf2 24%, #e8f2f7 52%, #dcecf4 74%, #e6e0f0 100%);
+  background-attachment: local;
+}
+
+.home-page::before {
+  position: fixed;
+  background:
+    radial-gradient(ellipse 20% 8% at 14% 28%, rgba(255, 255, 255, .42) 0 62%, transparent 68%),
+    radial-gradient(ellipse 25% 9% at 84% 38%, rgba(255, 255, 255, .36) 0 62%, transparent 69%),
+    radial-gradient(circle at 9% 76%, rgba(255, 255, 255, .32) 0 4px, transparent 5px),
+    radial-gradient(circle at 91% 68%, rgba(255, 255, 255, .28) 0 5px, transparent 6px);
+  opacity: 1;
+  filter: blur(.3px);
+}
+
+.home-page::after {
+  position: fixed;
+  background: radial-gradient(ellipse 92% 78% at 50% 45%, transparent 0%, rgba(83, 103, 125, .035) 74%, rgba(57, 72, 92, .08) 100%);
+  opacity: 1;
+}
