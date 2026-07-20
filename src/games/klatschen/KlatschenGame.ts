@@ -312,7 +312,7 @@ function renderCard() {
 }
 
 function renderFinished() {
-  return `<section class="klatschen-play-screen klatschen-summary"><div class="klatschen-summary-content"><div class="klatschen-summary-message"><h2>Ihr habt's überlebt.</h2><p>Nochmal oder Feierabend?</p></div><div class="klatschen-summary-actions"><button class="game-button primary ipad-pwa-end-button" data-klatschen-action="exit">Beenden</button><button class="game-button primary ipad-pwa-end-button" data-klatschen-action="restart">Neustarten</button></div></div></section>`
+  return `<section class="setup-panel setup-game-panel klatschen-summary"><div class="klatschen-summary-content"><div class="klatschen-summary-message"><h2>Spiel beendet</h2><p>Nochmal oder Feierabend?</p></div><div class="klatschen-summary-actions"><button class="game-button primary ipad-pwa-end-button" data-klatschen-action="exit">Beenden</button><button class="game-button primary ipad-pwa-end-button" data-klatschen-action="restart">Neustarten</button></div></div></section>`
 }
 
 function addDrinks(playerIndex: number, amount: number, includePartner = true) {
@@ -692,11 +692,13 @@ function render() {
   if (!root) return
   const content = state.phase === 'rule' || state.phase === 'turn' ? renderTurn() : state.phase === 'card' ? renderCard() : renderFinished()
   const isFinished = state.phase === 'finished'
-  const header = isFinished
-    ? '<header class="busfahrer-header klatschen-end-header"><div><h1>BLOBBEN</h1></div></header>'
-    : '<header class="busfahrer-header"><button class="back-button bus-back ipad-pwa-header-button" type="button" data-action="back">Beenden</button><div><p>BLOBBA präsentiert</p><h1>BLOBBEN</h1></div><button class="restart-button ipad-pwa-header-button" type="button" data-klatschen-action="restart">Neu starten</button></header>'
-  const globalRule = isFinished ? '' : '<div class="klatschen-global-rule">Sag nicht „trinken“ – sag „blobben“.</div>'
-  root.innerHTML = `<div class="busfahrer-shell klatschen-shell${isFinished ? ' is-finished' : ''}">${header}${globalRule}<div class="klatschen-stage">${content}</div></div>`
+  if (isFinished) {
+    root.innerHTML = `<div class="busfahrer-shell setup-shell klatschen-shell is-finished"><section class="setup-stage"><div class="setup-stack"><h1 class="setup-title">BLOBBEN</h1>${content}</div></section></div>`
+  } else {
+    const header = '<header class="busfahrer-header"><button class="back-button bus-back ipad-pwa-header-button" type="button" data-action="back">Beenden</button><div><p>BLOBBA präsentiert</p><h1>BLOBBEN</h1></div><button class="restart-button ipad-pwa-header-button" type="button" data-klatschen-action="restart">Neu starten</button></header>'
+    const globalRule = '<div class="klatschen-global-rule">Sag nicht „trinken“ – sag „blobben“.</div>'
+    root.innerHTML = `<div class="busfahrer-shell klatschen-shell">${header}${globalRule}<div class="klatschen-stage">${content}</div></div>`
+  }
   updateMiddleLayout()
   positionDrawAnimation()
   window.cancelAnimationFrame(layoutFrame ?? 0)
