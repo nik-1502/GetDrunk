@@ -312,8 +312,7 @@ function renderCard() {
 }
 
 function renderFinished() {
-  const sorted = [...state.players].sort((left, right) => right.drinks - left.drinks)
-  return `<section class="klatschen-summary"><h2>Alle Karten wurden gezogen</h2><div class="klatschen-stats">${sorted.map((player) => `<div>${avatarMarkup(player)}<strong class="player-name-color" ${playerNameColor(player)}>${escapeHtml(player.name)}</strong><span>${player.drinks} Schluck${player.drinks === 1 ? '' : 'e'}</span></div>`).join('')}</div><div class="klatschen-summary-actions"><button class="game-button primary ipad-pwa-end-button" data-klatschen-action="exit">Beenden</button><button class="game-button primary ipad-pwa-end-button" data-klatschen-action="restart">Neustarten</button></div></section>`
+  return `<section class="klatschen-summary"><div class="klatschen-summary-message"><h2>Ihr habt's überlebt.</h2><p>Nochmal oder Feierabend?</p></div><div class="klatschen-summary-actions"><button class="game-button primary ipad-pwa-end-button" data-klatschen-action="exit">Beenden</button><button class="game-button primary ipad-pwa-end-button" data-klatschen-action="restart">Neustarten</button></div></section>`
 }
 
 function addDrinks(playerIndex: number, amount: number, includePartner = true) {
