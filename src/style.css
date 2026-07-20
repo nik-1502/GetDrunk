@@ -852,7 +852,7 @@ html.is-standalone #app > .setup-page > .setup-shell {
 /* Freundlicher, natürlicher Startseitenhintergrund ohne Neonwirkung */
 .home-page,
 html.is-standalone #app > .home-page {
-  --home-sun-size: clamp(360px, 88vw, 760px);
+  --home-sun-size: clamp(280px, 62vw, 610px);
   background: #9ddcf7;
   background-attachment: local;
 }
@@ -875,21 +875,34 @@ html.is-standalone #app > .home-page {
   position: absolute;
   top: 50%;
   left: 50%;
-  z-index: 0;
+  z-index: 1;
   width: var(--home-sun-size);
   aspect-ratio: 1;
   transform: translate(-50%, -50%);
-  background:
-    url('./assets/background/blobba-sun.png') center / contain no-repeat,
-    radial-gradient(circle, rgba(255, 252, 210, .96) 0%, rgba(255, 233, 105, .72) 34%, rgba(255, 225, 80, .38) 52%, rgba(255, 239, 158, .15) 66%, transparent 76%);
+  background: url('./assets/background/blobba-sun.png') center / contain no-repeat;
   filter:
-    drop-shadow(0 0 22px rgba(255, 247, 183, .88))
-    drop-shadow(0 0 52px rgba(255, 232, 112, .58))
-    drop-shadow(0 0 88px rgba(255, 239, 153, .30));
+    drop-shadow(0 0 20px rgba(255, 251, 222, .68))
+    drop-shadow(0 0 48px rgba(255, 247, 211, .34))
+    drop-shadow(0 0 92px rgba(255, 250, 228, .18));
+  pointer-events: none;
+}
+
+.home-page .hero-header::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 0;
+  width: calc(var(--home-sun-size) * 1.65);
+  height: calc(var(--home-sun-size) * .96);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(ellipse, rgba(255, 253, 232, .58) 0%, rgba(255, 249, 220, .38) 34%, rgba(255, 248, 222, .20) 55%, rgba(255, 251, 235, .08) 70%, transparent 83%);
+  filter: blur(18px);
   pointer-events: none;
 }
 
 .home-page .hero-logo {
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
