@@ -92,7 +92,7 @@ function createState(setups: KlatschenPlayerSetup[]): KlatschenGameState {
   const deck = klatschenCards.filter((card) => card.id !== 'clap-partner').map((card) => card.id)
   deck.push(...Array.from({ length: partnerCardCount }, () => 'clap-partner'))
   return {
-    phase: 'rule',
+    phase: 'turn',
     players,
     currentPlayerIndex: 0,
     deck: shuffle(deck),
@@ -266,10 +266,6 @@ function playersDialogMarkup() {
     return `<section class="klatschen-player-card-row"><div class="klatschen-player-card-person">${avatarMarkup(player)}<strong class="player-name-color" ${playerNameColor(player)}>${escapeHtml(player.name)}</strong></div><div class="klatschen-player-card-list">${cards}</div></section>`
   }).join('')
   return `<div class="klatschen-players-backdrop" data-klatschen-action="close-players"><article class="klatschen-players-dialog" role="dialog" aria-modal="true" aria-labelledby="klatschen-players-title"><h2 id="klatschen-players-title">Mitspieler</h2><div class="klatschen-player-card-table">${rows}</div><button type="button" class="game-button primary" data-klatschen-action="close-players">Schließen</button></article></div>`
-}
-
-function renderRule() {
-  return `<section class="klatschen-rule-screen"><p class="eyebrow">Grundregel</p><h2>Ab jetzt darf das Wort „trinken“ nicht mehr gesagt werden.</h2><p>Stattdessen muss immer <strong>„blobben“</strong> gesagt werden.</p><button class="game-button primary" data-klatschen-action="start">Verstanden – Spiel starten</button></section>`
 }
 
 function renderTurn() {
@@ -489,15 +485,6 @@ function playDealSequence() {
   })
 }
 
-function startGameWithDeal() {
-  if (!canControl() || state.phase !== 'rule') return
-  dealAnimationActive = true
-  state.phase = 'turn'
-  render()
-  publish()
-  playDealSequence()
-}
-
 function handleClick(event: Event) {
   const target = event.target as HTMLElement
   if (target.classList.contains('klatschen-players-backdrop')) {
@@ -523,7 +510,6 @@ function handleClick(event: Event) {
   const action = button.dataset.klatschenAction
   if (action === 'players') { playSound('ui-click'); playersDialogOpen = true; render(); return }
   if (action === 'close-players') { playSound('ui-back'); playersDialogOpen = false; render(); return }
-  if (action === 'start') startGameWithDeal()
   if (action === 'draw') drawCard()
   if (action === 'next') nextTurn()
   if (action === 'choose-partner' && canControl() && state.phase === 'card' && state.currentCardId === 'clap-partner') {
@@ -705,7 +691,7 @@ function removeRevealedCardBack() {
 
 function render() {
   if (!root) return
-  const content = state.phase === 'rule' ? renderRule() : state.phase === 'turn' ? renderTurn() : state.phase === 'card' ? renderCard() : renderFinished()
+  const content = state.phase === 'rule' || state.phase === 'turn' ? renderTurn() : state.phase === 'card' ? renderCard() : renderFinished()
   root.innerHTML = `<div class="busfahrer-shell klatschen-shell"><header class="busfahrer-header"><button class="back-button bus-back ipad-pwa-header-button" type="button" data-action="back">Beenden</button><div><p>BLOBBA präsentiert</p><h1>BLOBBEN</h1></div><button class="restart-button ipad-pwa-header-button" type="button" data-klatschen-action="restart">Neu starten</button></header><div class="klatschen-global-rule">Sag nicht „trinken“ – sag „blobben“.</div><div class="klatschen-stage">${content}</div></div>`
   updateMiddleLayout()
   positionDrawAnimation()
@@ -754,8 +740,10 @@ export function mountKlatschen(target: HTMLElement, players: KlatschenPlayerSetu
   partnerGroupIdentityByPlayer.clear()
   nextPartnerGroupIndex = 0
   options = gameOptions
-  dealAnimationActive = false
   state = gameOptions.initialState ? structuredClone(gameOptions.initialState) : createState(players)
+  const shouldStartImmediately = !gameOptions.initialState || state.phase === 'rule'
+  if (state.phase === 'rule') state.phase = 'turn'
+  dealAnimationActive = shouldStartImmediately
   state.players.forEach((player) => {
     player.heldCards ??= []
     player.partnerIds ??= []
@@ -768,5 +756,6 @@ export function mountKlatschen(target: HTMLElement, players: KlatschenPlayerSetu
   root.addEventListener('click', handleClick)
   window.addEventListener('resize', updateMiddleLayout)
   render()
+  if (shouldStartImmediately) playDealSequence()
   return () => { window.clearTimeout(revealTimer); window.clearTimeout(dealTimer); window.cancelAnimationFrame(layoutFrame ?? 0); dealAudio.pause(); dealAudio.currentTime = 0; dealAnimationActive = false; root?.removeEventListener('click', handleClick); window.removeEventListener('resize', updateMiddleLayout); root = null; options = {} }
 }
