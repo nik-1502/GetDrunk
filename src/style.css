@@ -862,25 +862,22 @@ html.is-standalone #app > .setup-page > .setup-shell {
 html.is-standalone #app > .home-page {
   --home-sun-size: clamp(305px, 68vw, 670px);
   background:
-    linear-gradient(180deg,
-      #fff9d9 0%,
-      #fff1c2 25%,
-      #f5f4dd 43%,
-      #e6f7ff 65%,
-      #89d2f2 100%);
+    radial-gradient(ellipse 92% 58% at 50% 9%, rgba(255, 251, 174, .96) 0%, rgba(255, 235, 62, .72) 36%, rgba(255, 199, 35, .30) 68%, transparent 100%),
+    radial-gradient(ellipse 82% 45% at 50% 58%, rgba(255, 231, 47, .48) 0%, rgba(255, 186, 26, .24) 62%, transparent 100%),
+    linear-gradient(180deg, #fff6a8 0%, #ffe542 32%, #ffc62b 68%, #f5a51b 100%);
   background-attachment: local;
 }
 
 .home-page::before {
   position: fixed;
   background:
-    linear-gradient(109deg, transparent 20%, rgba(255, 255, 255, .22) 34%, transparent 48%),
-    linear-gradient(71deg, transparent 28%, rgba(255, 255, 255, .15) 40%, transparent 53%),
-    radial-gradient(ellipse 28% 9% at 16% 27%, rgba(255, 255, 255, .22), transparent 72%),
-    radial-gradient(ellipse 34% 10% at 79% 34%, rgba(255, 255, 255, .18), transparent 74%),
-    radial-gradient(ellipse 26% 8% at 48% 48%, rgba(255, 255, 255, .12), transparent 76%);
-  opacity: .58;
-  filter: blur(15px);
+    linear-gradient(107deg, transparent 22%, rgba(255, 255, 211, .20) 35%, transparent 48%),
+    linear-gradient(73deg, transparent 22%, rgba(255, 255, 211, .20) 35%, transparent 48%),
+    radial-gradient(ellipse 52% 22% at 50% 18%, rgba(255, 255, 211, .34), transparent 76%),
+    radial-gradient(ellipse 30% 12% at 22% 48%, rgba(255, 224, 54, .15), transparent 78%),
+    radial-gradient(ellipse 30% 12% at 78% 48%, rgba(255, 224, 54, .15), transparent 78%);
+  opacity: .62;
+  filter: blur(18px);
   -webkit-mask-image: none;
   mask-image: none;
 }
@@ -888,14 +885,14 @@ html.is-standalone #app > .home-page {
 .home-page::after {
   position: fixed;
   background:
-    radial-gradient(ellipse 42% 3% at 18% 83%, rgba(255, 255, 255, .20), transparent 72%),
-    radial-gradient(ellipse 48% 3% at 78% 90%, rgba(255, 255, 255, .16), transparent 74%),
-    radial-gradient(ellipse 35% 2.5% at 48% 96%, rgba(33, 161, 213, .14), transparent 76%),
-    linear-gradient(180deg, transparent 60%, rgba(25, 167, 219, .08) 100%);
-  opacity: .58;
-  filter: blur(10px);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 50%, #000 78%);
-  mask-image: linear-gradient(to bottom, transparent 50%, #000 78%);
+    radial-gradient(ellipse 44% 12% at 50% 30%, rgba(255, 249, 159, .22), transparent 76%),
+    radial-gradient(ellipse 36% 18% at 18% 76%, rgba(255, 190, 29, .16), transparent 78%),
+    radial-gradient(ellipse 36% 18% at 82% 76%, rgba(255, 190, 29, .16), transparent 78%),
+    linear-gradient(180deg, transparent 58%, rgba(229, 132, 14, .08) 100%);
+  opacity: .54;
+  filter: blur(14px);
+  -webkit-mask-image: none;
+  mask-image: none;
 }
 
 .home-page .hero-header::before {
