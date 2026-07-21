@@ -133,13 +133,13 @@ body {
 
 .home-settings-button {
   position: absolute;
-  top: calc(clamp(16px, 4vw, 40px) + 8px);
+  top: calc(clamp(16px, 4vw, 40px) + 2px);
   left: clamp(16px, 4vw, 40px);
 }
 
 .home-user-button {
   position: absolute;
-  top: calc(clamp(16px, 4vw, 40px) + 8px);
+  top: calc(clamp(16px, 4vw, 40px) + 2px);
   right: clamp(16px, 4vw, 40px);
 }
 
@@ -164,21 +164,21 @@ body {
 
   .home-settings-button,
   .home-user-button {
-    top: calc(env(safe-area-inset-top, 0px) + clamp(16px, 4vw, 40px) + 8px);
+    top: calc(env(safe-area-inset-top, 0px) + clamp(16px, 4vw, 40px) + 2px);
   }
 }
 
 @media (max-width: 620px) {
   html:not(.is-standalone) .home-settings-button,
   html:not(.is-standalone) .home-user-button {
-    top: calc(clamp(16px, 4vw, 40px) + 8px + 59px);
+    top: calc(clamp(16px, 4vw, 40px) + 2px + 59px);
   }
 }
 
 @media (min-width: 621px) and (max-width: 1366px) {
   html:not(.is-standalone) .home-settings-button,
   html:not(.is-standalone) .home-user-button {
-    top: calc(clamp(16px, 4vw, 40px) + 8px + 24px);
+    top: calc(clamp(16px, 4vw, 40px) + 2px + 24px);
   }
 }
 
@@ -716,20 +716,30 @@ html.is-standalone #app > .setup-page > .setup-shell {
 }
 
 .home-page .home-profile-button {
-  width: clamp(52px, 7vw, 60px);
-  height: clamp(52px, 7vw, 60px);
+  width: clamp(58px, 8vw, 68px);
+  height: clamp(58px, 8vw, 68px);
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 255, 255, .11), rgba(255, 255, 255, .02) 68%, transparent 72%);
-  box-shadow: 0 0 18px rgba(154, 86, 255, .13);
+  border: 1.5px solid rgba(255, 255, 255, .90);
+  background: linear-gradient(180deg, rgba(255, 122, 26, .25) 0%, rgba(247, 91, 4, .25) 50%, rgba(217, 74, 0, .25) 100%);
+  box-shadow:
+    0 7px 15px rgba(105, 35, 0, .42),
+    0 2px 4px rgba(105, 35, 0, .25),
+    inset 0 1px 1px rgba(255, 255, 255, .48),
+    inset 0 -2px 3px rgba(120, 35, 0, .30);
   transition: filter 160ms ease, background 160ms ease, box-shadow 160ms ease, transform 120ms ease;
 }
 
 .home-page .home-profile-button:hover,
 .home-page .home-profile-button:active {
-  background: radial-gradient(circle, rgba(255, 255, 255, .17), rgba(255, 255, 255, .03) 68%, transparent 72%);
+  background: linear-gradient(180deg, rgba(255, 132, 42, .30) 0%, rgba(247, 91, 4, .30) 50%, rgba(211, 68, 0, .30) 100%);
+  box-shadow:
+    0 8px 16px rgba(105, 35, 0, .44),
+    0 3px 5px rgba(105, 35, 0, .24),
+    inset 0 1px 1px rgba(255, 255, 255, .50),
+    inset 0 -2px 3px rgba(120, 35, 0, .30);
 }
 
-.home-page .home-profile-button:active { transform: scale(.96); }
+.home-page .home-profile-button:active { filter: brightness(.97); }
 
 .home-page .hero-header,
 .home-page .game-filters,
@@ -817,11 +827,25 @@ html.is-standalone #app > .setup-page > .setup-shell {
 
 .home-page .busfahrer-button {
   border-color: rgba(255, 255, 255, .58);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .18), 0 0 15px rgba(121, 99, 255, .22), 0 12px 28px rgba(0, 0, 0, .36);
+  box-shadow:
+    inset 0 3px 4px rgba(214, 246, 255, .58),
+    inset 0 -5px 7px rgba(0, 44, 118, .42),
+    inset 3px 0 4px rgba(86, 205, 255, .20),
+    inset -3px 0 4px rgba(0, 67, 155, .22),
+    0 0 15px rgba(121, 99, 255, .22),
+    0 12px 28px rgba(0, 0, 0, .36);
   transition: transform 150ms ease, box-shadow 160ms ease, filter 160ms ease;
 }
 
-.home-page .busfahrer-button:hover { transform: translateY(-4px); }
+.home-page .busfahrer-button:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    inset 0 3px 4px rgba(229, 250, 255, .66),
+    inset 0 -5px 7px rgba(0, 44, 118, .46),
+    inset 3px 0 4px rgba(86, 205, 255, .24),
+    inset -3px 0 4px rgba(0, 67, 155, .26),
+    0 16px 34px rgba(0, 38, 90, .34);
+}
 .home-page .busfahrer-button:active { transform: scale(.985); }
 
 .home-page .favorite-heart-button {
