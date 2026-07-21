@@ -945,4 +945,10 @@ html.is-standalone #app > .home-page {
 .home-page .hero-logo {
   position: relative;
   z-index: 2;
+  transform: translateY(-8px) scale(1.08);
+  filter:
+    saturate(1.24)
+    contrast(1.12)
+    brightness(.96)
+    drop-shadow(0 8px 14px rgba(0, 73, 168, .24));
 }
