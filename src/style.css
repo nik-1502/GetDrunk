@@ -958,7 +958,7 @@ html.is-standalone #app > .home-page {
     saturate(1.24)
     contrast(1.12)
     brightness(.96)
-    drop-shadow(0 0 1.6px rgba(0, 42, 105, .94))
-    drop-shadow(0 0 1.6px rgba(0, 42, 105, .72))
+    drop-shadow(0 0 2.4px rgba(0, 42, 105, .96))
+    drop-shadow(0 0 2.4px rgba(0, 42, 105, .78))
     drop-shadow(0 8px 14px rgba(0, 73, 168, .24));
 }
