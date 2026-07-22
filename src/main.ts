@@ -24,9 +24,9 @@ import {
   type OnlineMember,
 } from './online.ts'
 import type { Session } from '@supabase/supabase-js'
-import busfahrerGameImage from './assets/spielbild icons/91c70169-1e14-42c9-b836-6eacc3325af0.png'
-import blobbenGameImage from './assets/spielbild icons/55490394-9fa1-45b5-adba-ce8260738e69.png'
-import heroLogo from './assets/überschrift/ebe5baf7-8dca-44a0-a5bc-ba2f48425dc2.png'
+import busfahrerGameImage from './assets/spielbild icons/blobb-fahrer-cover-clean.png'
+import blobbenGameImage from './assets/spielbild icons/blobben-cover-clean.png'
+import heroLogo from './assets/überschrift/blobba-logo-clean.png'
 
 const app = document.querySelector<HTMLDivElement>('#app')!
 const PROFILE_STORAGE_KEY = 'blobba.profiles.v1'

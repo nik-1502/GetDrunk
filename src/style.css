@@ -276,9 +276,7 @@ body {
 
 .blobfahrer-home-button,
 .klatschen-home-button {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, .24) 0%, rgba(255, 255, 255, .05) 10%, transparent 24%),
-    linear-gradient(180deg, #12b9f5 0%, #079ee8 31%, #087ccc 66%, #0750aa 100%);
+  background: linear-gradient(180deg, var(--home-tile-blue-top), var(--home-tile-blue-bottom));
 }
 
 .busfahrer-button-label {
@@ -694,11 +692,15 @@ html.is-standalone #app > .setup-page > .setup-shell {
   --home-content-width: 820px;
   --home-control-radius: 20px;
   --home-glass-border: rgba(255, 255, 255, .90);
+  --home-orange-top-rgb: 255 116 24;
+  --home-orange-bottom-rgb: 223 77 2;
+  --home-tile-blue-top: #13aae9;
+  --home-tile-blue-bottom: #0871c7;
+  --home-tile-outline: #06458f;
   --home-glass-shadow:
-    0 6px 12px rgba(112, 40, 0, .38),
-    0 2px 4px rgba(112, 40, 0, .22),
-    inset 0 1px 1px rgba(255, 255, 255, .42),
-    inset 0 -2px 3px rgba(120, 35, 0, .28);
+    0 5px 10px rgba(112, 40, 0, .28),
+    inset 0 1px 0 rgba(255, 255, 255, .34),
+    inset 0 -1px 2px rgba(120, 35, 0, .18);
   padding-right: max(clamp(14px, 3.4vw, 48px), env(safe-area-inset-right, 0px));
   padding-bottom: calc(clamp(28px, 6vh, 64px) + env(safe-area-inset-bottom, 0px));
   padding-left: max(clamp(14px, 3.4vw, 48px), env(safe-area-inset-left, 0px));
@@ -719,23 +721,19 @@ html.is-standalone #app > .setup-page > .setup-shell {
   height: clamp(58px, 8vw, 68px);
   border-radius: 50%;
   border: 1.5px solid rgba(255, 255, 255, .90);
-  background: linear-gradient(180deg, rgba(255, 122, 26, .25) 0%, rgba(247, 91, 4, .25) 50%, rgba(217, 74, 0, .25) 100%);
+  background: linear-gradient(180deg, rgb(var(--home-orange-top-rgb) / .25), rgb(var(--home-orange-bottom-rgb) / .25));
   box-shadow:
-    0 7px 15px rgba(105, 35, 0, .42),
-    0 2px 4px rgba(105, 35, 0, .25),
-    inset 0 1px 1px rgba(255, 255, 255, .48),
-    inset 0 -2px 3px rgba(120, 35, 0, .30);
+    0 5px 11px rgba(105, 35, 0, .28),
+    inset 0 1px 0 rgba(255, 255, 255, .38);
   transition: filter 160ms ease, background 160ms ease, box-shadow 160ms ease, transform 120ms ease;
 }
 
 .home-page .home-profile-button:hover,
 .home-page .home-profile-button:active {
-  background: linear-gradient(180deg, rgba(255, 132, 42, .30) 0%, rgba(247, 91, 4, .30) 50%, rgba(211, 68, 0, .30) 100%);
+  background: linear-gradient(180deg, rgba(255, 126, 35, .30), rgba(218, 70, 0, .30));
   box-shadow:
-    0 8px 16px rgba(105, 35, 0, .44),
-    0 3px 5px rgba(105, 35, 0, .24),
-    inset 0 1px 1px rgba(255, 255, 255, .50),
-    inset 0 -2px 3px rgba(120, 35, 0, .30);
+    0 6px 12px rgba(105, 35, 0, .30),
+    inset 0 1px 0 rgba(255, 255, 255, .40);
 }
 
 .home-page .home-profile-button:active { filter: brightness(.97); }
@@ -748,7 +746,7 @@ html.is-standalone #app > .setup-page > .setup-shell {
 }
 
 .home-page .hero-logo {
-  filter: drop-shadow(0 0 16px rgba(255, 63, 172, .28)) drop-shadow(0 0 22px rgba(58, 112, 255, .22));
+  filter: drop-shadow(0 7px 11px rgba(0, 48, 122, .24));
   animation: home-logo-float 8s ease-in-out infinite;
 }
 
@@ -764,27 +762,26 @@ html.is-standalone #app > .setup-page > .setup-shell {
 .home-page .favorites-filter-button {
   border: 1.5px solid var(--home-glass-border);
   border-radius: var(--home-control-radius);
-  background: linear-gradient(180deg, rgba(255, 122, 26, .49) 0%, rgba(247, 91, 4, .49) 50%, rgba(217, 74, 0, .49) 100%);
+  background: linear-gradient(180deg, rgb(var(--home-orange-top-rgb) / .49), rgb(var(--home-orange-bottom-rgb) / .49));
   box-shadow: var(--home-glass-shadow);
 }
 
 .home-page .games-search-bar {
   border: 1.5px solid rgba(255, 255, 255, .90);
-  background: linear-gradient(180deg, rgba(255, 122, 26, .25) 0%, rgba(247, 91, 4, .25) 50%, rgba(217, 74, 0, .25) 100%);
+  background: linear-gradient(180deg, rgb(var(--home-orange-top-rgb) / .25), rgb(var(--home-orange-bottom-rgb) / .25));
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
   box-shadow:
-    0 7px 15px rgba(105, 35, 0, .42),
-    0 2px 4px rgba(105, 35, 0, .25),
-    inset 0 1px 1px rgba(255, 255, 255, .48),
-    inset 0 -2px 3px rgba(120, 35, 0, .30);
+    0 6px 12px rgba(105, 35, 0, .30),
+    inset 0 1px 0 rgba(255, 255, 255, .38),
+    inset 0 -1px 2px rgba(120, 35, 0, .18);
 }
 
 .home-page .game-search input::placeholder { color: rgba(255, 255, 255, .92); }
 
 .home-page .game-search:focus-within {
   border-color: rgba(255, 255, 255, .94);
-  box-shadow: inset 0 1px 0 rgba(255, 249, 205, .72), 0 0 0 3px rgba(255, 210, 74, .25), 0 0 24px rgba(181, 112, 8, .26), 0 10px 26px rgba(125, 79, 8, .17);
+  box-shadow: 0 0 0 2px rgba(255, 224, 133, .24), 0 7px 15px rgba(105, 35, 0, .28), inset 0 1px 0 rgba(255, 255, 255, .40);
 }
 
 .home-page .categories-filter-button,
@@ -806,7 +803,7 @@ html.is-standalone #app > .setup-page > .setup-shell {
 .home-page .categories-filter-button.is-active,
 .home-page .favorites-filter-button.is-active {
   border-color: rgba(255, 255, 255, .82);
-  background: linear-gradient(180deg, rgba(255, 131, 41, .49) 0%, rgba(247, 91, 4, .49) 50%, rgba(207, 66, 0, .49) 100%);
+  background: linear-gradient(180deg, rgba(255, 126, 35, .49), rgba(211, 67, 0, .49));
   box-shadow: var(--home-glass-shadow);
 }
 
@@ -819,45 +816,35 @@ html.is-standalone #app > .setup-page > .setup-shell {
   line-height: 1;
   letter-spacing: .02em;
   text-align: left;
-  text-shadow: 0 2px 12px rgba(0, 0, 0, .35), 0 0 16px rgba(255, 63, 159, .20);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, .28);
 }
 
 .home-page .game-list { gap: clamp(9px, 1.8vw, 16px); }
 
 .home-page .busfahrer-button {
-  border-color: rgba(4, 50, 133, .96);
+  border-color: var(--home-tile-outline);
   box-shadow:
-    inset 0 0 0 2px rgba(189, 241, 255, .72),
-    inset 0 5px 4px rgba(255, 255, 255, .82),
-    inset 0 -7px 9px rgba(0, 30, 91, .52),
-    inset 5px 0 6px rgba(128, 224, 255, .28),
-    inset -5px 0 6px rgba(0, 40, 116, .34),
-    0 0 9px rgba(71, 184, 244, .32),
-    0 8px 10px rgba(0, 42, 105, .52),
-    0 12px 19px rgba(0, 0, 0, .36);
+    inset 0 2px 0 rgba(218, 248, 255, .50),
+    0 7px 15px rgba(0, 45, 105, .30),
+    0 12px 22px rgba(46, 20, 3, .22);
   transition: transform 150ms ease, box-shadow 160ms ease, filter 160ms ease;
 }
 
 .home-page .busfahrer-button:hover {
   transform: translateY(-4px);
   box-shadow:
-    inset 0 0 0 2px rgba(207, 247, 255, .80),
-    inset 0 5px 4px rgba(255, 255, 255, .90),
-    inset 0 -7px 9px rgba(0, 38, 108, .52),
-    inset 5px 0 6px rgba(150, 233, 255, .34),
-    inset -5px 0 6px rgba(0, 55, 142, .34),
-    0 0 11px rgba(75, 193, 255, .38),
-    0 10px 12px rgba(0, 42, 105, .54),
-    0 15px 23px rgba(0, 35, 88, .36);
+    inset 0 2px 0 rgba(228, 251, 255, .58),
+    0 9px 17px rgba(0, 45, 105, .33),
+    0 15px 25px rgba(46, 20, 3, .24);
 }
 .home-page .busfahrer-button:active { transform: scale(.985); }
 
 .home-page .favorite-heart-button {
   width: 44px;
   height: 44px;
-  background: rgba(3, 7, 48, .58);
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .11), 0 4px 12px rgba(0, 0, 0, .25);
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .42));
+  background: rgba(5, 35, 93, .78);
+  box-shadow: 0 3px 8px rgba(0, 25, 70, .26);
+  filter: none;
   transition: transform 140ms ease, color 140ms ease, background 140ms ease;
 }
 
@@ -871,10 +858,9 @@ html.is-standalone #app > .setup-page > .setup-shell {
     filter: brightness(1.05);
     transform: translateY(-1px);
     box-shadow:
-      0 8px 16px rgba(112, 40, 0, .42),
-      0 3px 5px rgba(112, 40, 0, .24),
-      inset 0 1px 1px rgba(255, 255, 255, .46),
-      inset 0 -2px 3px rgba(120, 35, 0, .28);
+      0 7px 13px rgba(112, 40, 0, .30),
+      inset 0 1px 0 rgba(255, 255, 255, .40),
+      inset 0 -1px 2px rgba(120, 35, 0, .18);
   }
 }
 
@@ -914,7 +900,7 @@ html.is-standalone #app > .setup-page > .setup-shell {
 html.is-standalone #app > .home-page {
   --home-sun-size: clamp(305px, 68vw, 670px);
   background-color: #f75b04;
-  background-image: url('./assets/background/blobba-orange-comic-background.png');
+  background-image: url('./assets/background/blobba-background-clean.png');
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
@@ -958,13 +944,7 @@ html.is-standalone #app > .home-page {
   position: relative;
   z-index: 2;
   transform: translateY(-8px) scale(1.08);
-  filter:
-    saturate(1.24)
-    contrast(1.12)
-    brightness(.96)
-    drop-shadow(0 0 2.4px rgba(0, 42, 105, .96))
-    drop-shadow(0 0 2.4px rgba(0, 42, 105, .78))
-    drop-shadow(0 8px 14px rgba(0, 73, 168, .24));
+  filter: drop-shadow(0 7px 11px rgba(0, 48, 122, .24));
 }
 
 /* Installierte iOS-App: den sichtbaren Startseiteninhalt unter der Dynamic Island beginnen lassen. */
