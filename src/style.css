@@ -278,10 +278,10 @@ body {
 .klatschen-home-button {
   background: linear-gradient(
     180deg,
-    #36c9f7 0%,
-    #10afea 24%,
-    #079be0 62%,
-    #0575c5 100%
+    #29b9ee 0%,
+    #108edb 28%,
+    #086fc8 62%,
+    #06489f 100%
   );
 }
 
@@ -831,12 +831,12 @@ html.is-standalone #app > .setup-page > .setup-shell {
 .home-page .busfahrer-button {
   border-color: rgba(255, 255, 255, .58);
   box-shadow:
-    inset 0 4px 3px rgba(244, 253, 255, .78),
-    inset 0 -6px 8px rgba(0, 49, 126, .45),
-    inset 4px 0 5px rgba(136, 228, 255, .28),
-    inset -4px 0 5px rgba(0, 64, 151, .26),
-    0 0 0 1px rgba(191, 241, 255, .22),
-    0 0 15px rgba(74, 188, 255, .24),
+    inset 0 4px 3px rgba(244, 253, 255, .76),
+    inset 0 -6px 8px rgba(0, 31, 91, .48),
+    inset 4px 0 5px rgba(124, 218, 255, .26),
+    inset -4px 0 5px rgba(0, 42, 112, .30),
+    0 0 0 1px rgba(191, 241, 255, .24),
+    0 0 15px rgba(41, 130, 223, .25),
     0 12px 28px rgba(0, 0, 0, .36);
   transition: transform 150ms ease, box-shadow 160ms ease, filter 160ms ease;
 }
