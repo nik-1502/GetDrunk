@@ -353,6 +353,17 @@ html.is-ipad-standalone .busfahrer-page :is(.end-actions, .klatschen-summary-act
   line-height: 1;
 }
 
+.busfahrer-page .player-turn-screen > .player-turn-prompt {
+  order: initial;
+  margin: auto 0 0;
+  color: #fff;
+  font-size: clamp(1.25rem, 3.5dvh, 2.4rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
 .busfahrer-page .game-stage:has(.player-turn-wrap) {
   --question-hand-frame-height: clamp(62.9px, 12.75dvh, 107.1px);
   --question-frame-gap: clamp(8px, 3vw, 16px);
