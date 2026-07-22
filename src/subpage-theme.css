@@ -287,7 +287,10 @@ html.is-ipad-standalone .busfahrer-page :is(.end-actions, .klatschen-summary-act
   width: 100%;
   height: calc(79% + var(--player-turn-top-extension, 0px));
   min-height: 0;
-  padding: clamp(6.8px, 1.7dvh, 18.7px) clamp(10px, 3vw, 28px);
+  padding:
+    clamp(26px, 4.5dvh, 48px)
+    clamp(10px, 3vw, 28px)
+    clamp(6.8px, 1.7dvh, 18.7px);
   margin: 0;
   box-sizing: border-box;
   border: 1px solid var(--blobba-panel-border);
