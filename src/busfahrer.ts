@@ -248,7 +248,8 @@ function playerTargetAvatarMarkup(player: GamePlayer) {
 }
 
 function currentPlayerFooterMarkup() {
-  const isActiveGameScreen = phase === 'questions'
+  const isActiveGameScreen = phase === 'player-intro'
+    || phase === 'questions'
     || phase === 'bus'
     || (phase === 'pyramid' && pyramidDecision?.step !== 'target')
   if (!isActiveGameScreen) return ''
