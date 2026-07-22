@@ -960,12 +960,14 @@ html.is-standalone #app > .home-page {
 
 @media (max-width: 620px) and (display-mode: standalone) {
   .home-page {
-    padding-top: calc(76px + env(safe-area-inset-top, 0px));
+    --home-pwa-header-balance: clamp(24px, 3.3dvh, 30px);
+    padding-top: calc(76px + env(safe-area-inset-top, 0px) - var(--home-pwa-header-balance));
   }
 }
 
 @media (max-width: 620px) {
   html.is-standalone #app > .home-page {
-    padding-top: calc(76px + env(safe-area-inset-top, 0px));
+    --home-pwa-header-balance: clamp(24px, 3.3dvh, 30px);
+    padding-top: calc(76px + env(safe-area-inset-top, 0px) - var(--home-pwa-header-balance));
   }
 }
