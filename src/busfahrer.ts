@@ -237,7 +237,7 @@ function renderPlayerIntro() {
   const player = currentPlayer()
   const avatar = player.avatar ? `<img src="${player.avatar}" alt="Profilbild von ${escapeHtml(player.name)}">` : defaultProfileIconMarkup()
   const playerImage = `<span class="player-turn-avatar ${player.avatar ? '' : 'is-default'}" style="--avatar-ring:${player.avatarColor}">${avatar}</span>`
-  return `<div class="player-turn-wrap">${playerImage}<section class="player-turn-screen"><p>Spieler ${currentPlayerIndex + 1} von ${gamePlayers.length}</p><h2><strong class="turn-player-name player-name-color" ${playerNameColor(player)}>${escapeHtml(player.name)}</strong><span>ist dran</span></h2>
+  return `<div class="player-turn-wrap"><section class="player-turn-screen"><p class="player-turn-status">Spieler ${currentPlayerIndex + 1} ist dran</p>${playerImage}<h2><strong class="turn-player-name player-name-color" ${playerNameColor(player)}>${escapeHtml(player.name)}</strong></h2>
     <div class="player-turn-actions"><button class="game-button primary" data-action="start-player-round">Jetzt starten</button></div></section></div>`
 }
 

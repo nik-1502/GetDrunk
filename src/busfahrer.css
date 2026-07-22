@@ -607,13 +607,13 @@ html.is-ipad-standalone .game-button.primary.ipad-pwa-end-button {
   text-align: center;
   transform: none;
 }
-.player-turn-avatar { position: absolute; left: 50%; bottom: calc(var(--turn-frame-bottom-gap) + clamp(190px, 28dvh, 260px) + ((100% - var(--turn-frame-bottom-gap) - clamp(190px, 28dvh, 260px) - var(--turn-avatar-size)) / 2)); display: grid; width: var(--turn-avatar-size); height: var(--turn-avatar-size); aspect-ratio: 1; border: 0; place-items: center; flex: 0 0 auto; overflow: visible; isolation: isolate; background: transparent; box-shadow: none; transform: translateX(-50%); }
+.player-turn-avatar { position: relative; display: grid; width: var(--turn-avatar-size); height: var(--turn-avatar-size); aspect-ratio: 1; border: 0; place-items: center; flex: 0 0 auto; overflow: visible; isolation: isolate; background: transparent; box-shadow: none; transform: none; }
 .player-turn-avatar img { z-index: 0; display: block; width: 100%; height: 100%; aspect-ratio: 1; object-fit: contain; object-position: 50% 50%; transform: none; transform-origin: 50% 50%; }
-.player-turn-screen > p { order: 3; margin: clamp(28px, 6dvh, 48px) 0 0; color: #aaa1ba; font-size: .78rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
-.player-turn-screen h2 { display: grid; margin: 0 0 clamp(28px, 6dvh, 48px); color: #fff; gap: 4px; }
+.player-turn-screen > p { order: initial; margin: 0; color: #aaa1ba; font-size: .78rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.player-turn-screen h2 { display: grid; margin: 0; color: #fff; gap: 4px; }
 .turn-player-name { color: #dda15e; font-size: clamp(2.6rem, 11vw, 5.4rem); font-weight: 900; line-height: 1; }
 .player-turn-screen h2 > span { font-size: clamp(1.25rem, 4vw, 2rem); font-weight: 700; }
-.player-turn-actions { order: 2; display: grid; width: min(315px, 75%); grid-template-columns: 1fr; gap: 12px; }
+.player-turn-actions { order: initial; display: grid; width: min(315px, 75%); grid-template-columns: 1fr; gap: 12px; }
 .player-turn-actions .game-button { width: 100%; }
 
 @keyframes feedback-pop { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: scale(1); } }
