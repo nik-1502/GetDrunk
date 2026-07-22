@@ -570,7 +570,7 @@ html.is-ipad-standalone .game-button.primary.ipad-pwa-end-button {
   overflow: auto;
 }
 .game-summary-panel h2 { margin: 0; color: #fff; text-align: center; }
-.game-summary-panel > .game-button { display: flex; width: min(460px, 100%); height: var(--summary-action-height); min-height: var(--summary-action-height); align-items: center; justify-content: center; align-self: end; transform: translateY(clamp(68px, 10dvh, 96px)); }
+.game-summary-panel > .game-button { position: relative; top: clamp(68px, 10dvh, 96px); display: flex; width: min(460px, 100%); height: var(--summary-action-height); min-height: var(--summary-action-height); align-items: center; justify-content: center; align-self: end; transform: none; }
 .game-stats-table { width: min(620px, 100%); overflow: hidden; border: 1px solid rgba(255, 255, 255, .12); border-radius: 14px; background: rgba(0, 0, 0, .14); }
 .game-stats-head, .game-stats-row { display: grid; padding: 10px 12px; grid-template-columns: minmax(0, 1fr) 96px; align-items: center; gap: 8px; }
 .game-stats-head { color: #9e8bd0; font-size: .72rem; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
@@ -605,7 +605,7 @@ html.is-ipad-standalone .game-button.primary.ipad-pwa-end-button {
   justify-content: center;
   color: #f8f5ff;
   text-align: center;
-  transform: translateY(clamp(-92px, -10dvh, -52px));
+  transform: none;
 }
 .player-turn-avatar { position: absolute; left: 50%; bottom: calc(var(--turn-frame-bottom-gap) + clamp(190px, 28dvh, 260px) + ((100% - var(--turn-frame-bottom-gap) - clamp(190px, 28dvh, 260px) - var(--turn-avatar-size)) / 2)); display: grid; width: var(--turn-avatar-size); height: var(--turn-avatar-size); aspect-ratio: 1; border: 0; place-items: center; flex: 0 0 auto; overflow: visible; isolation: isolate; background: transparent; box-shadow: none; transform: translateX(-50%); }
 .player-turn-avatar img { z-index: 0; display: block; width: 100%; height: 100%; aspect-ratio: 1; object-fit: contain; object-position: 50% 50%; transform: none; transform-origin: 50% 50%; }
@@ -771,7 +771,7 @@ html.is-ipad-standalone .game-button.primary.ipad-pwa-end-button {
 .avatar-fieldset legend { margin-bottom: 12px; color: #d7d0e4; font-weight: 800; }
 .avatar-choice-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
 .avatar-choice { display: grid; min-width: 0; padding: 8px; border: 2px solid transparent; border-radius: 14px; color: #d9d2e7; background: rgba(255, 255, 255, .05); place-items: center; font: inherit; cursor: pointer; transition: border-color 150ms ease, background 150ms ease, transform 150ms ease; }
-.avatar-choice:hover { transform: translateY(-2px); background: rgba(255, 255, 255, .09); }
+.avatar-choice:hover { transform: none; background: rgba(255, 255, 255, .09); }
 .avatar-choice.is-selected { border-color: #a77cff; background: rgba(138, 92, 255, .2); box-shadow: 0 0 0 2px rgba(138, 92, 255, .16); }
 .avatar-choice.is-unavailable { filter: grayscale(1); cursor: not-allowed; opacity: .28; }
 .avatar-choice.is-unavailable:hover { transform: none; background: rgba(255, 255, 255, .05); }
@@ -824,7 +824,7 @@ html.is-ipad-standalone .game-button.primary.ipad-pwa-end-button {
 .sound-volume-row output { color: #d7d0e4; text-align: right; font-weight: 750; }
 .saved-profile-grid { display: grid; max-height: min(48dvh, 430px); margin-bottom: 18px; overflow: auto; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .saved-profile-card { display: grid; min-width: 0; padding: 16px 10px; border: 1px solid rgba(255, 255, 255, .12); border-radius: 16px; color: #fff; background: rgba(255, 255, 255, .05); place-items: center; gap: 7px; font: inherit; font-size: 1.08rem; cursor: pointer; transition: transform 150ms ease, border-color 150ms ease, background 150ms ease; }
-.saved-profile-card:hover { transform: translateY(-2px); border-color: #9d73ff; background: rgba(138, 92, 255, .14); }
+.saved-profile-card:hover { transform: none; border-color: #9d73ff; background: rgba(138, 92, 255, .14); }
 .saved-profile-card strong { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .saved-profile-card > span:last-child { color: #bdb4d2; font-size: .75rem; }
 .profile-empty-copy { grid-column: 1 / -1; margin: 12px 0 20px; color: #bdb4d2; }
@@ -1000,12 +1000,12 @@ html.is-standalone #app > .busfahrer-page.player-selection-page::after {
 
 .player-selection-page .game-button:hover:not(:disabled) {
   filter: brightness(1.06);
-  transform: translateY(-1px);
+  transform: none;
 }
 
 .player-selection-page .game-button:active:not(:disabled) {
   filter: brightness(.96);
-  transform: translateY(1px);
+  transform: scale(.985);
   box-shadow: 0 3px 8px rgba(65, 20, 0, .24), inset 0 2px 4px rgba(79, 22, 0, .24);
 }
 

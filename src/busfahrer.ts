@@ -429,13 +429,13 @@ function playerStatsMarkup() {
 function renderSummary(final = false) {
   const title = final ? finalResult : `${gamePlayers[busDriverIndex]!.name} ist BLOBB-FAHRER`
   return `${phaseHeader(final ? 3 : 2, final ? 'Endstand' : 'Auswertung')}<section class="game-summary-panel"><h2>${playerNameInText(title)}</h2>${playerStatsMarkup()}
-    <button class="game-button primary" data-action="${final ? 'restart' : 'start-bus'}">${final ? 'Neu starten' : 'Phase 3 starten'}</button></section>`
+    <button class="game-button primary${final ? ' blobba-nav-action' : ''}" data-action="${final ? 'restart' : 'start-bus'}">${final ? 'Neu starten' : 'Phase 3 starten'}</button></section>`
 }
 
 function renderBus() {
   if (busLost) {
     return `<section class="bus-panel lost-screen"><h2>Deck aufgebraucht – Verloren</h2>
-      <div class="end-actions"><button class="game-button ipad-pwa-end-button" data-action="restart">Erneut spielen</button><button class="game-button ipad-pwa-end-button" data-action="back">Spiel beenden</button></div>
+      <div class="end-actions"><button class="game-button blobba-nav-action ipad-pwa-end-button" data-action="restart">Erneut spielen</button><button class="game-button blobba-nav-action ipad-pwa-end-button" data-action="back">Spiel beenden</button></div>
     </section>`
   }
   const complete = busProgress === busCards.length
@@ -533,8 +533,8 @@ function renderGame() {
   if (!gameRoot) return
   const content = phase === 'player-intro' ? renderPlayerIntro() : phase === 'questions' ? renderQuestions() : phase === 'pyramid' ? renderPyramid() : phase === 'summary' ? renderSummary() : phase === 'final' ? renderSummary(true) : renderBus()
   gameRoot.innerHTML = `<div class="busfahrer-shell"><header class="busfahrer-header">
-    <button class="back-button bus-back ipad-pwa-header-button" type="button" data-action="back">Beenden</button><div><p>BLOBBA präsentiert</p><h1>BLOBB-FAHRER</h1></div>
-    <button class="restart-button ipad-pwa-header-button" type="button" data-action="restart">Neu starten</button></header>
+    <button class="back-button bus-back blobba-nav-action ipad-pwa-header-button" type="button" data-action="back">Beenden</button><div><p>BLOBBA präsentiert</p><h1>BLOBB-FAHRER</h1></div>
+    <button class="restart-button blobba-nav-action ipad-pwa-header-button" type="button" data-action="restart">Neu starten</button></header>
     <p class="responsibility-note">Trink verantwortungsvoll. Dieses Spiel ist nur für Erwachsene.</p><div class="game-stage">${content}${phase === 'bus' ? busUsedCardsMarkup() : ''}${currentPlayerFooterMarkup()}</div></div>`
   gameRoot.querySelector('.responsibility-note')?.remove()
   alignPyramidOfferChoices()
