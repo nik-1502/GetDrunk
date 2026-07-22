@@ -966,3 +966,26 @@ html.is-standalone #app > .home-page {
     drop-shadow(0 0 2.4px rgba(0, 42, 105, .78))
     drop-shadow(0 8px 14px rgba(0, 73, 168, .24));
 }
+
+/* Installierte iOS-App: den sichtbaren Startseiteninhalt unter der Dynamic Island beginnen lassen. */
+@media (display-mode: standalone) {
+  .home-page {
+    padding-top: calc(clamp(18px, 4vh, 40px) + env(safe-area-inset-top, 0px));
+  }
+}
+
+html.is-standalone #app > .home-page {
+  padding-top: calc(clamp(18px, 4vh, 40px) + env(safe-area-inset-top, 0px));
+}
+
+@media (max-width: 620px) and (display-mode: standalone) {
+  .home-page {
+    padding-top: calc(76px + env(safe-area-inset-top, 0px));
+  }
+}
+
+@media (max-width: 620px) {
+  html.is-standalone #app > .home-page {
+    padding-top: calc(76px + env(safe-area-inset-top, 0px));
+  }
+}
