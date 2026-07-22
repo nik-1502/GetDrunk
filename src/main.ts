@@ -24,6 +24,7 @@ import {
   type OnlineMember,
 } from './online.ts'
 import type { Session } from '@supabase/supabase-js'
+import './subpage-theme.css'
 import busfahrerGameImage from './assets/spielbild icons/blobb-fahrer-cover-clean.png'
 import blobbenGameImage from './assets/spielbild icons/blobben-cover-clean-v2.png'
 import heroLogo from './assets/überschrift/blobba-logo-clean-outlined.png'

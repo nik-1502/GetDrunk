@@ -1,0 +1,350 @@
+/*
+ * Shared visual system for every BLOBBA screen below .busfahrer-page.
+ * The home screen uses .home-page and is intentionally outside this scope.
+ */
+.busfahrer-page,
+.busfahrer-page.profile-page {
+  --blobba-orange-light: #ff922f;
+  --blobba-orange-main: #f75b04;
+  --blobba-orange-dark: #c83d00;
+  --blobba-water-light: #28baf2;
+  --blobba-water-main: #129add;
+  --blobba-water-dark: #0871c7;
+  --blobba-water-outline: #06458f;
+  --blobba-panel-bg: rgba(31, 27, 29, .9);
+  --blobba-panel-bg-soft: rgba(52, 43, 40, .78);
+  --blobba-panel-border: rgba(255, 255, 255, .22);
+  --blobba-panel-highlight: rgba(255, 255, 255, .08);
+  --blobba-text-main: #fff;
+  --blobba-text-muted: rgba(255, 245, 237, .76);
+  --blobba-success: #42bd78;
+  --blobba-danger: #c84343;
+  --blobba-warning: #f1ad30;
+  --blobba-radius-small: 11px;
+  --blobba-radius-medium: 16px;
+  --blobba-radius-large: 24px;
+  --blobba-shadow-soft: 0 8px 20px rgba(65, 20, 0, .2);
+  --blobba-shadow-panel: 0 24px 64px rgba(72, 21, 0, .3);
+  --blobba-shadow-button: 0 8px 18px rgba(0, 45, 105, .3);
+  min-height: 100svh;
+  min-height: 100dvh;
+  color: var(--blobba-text-main);
+  background-color: var(--blobba-orange-main);
+  background-image:
+    linear-gradient(rgba(0, 0, 0, .2), rgba(0, 0, 0, .2)),
+    url('./assets/background/blobba-background-clean.png');
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+.busfahrer-page::before,
+.busfahrer-page::after,
+.busfahrer-page.profile-page::before,
+.busfahrer-page.profile-page::after {
+  background: none;
+  opacity: 0;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+html.is-standalone #app > .busfahrer-page,
+html.is-standalone #app > .busfahrer-page.profile-page {
+  background-color: var(--blobba-orange-main);
+  background-image:
+    linear-gradient(rgba(0, 0, 0, .2), rgba(0, 0, 0, .2)),
+    url('./assets/background/blobba-background-clean.png');
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+html.is-standalone #app > .busfahrer-page::before,
+html.is-standalone #app > .busfahrer-page::after,
+html.is-standalone #app > .busfahrer-page.profile-page::before,
+html.is-standalone #app > .busfahrer-page.profile-page::after {
+  background: none;
+  opacity: 0;
+}
+
+/* Shared neutral panels; dimensions and game layouts stay in their source CSS. */
+.busfahrer-page:not(.player-selection-page) :is(
+  .setup-panel,
+  .question-panel,
+  .pyramid-panel,
+  .bus-panel,
+  .pyramid-target-screen,
+  .game-summary-panel,
+  .player-turn-screen,
+  .klatschen-rule-screen,
+  .klatschen-summary,
+  .klatschen-play-screen,
+  .klatschen-card-screen,
+  .klatschen-partner-target-screen
+) {
+  border-color: var(--blobba-panel-border);
+  color: var(--blobba-text-main);
+  background: linear-gradient(160deg, rgba(61, 51, 48, .9), var(--blobba-panel-bg));
+  box-shadow: var(--blobba-shadow-panel), inset 0 1px var(--blobba-panel-highlight);
+}
+
+.busfahrer-page :is(.player-hand, .used-cards, .game-stats-table, .klatschen-player-card-row) {
+  border-color: rgba(255, 255, 255, .18);
+  background: linear-gradient(145deg, rgba(61, 52, 49, .76), rgba(35, 30, 30, .82));
+  box-shadow: inset 0 1px rgba(255, 255, 255, .055);
+}
+
+.busfahrer-page :is(.game-stats-head, .player-edit-label, .setup-copy, .profile-empty-copy) {
+  color: var(--blobba-text-muted);
+}
+
+.busfahrer-page .game-stats-row.is-bus-driver {
+  background: rgba(18, 154, 221, .18);
+}
+
+.busfahrer-page .busfahrer-header p,
+.busfahrer-page .responsibility-note,
+.busfahrer-page .klatschen-rule-screen > p:not(.eyebrow),
+.busfahrer-page .klatschen-summary-message p {
+  color: var(--blobba-text-muted);
+}
+
+.busfahrer-page .klatschen-global-rule,
+.busfahrer-page .pyramid-offer-question {
+  border-color: rgba(255, 255, 255, .18);
+  color: #fff;
+  background: rgba(43, 36, 34, .76);
+  box-shadow: inset 0 1px rgba(255, 255, 255, .06);
+}
+
+.busfahrer-page .feedback-info {
+  color: #d8f2ff;
+  background: rgba(18, 154, 221, .16);
+}
+
+.busfahrer-page .progress-track {
+  background: rgba(26, 23, 24, .52);
+}
+
+.busfahrer-page .progress-track i {
+  background: linear-gradient(90deg, var(--blobba-water-main), var(--blobba-water-light));
+}
+
+/* Header actions follow the quiet glass treatment from player selection. */
+.busfahrer-page .back-button,
+.busfahrer-page .restart-button {
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid rgba(255, 255, 255, .76);
+  border-radius: 14px;
+  color: #fff;
+  background: linear-gradient(180deg, rgba(72, 61, 58, .86), rgba(38, 32, 31, .88));
+  box-shadow: var(--blobba-shadow-soft), inset 0 1px rgba(255, 255, 255, .13);
+}
+
+.busfahrer-page .restart-button {
+  border-color: rgba(255, 194, 120, .68);
+  background: linear-gradient(180deg, rgba(255, 137, 39, .9), rgba(196, 61, 0, .9));
+}
+
+/* Default buttons are secondary; primary continuation actions use card-water blue. */
+.busfahrer-page:not(.player-selection-page) .game-button {
+  border: 1px solid rgba(255, 255, 255, .25);
+  border-radius: 14px;
+  color: #fff;
+  background: linear-gradient(180deg, rgba(75, 63, 59, .94), rgba(42, 34, 33, .95));
+  box-shadow: 0 7px 16px rgba(22, 13, 10, .2), inset 0 1px rgba(255, 255, 255, .1);
+  transition: transform 150ms ease, filter 150ms ease, box-shadow 150ms ease;
+}
+
+.busfahrer-page:not(.player-selection-page) .game-button.primary {
+  border: 2px solid var(--blobba-water-outline);
+  color: #fff;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .16), transparent 32%),
+    linear-gradient(180deg, var(--blobba-water-light), var(--blobba-water-main) 48%, var(--blobba-water-dark));
+  box-shadow:
+    inset 0 2px rgba(255, 255, 255, .3),
+    inset 0 -3px rgba(0, 45, 105, .2),
+    var(--blobba-shadow-button);
+}
+
+.busfahrer-page:not(.player-selection-page) .game-button:hover:not(:disabled) {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+
+.busfahrer-page:not(.player-selection-page) .game-button:active:not(:disabled) {
+  filter: brightness(.97);
+  transform: scale(.98);
+  box-shadow: 0 3px 8px rgba(0, 38, 88, .25), inset 0 2px 4px rgba(0, 45, 105, .24);
+}
+
+/* Preserve semantic game choices instead of turning every choice blue. */
+.busfahrer-page .game-button:is(.choice-red, .choice-heart, .choice-diamond, .choice-higher, .choice-inside),
+.busfahrer-page .klatschen-cancel-remove {
+  border-color: #7f2435;
+  background: linear-gradient(180deg, #ce4961, #9e263f);
+}
+
+.busfahrer-page .game-button:is(.choice-blue, .choice-star, .choice-moon, .choice-lower, .choice-outside) {
+  border-color: var(--blobba-water-outline);
+  background: linear-gradient(180deg, #318ee0, #155daf);
+}
+
+.busfahrer-page .game-button.choice-equal {
+  border-color: #65418e;
+  background: linear-gradient(180deg, #9364bf, #69458f);
+}
+
+.busfahrer-page .klatschen-target.is-selected {
+  outline-color: var(--blobba-water-light);
+  background: rgba(18, 154, 221, .24);
+}
+
+.busfahrer-page:not(.player-selection-page) .end-actions .game-button[data-action='back'],
+.busfahrer-page:not(.player-selection-page) .game-button[data-klatschen-action='exit'] {
+  border-color: rgba(220, 83, 83, .7);
+  background: linear-gradient(180deg, rgba(111, 49, 47, .96), rgba(70, 31, 31, .98));
+  box-shadow: 0 8px 18px rgba(73, 15, 15, .25), inset 0 1px rgba(255, 255, 255, .08);
+}
+
+.busfahrer-page:not(.player-selection-page) .end-actions .game-button[data-action='restart'],
+.busfahrer-page:not(.player-selection-page) .game-button[data-klatschen-action='restart'] {
+  border-color: rgba(255, 211, 156, .72);
+  background: linear-gradient(180deg, var(--blobba-orange-light), var(--blobba-orange-main) 52%, var(--blobba-orange-dark));
+  box-shadow: 0 8px 18px rgba(101, 29, 0, .28), inset 0 1px rgba(255, 255, 255, .3);
+}
+
+/* Forms, profile, settings and auth. */
+.busfahrer-page :is(.player-entry-input, .setup-text-input, .profile-name-input, .player-entry-trigger) {
+  border-color: rgba(255, 255, 255, .22);
+  border-radius: var(--blobba-radius-small);
+  color: #fff;
+  background: rgba(24, 20, 20, .72);
+  caret-color: var(--blobba-water-light);
+}
+
+.busfahrer-page :is(.player-entry-input, .setup-text-input, .profile-name-input):focus {
+  border-color: var(--blobba-water-light);
+  box-shadow: 0 0 0 3px rgba(18, 154, 221, .25);
+}
+
+.busfahrer-page input:-webkit-autofill,
+.busfahrer-page input:-webkit-autofill:hover,
+.busfahrer-page input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #fff;
+  box-shadow: 0 0 0 1000px #211d1d inset;
+  transition: background-color 9999s ease-out;
+}
+
+.busfahrer-page .profile-name-label,
+.busfahrer-page .avatar-fieldset legend {
+  color: var(--blobba-text-muted);
+}
+
+.busfahrer-page .avatar-choice,
+.busfahrer-page .saved-profile-card {
+  border-color: rgba(255, 255, 255, .16);
+  color: #fff;
+  background: rgba(55, 47, 45, .74);
+}
+
+.busfahrer-page .avatar-choice:hover,
+.busfahrer-page .saved-profile-card:hover {
+  border-color: var(--blobba-water-light);
+  background: rgba(18, 154, 221, .12);
+}
+
+.busfahrer-page .avatar-choice.is-selected {
+  border-color: var(--blobba-water-light);
+  background: rgba(18, 154, 221, .2);
+  box-shadow: 0 0 0 2px rgba(18, 154, 221, .14);
+}
+
+.busfahrer-page .sound-toggle span {
+  border-color: rgba(255, 255, 255, .26);
+  background: rgba(55, 48, 46, .86);
+}
+
+.busfahrer-page .sound-toggle input:checked + span {
+  border-color: var(--blobba-water-light);
+  background: linear-gradient(90deg, var(--blobba-water-dark), var(--blobba-water-light));
+}
+
+.busfahrer-page .sound-toggle input:focus-visible + span {
+  outline: 3px solid rgba(40, 186, 242, .38);
+  outline-offset: 3px;
+}
+
+.busfahrer-page .sound-volume-row input {
+  accent-color: var(--blobba-water-main);
+}
+
+.busfahrer-page .sound-volume-row output {
+  color: var(--blobba-text-muted);
+}
+
+.busfahrer-page .player-remove,
+.busfahrer-page .profile-auth-button[data-auth-action='logout'] {
+  border-color: rgba(220, 83, 83, .56);
+  color: #ffd9d9;
+  background: rgba(91, 38, 38, .72);
+}
+
+/* Project-wide dialogs and overlays within subpages. */
+.busfahrer-page :is(.setup-modal-backdrop, .klatschen-held-dialog-backdrop, .klatschen-players-backdrop) {
+  background: rgba(48, 20, 10, .64);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
+}
+
+.busfahrer-page :is(.setup-modal, .klatschen-held-dialog, .klatschen-players-dialog) {
+  border-color: var(--blobba-panel-border);
+  color: #fff;
+  background: linear-gradient(160deg, rgba(63, 52, 48, .98), rgba(30, 26, 27, .98));
+  box-shadow: 0 28px 76px rgba(57, 15, 0, .44), inset 0 1px rgba(255, 255, 255, .07);
+}
+
+.busfahrer-page .klatschen-held-dialog p {
+  color: var(--blobba-text-muted);
+}
+
+.busfahrer-page .klatschen-partner-dialog-list > div {
+  border-color: rgba(255, 255, 255, .16);
+  background: rgba(255, 255, 255, .055);
+}
+
+.busfahrer-page :is(button, a, input, select, textarea):focus-visible {
+  outline: 3px solid rgba(207, 239, 255, .9);
+  outline-offset: 3px;
+}
+
+@media (max-width: 520px) {
+  .busfahrer-page:not(.player-selection-page) .setup-panel {
+    padding: 20px 16px;
+  }
+
+  .busfahrer-page :is(.setup-modal, .klatschen-held-dialog, .klatschen-players-dialog) {
+    max-width: 100%;
+    max-height: calc(100dvh - 32px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .busfahrer-page .game-button,
+  .busfahrer-page .back-button,
+  .busfahrer-page .restart-button,
+  .busfahrer-page .avatar-choice,
+  .busfahrer-page .saved-profile-card {
+    transition: none;
+  }
+
+  .busfahrer-page .game-button:hover,
+  .busfahrer-page .game-button:active {
+    transform: none;
+  }
+}
